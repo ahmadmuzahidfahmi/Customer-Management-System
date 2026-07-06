@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+/* Header improvements */
+nav {
+  font-family: 'Inter', sans-serif; /* clean modern font */
+  letter-spacing: 0.5px;            /* subtle spacing for readability */
+}
+
+nav a {
+  transition: color 0.2s ease, border-bottom 0.2s ease;
+  border-bottom: 2px solid transparent;
+}
+
+nav a:hover {
+  color: #e0e7ff;                   /* lighter indigo on hover */
+  border-bottom: 2px solid #e0e7ff; /* underline effect */
+}
+
+/* Footer improvements */
+footer {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  color: #4b5563; /* Tailwind gray-600 */
+}
+
+footer p {
+  margin: 0;
+  letter-spacing: 0.3px;
+}
+
+.nav-link {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.nav-link::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -5px;
+    left: 0;
+    background-color: white;
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+nav.hover-grow {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+nav.hover-grow:hover {
+    transform: scale(1.05);
+}
