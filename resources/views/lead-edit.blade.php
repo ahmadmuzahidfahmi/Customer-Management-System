@@ -1,6 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
+<head> 
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+
+</head>
 
 <h1 class="text-2xl font-bold mb-6">
     Edit Lead

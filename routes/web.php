@@ -83,6 +83,11 @@ Route::get(
     '/recycle-bin/lead/{id}',
     [LeadController::class, 'showDeleted']
 )->name('leads.trashed.show');
+
+Route::get('/leads/board', [LeadController::class, 'board'])->name('leads.board');
+
+Route::post('/leads/{lead}/move', [LeadController::class, 'move'])->name('leads.move');
+
 /*
 |--------------------------------------------------------------------------
 | Contacts
@@ -148,3 +153,4 @@ Route::get(
     '/recycle-bin/customer/{id}',
     [CustomerController::class, 'showDeleted']
 )->name('customers.trashed.show');
+

@@ -1,6 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
+<head> 
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+
+</head>
 
 <div class="flex items-center gap-2 mb-6">
     <h1 class="text-3xl font-bold text-gray-800">
