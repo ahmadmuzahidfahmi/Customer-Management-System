@@ -3,27 +3,29 @@ import Alpine from 'alpinejs';
 
 window.Alpine = Alpine;
 
-Alpine.data('searchDropdown', () => ({
-    query: '',
-    open: false,
-    filtered: [],
+window.searchDropdown = function (items = []) {
+    return {
+        query: '',
+        open: false,
+        filtered: [],
 
-    init() {
-        this.filtered = window.companyList || [];
-    },
+        init() {
+            this.filtered = items;
+        },
 
-    filterResults() {
-        const q = this.query.toLowerCase();
+        filterResults() {
+            const q = this.query.toLowerCase();
 
-        this.filtered = (window.companyList || []).filter(item =>
-            item.toLowerCase().includes(q)
-        );
-    },
+            this.filtered = items.filter(item =>
+                item.toLowerCase().includes(q)
+            );
+        },
 
-    select(item) {
-        this.query = item;
-        this.open = false;
-    }
-}));
+        select(item) {
+            this.query = item;
+            this.open = false;
+        }
+    };
+};
 
 Alpine.start();

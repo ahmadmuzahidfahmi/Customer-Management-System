@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Leads;
 use App\Models\Customer;
+use App\Models\User;
+
+
 
 use Illuminate\Database\Eloquent\Model;
 class LeadController extends Controller
@@ -15,6 +18,21 @@ public function index(Request $request)
 
     if ($request->filled('status')) {
         $query->where('Status', $request->status);
+    }
+        if ($request->filled('lead')) {
+        $query->where(
+            'Lead_Name',
+            'like',
+            '%' . $request->lead . '%'
+        );
+    }
+
+    if ($request->filled('source')) {
+        $query->where(
+            'Source',
+            'like',
+            '%' . $request->source . '%'
+        );
     }
 
     $leads = $query->paginate(10);
@@ -35,8 +53,116 @@ public function index(Request $request)
 }
 public function show($id)
 {
-    $customer = Customer::findOrFail($id);
+    
+    $lead = Leads::findOrFail($id);
+    
 
-    return view('customer-view', compact('customer'));
+    return view('lead-view', compact('lead'));
+}
+
+public function create()
+{
+    $users = User::all(); // optional
+
+    $customers = Customer::orderBy('Company_Name')->get();
+
+    return view('lead-create', compact('users','customers'));
+}
+
+public function store(Request $request)
+{
+    
+    Leads::create([
+        'Lead_Name'  => $request->Lead_Name,
+        'Company_ID' => $request->Company_ID,
+        'Source'     => $request->Source,
+        'User_ID'    => $request->User_ID,
+        'Lead_Note'  => $request->Lead_Note,
+        'Status'     => $request->Status,
+        'Estimated_Value' => $request->Estimated_Value,
+    ]);
+
+    return redirect()
+        ->route('leads')
+        ->with('success', 'Lead created successfully.');
+} 
+
+public function edit($id)
+{
+    $lead = Leads::findOrFail($id);
+
+    $customers = Customer::orderBy('Company_Name')->get();
+
+    $users = User::all();
+
+    return view('lead-edit', compact(
+        'lead',
+        'customers',
+        'users'
+    ));
+}
+
+public function update(Request $request, $id)
+{
+    $lead = Leads::findOrFail($id);
+
+    $lead->update([
+        'Lead_Name'  => $request->Lead_Name,
+        'Company_ID' => $request->Company_ID,
+        'Source'     => $request->Source,
+        'User_ID'    => $request->User_ID,
+        'Status'     => $request->Status,
+        'Lead_Note'  => $request->Lead_Note,
+
+    ]);
+
+    return redirect()
+        ->route('leads.show', $lead->Lead_ID)
+        ->with('success', 'Lead updated successfully.');
+}
+
+public function destroy($id)
+{
+    $lead = Leads::findOrFail($id);
+
+    $lead->delete();
+
+    return redirect()
+        ->route('leads')
+        ->with('success', 'Lead moved to Recycle Bin.');
+}
+
+
+public function restore($id)
+{
+    $lead = Leads::onlyTrashed()
+        ->where('Lead_ID', $id)
+        ->firstOrFail();
+
+    $lead->restore();
+
+    return back()
+        ->with('success', 'Lead restored successfully.');
+}
+
+public function forceDelete($id)
+{
+    $lead = Leads::onlyTrashed()
+        ->where('Lead_ID', $id)
+        ->firstOrFail();
+
+    $lead->forceDelete();
+
+    return back()
+        ->with('success', 'Lead permanently deleted.');
+}
+
+public function showDeleted($id)
+{
+    $lead = Leads::onlyTrashed()
+        ->where('Lead_ID', $id)
+        ->firstOrFail();
+
+    return view('lead-view', compact('lead'));
 }
 }

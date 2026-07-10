@@ -120,7 +120,6 @@
         <!-- Status (always visible) -->
         <th class="px-6 py-3">Status</th>
 
-
         <!-- Actions (always visible) -->
         <th class="px-6 py-3">Actions</th>
     </tr>
