@@ -1,12 +1,13 @@
+@extends('layouts.app')
+
+@section('content')
 <head> 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 
 </head>
-@extends('layouts.app')
 
-@section('content')
 <div class="flex justify-between items-center mb-6">
     <h1 class="text-2xl font-bold text-gray-800">Customers</h1>
 
@@ -21,77 +22,7 @@
     window.companyList = @json(\App\Models\Customer::pluck('company_name')->unique()->values());
 </script>
 
-    <form method="GET" action="{{ route('customers') }}"
-          class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
 
-        <!-- Company Search (with dropdown suggestions) -->
-        <div class="relative" x-data="searchDropdown()">
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-               Search Company
-            </label>
-            
-            <input
-                type="text"
-                name="company"
-                placeholder="Type company name..."
-                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500"
-                x-model="query"
-                @input="filterResults()"
-                @focus="open = true"
-                @click.away="open = false"
-                autocomplete="off"
-            >
-
-            <!-- Dropdown -->
-            <div
-                x-show="open && filtered.length > 0"
-                class="absolute z-50 bg-white border w-full mt-1 rounded-lg shadow-lg"
-            >
-                <template x-for="item in filtered" :key="item">
-                    <div
-                        class="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                        @click="select(item)"
-                        x-text="item"
-                    ></div>
-                </template>
-            </div>
-        </div>
-
-        <!-- Status Filter -->
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-                Status
-            </label>
-
-            <select
-                name="status"
-                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500"
-            >
-                <option value="">All Statuses</option>
-                <option value="Active">Active</option>
-                <option value="Lead">Lead</option>
-                <option value="Inactive">Inactive</option>
-            </select>
-        </div>
-
-        <!-- Buttons -->
-        <div class="flex items-end gap-2">
-
-            <button
-                type="submit"
-                class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700">
-                Search
-            </button>
-
-            <a href="{{ route('customers') }}"
-               class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
-                Reset
-            </a>
-
-        </div>
-
-    </form>
-</div>
 
 <!-- Customer Table -->
 <div class="bg-white rounded-lg shadow overflow-hidden">

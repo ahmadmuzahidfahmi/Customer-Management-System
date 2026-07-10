@@ -1,11 +1,13 @@
+@extends('layouts.app')
+
+@section('content')
+
 <head> 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 
-@extends('layouts.app')
 
-@section('content')
 
 <div class="flex justify-between items-center mb-6">
 

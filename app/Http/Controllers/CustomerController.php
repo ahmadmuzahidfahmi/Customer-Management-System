@@ -17,17 +17,27 @@ public function index(Request $request)
 {
     $query = Customer::query();
 
-    // Filter by company
+    // Header search bar — searches across multiple fields at once
+    if ($request->filled('search')) {
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+            $q->where('Company_Name', 'like', '%' . $search . '%')
+              ->orWhere('Status', 'like', '%' . $search . '%')
+              ->orWhere('Company_Email', 'like', '%' . $search . '%')
+              ->orWhere('Company_No', 'like', '%' . $search . '%');
+        });
+    }
+
+    // Reserved for the future filter panel (applied on top of search, not instead of it)
     if ($request->filled('company')) {
-        $query->where('company_name', 'like', '%' . $request->company . '%');
+        $query->where('Company_Name', 'like', '%' . $request->company . '%');
     }
 
-    // Filter by status
     if ($request->filled('status')) {
-        $query->where('status', $request->status);
+        $query->where('Status', $request->status);
     }
 
-    // Final result (with pagination)
     $customers = $query->paginate(10);
 
     return view('customers', compact('customers'));
@@ -136,4 +146,6 @@ public function showDeleted($id)
 
     return view('customer-view', compact('customer'));
 }
+
+
 }

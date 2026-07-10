@@ -5,7 +5,7 @@
     <title>Customer Management System</title>
 
     <link rel="icon" type="image/png" 
-        href="{{ asset('image/visivest Logo.png') }}">
+        href="{{ asset('image/WSC_logo_head.png') }}">
    
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -34,23 +34,67 @@
 
         </div>
 
-        <!-- Right -->
-        <a href="{{ route('profile') }}"
-           class="flex items-center gap-3 hover-grow">
+        <!-- Middle - search bar -->
 
-            <div class="text-right hidden sm:block">
-                <p class="font-semibold">Admin</p>
-                <p class="text-xs text-indigo-200">
-                    System Manager
-                </p>
-            </div>
+    @unless(request()->routeIs('dashboard'))
+    <div class="flex-1 max-w-xl mx-6 hidden md:flex items-center gap-2"
+         x-data="{ filterOpen: false }">
 
-            <div
-                class="w-10 h-10 rounded-full bg-white text-indigo-700 flex items-center justify-center font-bold">
-                A
-            </div>
+        <form method="GET" action="{{ url()->current() }}" class="flex-1 relative">
+            <input
+                type="text"
+                name="search"
+                value="{{ request('search') }}"
+                placeholder="@if(request()->routeIs('customers'))Search customers by name, status...@elseif(request()->routeIs('leads'))Search leads by name, source...@elseif(request()->routeIs('contacts'))Search contacts by name, email...@else Search...@endif"
+                class="w-full rounded-lg pl-10 pr-3 py-2 text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-white">
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+        </form>
 
-        </a>
+<div class="relative flex items-center gap-2">
+    <button
+        @click="filterOpen = !filterOpen"
+        type="button"
+        class="flex items-center gap-1 bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg text-sm whitespace-nowrap">
+        ⚙️ Filters
+    </button>
+
+    <a href="{{ url()->current() }}"
+       class="flex items-center gap-1 bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg text-sm whitespace-nowrap">
+        ✕ Reset
+    </a>
+
+    <div
+        x-show="filterOpen"
+        @click.away="filterOpen = false"
+        x-cloak
+        class="absolute right-0 top-full mt-2 w-64 bg-white text-gray-800 rounded-lg shadow-lg p-4 z-50 space-y-2">
+
+        @if(request()->routeIs('customers'))
+            <p class="text-sm text-gray-500">Customer filters (status, industry...) — coming soon</p>
+        @elseif(request()->routeIs('leads'))
+            <p class="text-sm text-gray-500">Lead filters (source, status...) — coming soon</p>
+        @elseif(request()->routeIs('contacts'))
+            <p class="text-sm text-gray-500">Contact filters (role, company...) — coming soon</p>
+        @else
+            <p class="text-sm text-gray-500">No filters for this page</p>
+        @endif
+
+    </div>
+</div>
+
+    </div>
+    @endunless
+
+    <!-- Right -->
+    <a href="{{ route('profile') }}" class="flex items-center gap-3 hover-grow">
+        <div class="text-right hidden sm:block">
+            <p class="font-semibold">Admin</p>
+            <p class="text-xs text-indigo-200">System Manager</p>
+        </div>
+        <div class="w-10 h-10 rounded-full bg-white text-indigo-700 flex items-center justify-center font-bold">A</div>
+    </a>
+
+</div>
 
     </div>
 

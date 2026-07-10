@@ -12,27 +12,29 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 class LeadController extends Controller
 {
-public function index(Request $request)
+
+    public function index(Request $request)
 {
     $query = Leads::query();
 
-    if ($request->filled('status')) {
-        $query->where('Status', $request->status);
-    }
-        if ($request->filled('lead')) {
-        $query->where(
-            'Lead_Name',
-            'like',
-            '%' . $request->lead . '%'
-        );
+    // Header search bar — searches across multiple fields at once
+    if ($request->filled('search')) {
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+            $q->where('Lead_Name', 'like', '%' . $search . '%')
+            ->orWhere('Status', 'like', '%' . $search . '%')
+              ->orWhere('Source', 'like', '%' . $search . '%');
+        });
     }
 
-    if ($request->filled('source')) {
-        $query->where(
-            'Source',
-            'like',
-            '%' . $request->source . '%'
-        );
+    // Reserved for the future filter panel (applied on top of search, not instead of it)
+    if ($request->filled('lead')) {
+        $query->where('Lead_Name', 'like', '%' . $request->lead . '%');
+    }
+
+    if ($request->filled('status')) {
+        $query->where('Status', $request->status);
     }
 
     $leads = $query->paginate(10);
@@ -43,7 +45,7 @@ public function index(Request $request)
     $contactedLeads = Leads::where('Status', 'Contacted')->count();
     $wonLeads = Leads::where('Status', 'Won')->count();
 
-    return view('leads', compact(
+        return view('leads', compact(
         'leads',
         'totalLeads',
         'newLeads',
@@ -51,6 +53,8 @@ public function index(Request $request)
         'wonLeads'
     ));
 }
+
+
 public function show($id)
 {
     

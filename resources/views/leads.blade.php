@@ -1,3 +1,7 @@
+@extends('layouts.app')
+
+@section('content')
+
 <script>
     window.leadList = @json(
         \App\Models\Leads::pluck('Lead_Name')->unique()->values()
@@ -14,10 +18,6 @@
 
 
 </head>
-@extends('layouts.app')
-
-@section('content')
-
 
 <div class="flex justify-between items-center mb-6">
     <h1 class="text-2xl font-bold text-gray-800">Leads</h1>
@@ -168,8 +168,6 @@
             {{ $wonLeads }}
         </p>
     </div>
-
-</div>
 
 </div>
 

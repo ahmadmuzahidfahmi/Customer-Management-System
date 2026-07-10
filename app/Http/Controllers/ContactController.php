@@ -11,34 +11,36 @@ use App\Models\Customer;
 
 class ContactController extends Controller
 {
-public function index(Request $request)
+    public function index(Request $request)
 {
-    $query = Contact::query();
+    $query = contact::query();
 
-    if ($request->filled('contact')) {
-        $query->where(
-            'Contact_Name',
-            'like',
-            '%' . $request->contact . '%'
-        );
+    // Header search bar — searches across multiple fields at once
+    if ($request->filled('search')) {
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+            $q->where('Contact_Name', 'like', '%' . $search . '%')
+              ->orWhere('Contact_Email', 'like', '%' . $search . '%')
+              ->orWhere('Contact_Role', 'like', '%' . $search . '%')
+              ->orWhere('Contact_No', 'like', '%' . $search . '%');
+        });
     }
 
-    if ($request->filled('company')) {
+    // Reserved for the future filter panel (applied on top of search, not instead of it)
+    if ($request->filled('contact')) {
+        $query->where('Contact_Name', 'like', '%' . $request->company . '%');
+    }
 
-        $query->whereHas('company', function ($q) use ($request) {
-            $q->where(
-                'Company_Name',
-                'like',
-                '%' . $request->company . '%'
-            );
-        });
-
+    if ($request->filled('status')) {
+        $query->where('Status', $request->status);
     }
 
     $contacts = $query->paginate(10);
 
     return view('contacts', compact('contacts'));
 }
+
 public function show($id)
 {
     $contact = Contact::findOrFail($id);
