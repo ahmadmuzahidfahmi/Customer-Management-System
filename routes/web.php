@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\NoteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -154,3 +155,7 @@ Route::get(
     [CustomerController::class, 'showDeleted']
 )->name('customers.trashed.show');
 
+// Note 
+Route::post('/notes', [NoteController::class, 'store'])->name('notes.store');
+Route::delete('/notes/{id}', [NoteController::class, 'destroy'])->name('notes.destroy');
+Route::put('/notes/{id}', [NoteController::class, 'update'])->name('notes.update');

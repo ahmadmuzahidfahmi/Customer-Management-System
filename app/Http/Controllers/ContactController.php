@@ -64,7 +64,6 @@ public function store(Request $request)
         'Contact_No' => $request->Contact_No,
         'Company_ID' => $request->Company_ID,
         'Contact_Role' => $request->Contact_Role,
-        'Contact_Note' => $request->Contact_Note,
         'Country_Code' => $request->Country_Code,
     ]);
 

@@ -131,17 +131,11 @@
     </div>
 
     <!-- Notes -->
-    <div class="bg-white rounded-lg shadow p-6">
-
-        <h2 class="text-lg font-semibold mb-4">
-            Notes
-        </h2>
-
-        <p class="text-gray-700">
-            {{ $lead->Lead_Note ?? 'No notes available.' }}
-        </p>
-
-    </div>
+    @include('partials.notes', [
+        'notes' => $lead->notes,
+        'ownerField' => 'Lead_ID',
+        'ownerId' => $lead->Lead_ID,
+    ])
 
 </div>
 

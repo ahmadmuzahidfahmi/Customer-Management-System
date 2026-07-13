@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\models\Note;
+
 
 class Leads extends Model
 {
@@ -35,4 +37,8 @@ public function user()
     );
 }
 
+public function notes()
+{
+    return $this->hasMany(Note::class, 'Lead_ID', 'Lead_ID')->latest('Created_At');
+}
 }

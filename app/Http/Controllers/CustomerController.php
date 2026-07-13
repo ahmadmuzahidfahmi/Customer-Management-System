@@ -8,6 +8,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\Customer;
 use App\Models\Contact;
 use App\Models\Leads;
+use App\Models\Note;
 
 
 
@@ -54,7 +55,6 @@ public function store(Request $request)
         'Company_Email' => $request->Company_Email,
         'Company_No' => $request->Country_Code . $request->Company_No,
         'Status' => $request->Status,
-        'Company_Note' => $request->Company_Note,
     ]);
 
     return redirect()
@@ -65,7 +65,7 @@ public function store(Request $request)
 
 public function show($id)
 {
-    $customer = Customer::with('leads')->findOrFail($id);
+    $customer = Customer::with('leads', 'contacts')->findOrFail($id);
 
     return view('customer-view', compact('customer'));
 
@@ -91,7 +91,6 @@ public function update(Request $request, $id)
         'Company_Email' => $request->Company_Email,
         'Company_No'    => $request->Company_No,
         'Status'        => $request->Status,
-        'Company_Note'  => $request->Company_Note,
     ]);
 
     return redirect()
@@ -147,5 +146,9 @@ public function showDeleted($id)
     return view('customer-view', compact('customer'));
 }
 
+public function notes()
+{
+    return $this->hasMany(Note::class, 'Customer_ID', 'Company_ID')->latest('Created_At');
+}
 
 }

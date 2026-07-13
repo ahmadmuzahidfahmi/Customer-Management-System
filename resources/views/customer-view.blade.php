@@ -21,7 +21,6 @@
             </p>
         </div>
 
-    </form>
 
 <div class="flex gap-2">
     <a href="{{ route('customers.edit', $customer->Company_ID) }}"
@@ -89,20 +88,13 @@
                         </span>
                     @endif
             </div>
-             <!-- Company Note -->
-            <div>
-                <p class="text-sm text-gray-500">Note</p>
-                <p>{{ $customer->Company_Note }}</p>
-            </div>
 
         </div>
 
     </div>
-
     </div>
 
-</div>
-
+    <!-- Contacts -->
 <div class="bg-white rounded-lg shadow p-6 mt-6">
 
     <h2 class="text-lg font-semibold text-gray-800 mb-4">
@@ -155,6 +147,15 @@
     @endforelse
 
 </div>
+
+<!-- Notes -->
+
+<!-- Company Note -->
+@include('partials.notes', [
+    'notes' => $customer->notes()->latest('Created_At')->get(),
+    'ownerField' => 'Company_ID',
+    'ownerId' => $customer->Company_ID,
+])
 
   <!-- Company Lead -->
 <div class="bg-white rounded-lg shadow p-6 mt-6">
@@ -256,12 +257,6 @@
     @endif
 
 </div>
-
-    </div>
-
-</div>
-
-
 
 <div class ="bg-white rounded-lg shadow p-6 mt-6">
     <h2 class="text-lg font-semibold text-gray-800">

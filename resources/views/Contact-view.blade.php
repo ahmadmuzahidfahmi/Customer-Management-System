@@ -93,6 +93,14 @@
 
     </div>
 
+    <!-- Note -->
+
+    @include('partials.notes', [
+    'notes' => $contact->notes()->latest('Created_At')->get(),
+    'ownerField' => 'Contact_ID',
+    'ownerId' => $contact->Contact_ID,
+])
+
     <!-- Company Information -->
 
 <div class="bg-white rounded-lg shadow p-6 mt-6">

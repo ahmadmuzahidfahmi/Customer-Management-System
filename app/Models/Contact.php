@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\models\Note;
+
 
 class Contact extends Model
 {
@@ -30,5 +32,9 @@ public function company()
     'Country_Code',
 ];
 
-   
+public function notes()
+{
+    return $this->hasMany(Note::class, 'Contact_ID', 'Contact_ID')->latest('Created_At');
+}
+
 }
