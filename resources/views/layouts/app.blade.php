@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Customer Management System</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">  
 
-    <link rel="icon" type="image/png" 
-        href="{{ asset('image/WSC_logo_head.png') }}">
-   
+    <link rel="icon" type="image/png" href="{{ asset('image/visivest Logo.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
@@ -15,9 +14,8 @@
     class="bg-gray-100"
     x-data="{ mobileMenu: false, sidebarOpen: JSON.parse(localStorage.getItem('sidebarOpen') ?? 'true') }"
     x-init="$watch('sidebarOpen', value => localStorage.setItem('sidebarOpen', JSON.stringify(value)))">
-    
-<nav class="bg-[rgb(70,192,189)] text-white shadow-lg">
 
+<nav class="sticky top-0 z-40 bg-[rgb(70,192,189)] text-white shadow-lg">
     <div class="flex items-center justify-between px-6 py-3">
 
         <!-- Left -->
@@ -64,7 +62,7 @@
         </form>
     @endif
 
-    <div class="relative flex items-center gap-2">
+    <div  class="relative flex items-center gap-2">
         <button
             @click="filterOpen = !filterOpen"
             type="button"
@@ -128,9 +126,9 @@
     <!-- Sidebar -->
 <aside
     :class="sidebarOpen ? 'w-72 translate-x-0' : 'w-0 -translate-x-full md:translate-x-0'"
-    class="fixed md:relative top-0 left-0 h-full md:h-auto md:self-stretch bg-white shadow-lg z-[50] transition-all duration-300 overflow-hidden">
+    class="fixed md:sticky top-0 md:top-[72px] left-0 h-full md:h-[calc(100vh-72px)] bg-white shadow-lg z-[50] transition-all duration-300 overflow-hidden">
 
-    <div class="flex flex-col h-full w-72">
+    <div class="flex flex-col h-full w-72 overflow-y-auto">
         <!-- Sidebar Header -->
         <div class="flex items-center justify-between p-5 border-b">
             <h2 class="font-bold text-gray-800">Navigation</h2>
@@ -138,7 +136,7 @@
         </div>
 
         <!-- Links -->
-        <div class="flex flex-col p-4 space-y-2">
+        <div class="flex flex-col p-4 space-y-1">
 
             <a href="{{ route('dashboard') }}"
                class="px-4 py-3 rounded-lg
@@ -146,23 +144,43 @@
                 Dashboard
             </a>
 
-            <a href="{{ route('customers') }}"
-               class="px-4 py-3 rounded-lg
-               {{ request()->routeIs('customers') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
-                Customers
-            </a>
+<!-- Customers -->
+<a href="{{ route('customers') }}"
+   class="px-4 py-3 rounded-lg
+   {{ request()->routeIs('customers*') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+    Customers
+</a>
 
-            <a href="{{ route('contacts') }}"
-               class="px-4 py-3 rounded-lg
-               {{ request()->routeIs('contacts') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
-                Contacts
-            </a>
+<!-- Contacts -->
+<a href="{{ route('contacts') }}"
+   class="px-4 py-3 rounded-lg
+   {{ request()->routeIs('contacts*') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+    Contacts
+</a>
 
-            <a href="{{ route('leads') }}"
-               class="px-4 py-3 rounded-lg
-               {{ request()->routeIs('leads') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
-                Leads
-            </a>
+<!-- Leads -->
+<div>
+    <a href="{{ route('leads') }}"
+       class="block px-4 py-3 rounded-lg
+       {{ request()->routeIs('leads') || request()->routeIs('leads.kanban') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+        Leads
+    </a>
+
+    @if(request()->routeIs('leads') || request()->routeIs('leads.kanban'))
+    <div class="ml-4 mt-1 space-y-1">
+        <a href="{{ route('leads') }}"
+           class="block px-4 py-2 rounded-lg text-sm
+           {{ request()->routeIs('leads') ? 'text-cyan-600 font-medium' : 'text-gray-600 hover:bg-gray-100' }}">
+            Table View
+        </a>
+        <a href="{{ route('leads.kanban') }}"
+           class="block px-4 py-2 rounded-lg text-sm
+           {{ request()->routeIs('leads.kanban') ? 'text-cyan-600 font-medium' : 'text-gray-600 hover:bg-gray-100' }}">
+            Board View
+        </a>
+    </div>
+    @endif
+</div>
 
             <a href="{{ route('recycle-bin') }}"
                class="px-4 py-3 rounded-lg
@@ -197,6 +215,7 @@
 
 </button>
         </div>
+            @stack('scripts')
 </body>
 </html>
 </nav>

@@ -21,8 +21,7 @@
 
 </div>
 
-<div class="bg-white rounded-lg shadow p-4 mb-6">
-
+<!-- Search method -->
     <script>
         window.contactList = @json(
             \App\Models\Contact::pluck('Contact_Name')
@@ -35,107 +34,7 @@
     );
 
     </script>
-        <form method="GET"
-          action="{{ route('contacts') }}"
-          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
-        <!-- Contact Search -->
-        <div class="relative" x-data="searchDropdown(window.contactList)">
-
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-                Search Contact
-            </label>
-
-            <input
-                type="text"
-                name="contact"
-                placeholder="Type contact name..."
-                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500"
-                x-model="query"
-                @input="filterResults()"
-                @focus="open = true"
-                @click.away="open = false"
-                autocomplete="off"
-            >
-
-            <div
-                x-show="open && filtered.length"
-                class="absolute z-50 bg-white border w-full mt-1 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-
-                <template x-for="item in filtered" :key="item">
-
-                    <div
-                        class="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                        @click="select(item)"
-                        x-text="item">
-                    </div>
-
-                </template>
-
-            </div>
-
-        </div>
-
-        <!-- Company Search -->
-        <div class="relative" x-data="searchDropdown(window.companyList)">
-
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-                Company
-            </label>
-
-            <input
-                type="text"
-                name="company"
-                placeholder="Type company name..."
-                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-cyan-500"
-                x-model="query"
-                @input="filterResults()"
-                @focus="open = true"
-                @click.away="open = false"
-                autocomplete="off"
-            >
-
-            <div
-                x-show="open && filtered.length"
-                class="absolute z-50 bg-white border w-full mt-1 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-
-                <template x-for="item in filtered" :key="item">
-
-                    <div
-                        class="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                        @click="select(item)"
-                        x-text="item">
-                    </div>
-
-                </template>
-
-            </div>
-
-        </div>
-
-        <!-- Buttons -->
-        <div class="flex items-end gap-2">
-
-            <button
-                type="submit"
-                class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700">
-
-                Search
-
-            </button>
-
-            <a href="{{ route('contacts') }}"
-               class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
-
-                Reset
-
-            </a>
-
-        </div>
-
-    </form>
-
-</div>
 
 <div class="bg-white rounded-lg shadow overflow-hidden">
 

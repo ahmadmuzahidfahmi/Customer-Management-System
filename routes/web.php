@@ -7,15 +7,16 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\NoteController;
+use App\Http\Controllers\KanbanController;
 
 /*
 |--------------------------------------------------------------------------
 | Dashboard
 |--------------------------------------------------------------------------
 */
-
-Route::get('/', [DashboardController::class, 'index'])
-    ->name('home');
+Route::get('/', function () {
+    return redirect()->route('dashboard');
+});
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->name('dashboard');
@@ -52,6 +53,10 @@ Route::delete('/customers/{id}', [CustomerController::class, 'destroy'])
 | Leads
 |--------------------------------------------------------------------------
 */
+
+Route::get('/leads/kanban', [KanbanController::class, 'index'])->name('leads.kanban');
+Route::post('/leads/kanban/update-position', [KanbanController::class, 'updatePosition'])->name('leads.kanban.update');
+
 
 Route::get('/leads', [LeadController::class, 'index'])
     ->name('leads');
@@ -159,3 +164,4 @@ Route::get(
 Route::post('/notes', [NoteController::class, 'store'])->name('notes.store');
 Route::delete('/notes/{id}', [NoteController::class, 'destroy'])->name('notes.destroy');
 Route::put('/notes/{id}', [NoteController::class, 'update'])->name('notes.update');
+

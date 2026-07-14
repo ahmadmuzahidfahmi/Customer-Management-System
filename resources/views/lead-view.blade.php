@@ -1,12 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-<head> 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-
-</head>
 
 <div class="space-y-6">
 
@@ -130,12 +124,13 @@
 
     </div>
 
-    <!-- Notes -->
-    @include('partials.notes', [
-        'notes' => $lead->notes,
-        'ownerField' => 'Lead_ID',
-        'ownerId' => $lead->Lead_ID,
-    ])
+
+<!-- Notes -->
+@include('partials.notes', [
+    'notes' => $lead->notes()->latest('Created_At')->get(),
+    'ownerField' => 'Lead_ID',
+    'ownerId' => $lead->Lead_ID,
+])
 
 </div>
 

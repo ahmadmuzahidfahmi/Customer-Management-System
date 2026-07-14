@@ -28,10 +28,16 @@
 <div class="flex justify-between items-center mb-6">
     <h1 class="text-2xl font-bold text-gray-800">Leads</h1>
 
-    <a href="{{ route('leads.create') }}"
-   class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700">
-    + Add Lead
-</a>
+    <div class="flex gap-2">
+        <a href="{{ route('leads.kanban') }}"
+           class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
+            Board View
+        </a>
+        <a href="{{ route('leads.create') }}"
+           class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700">
+            + Add Lead
+        </a>
+    </div>
 </div>
 
 

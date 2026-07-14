@@ -4,8 +4,6 @@
 <head> 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-
 </head>
 
 <div class="flex justify-between items-center mb-6">
@@ -25,8 +23,6 @@
 
 
 <!-- Customer Table -->
-<div class="bg-white rounded-lg shadow overflow-hidden">
-
     <div class="px-6 py-4 border-b">
         <h2 class="text-lg font-semibold text-gray-800">
             Customer List
@@ -108,14 +104,14 @@
         </table>
     </div>
 
-</div>
-
-<div class="flex items-center justify-between px-6 py-4">
+    <div class="flex items-center justify-between px-6 py-4">
 <p class="text-sm text-gray-500">
     Showing {{ $customers->firstItem() }}–{{ $customers->lastItem() }}
     of {{ $customers->total() }} customers
 </p>
 </div>
+
+</div> <!-- end -->
 
 <div class="px-6 py-4 border-t">
    <div class="flex items-center justify-center gap-2 mt-6">

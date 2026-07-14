@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Leads;
 use App\Models\Customer;
 use App\Models\User;
+use App\Models\Note;
 
 
 
@@ -75,21 +76,25 @@ public function create()
 
 public function store(Request $request)
 {
-    
+    $request->validate([
+        'Lead_Name' => 'required|string|max:255',
+    ]);
+
     Leads::create([
-        'Lead_Name'  => $request->Lead_Name,
-        'Company_ID' => $request->Company_ID,
-        'Source'     => $request->Source,
-        'User_ID'    => $request->User_ID,
-        'Lead_Note'  => $request->Lead_Note,
-        'Status'     => $request->Status,
-        'Estimated_Value' => $request->Estimated_Value,
+        'Lead_Name'        => $request->Lead_Name,
+        'Source'           => $request->Source,
+        'User_ID'          => $request->User_ID,
+        'Status'           => $request->Status,
+        'Estimated_Value'  => $request->Estimated_Value,
+        'Company_ID'       => $request->Company_ID,
+        'Contact_ID'       => $request->Contact_ID,
+        ''
     ]);
 
     return redirect()
         ->route('leads')
         ->with('success', 'Lead created successfully.');
-} 
+}
 
 public function edit($id)
 {
@@ -111,20 +116,18 @@ public function update(Request $request, $id)
     $lead = Leads::findOrFail($id);
 
     $lead->update([
-        'Lead_Name'  => $request->Lead_Name,
-        'Company_ID' => $request->Company_ID,
-        'Source'     => $request->Source,
-        'User_ID'    => $request->User_ID,
-        'Status'     => $request->Status,
-        'Lead_Note'  => $request->Lead_Note,
-
+        'Lead_Name'       => $request->Lead_Name,
+        'Company_ID'      => $request->Company_ID,
+        'Source'          => $request->Source,
+        'User_ID'         => $request->User_ID,
+        'Status'          => $request->Status,
+        'Estimated_Value' => $request->Estimated_Value,
     ]);
 
     return redirect()
         ->route('leads.show', $lead->Lead_ID)
         ->with('success', 'Lead updated successfully.');
 }
-
 public function destroy($id)
 {
     $lead = Leads::findOrFail($id);
@@ -168,5 +171,10 @@ public function showDeleted($id)
         ->firstOrFail();
 
     return view('lead-view', compact('lead'));
+}
+
+public function notes()
+{
+    return $this->hasMany(Note::class, 'Customer_ID', 'Company_ID')->latest('Created_At');
 }
 }
