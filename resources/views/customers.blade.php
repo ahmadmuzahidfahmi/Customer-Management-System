@@ -14,104 +14,70 @@
     </a>
 </div>
 
+<!-- Main content table -->
+<div class="bg-white rounded-lg shadow overflow-hidden">
 
-<div class="bg-white rounded-lg shadow p-4 mb-6">
-    <script>
-    window.companyList = @json(\App\Models\Customer::pluck('company_name')->unique()->values());
-</script>
+    <table class="w-full text-sm">
 
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left">Company</th>
+                <th class="px-6 py-3 text-left">Email</th>
+                <th class="px-6 py-3 text-left">Phone</th>
+                <th class="px-6 py-3 text-left">Status</th>
+            </tr>
+        </thead>
 
+        <tbody class="divide-y">
 
-<!-- Customer Table -->
-    <div class="px-6 py-4 border-b">
-        <h2 class="text-lg font-semibold text-gray-800">
-            Customer List
-        </h2>
-    </div>
+            @foreach($customers as $customer)
 
-    <div class="overflow-x-auto">
-        <table class="w-full text-sm text-left">
+            <tr
+                onclick="window.location='{{ route('customers.show', $customer->Company_ID) }}'"
+                class="cursor-pointer hover:bg-cyan-50">
 
-            <!-- Table Header -->
-<thead class="bg-gray-50 text-gray-600 uppercase text-xs">
-    <tr>
-        <!-- Customer (always visible) -->
-        <th class="px-6 py-3">Customer</th>
+                <td class="px-6 py-4">
+                    {{ $customer->Company_Name }}
+                </td>
 
-        <!-- Email (hidden on mobile, visible on md+) -->
-        <th class="px-6 py-3 hidden md:table-cell">Email</th>
+                <td class="px-6 py-4">
+                    {{ $customer->Company_Email }}
+                </td>
 
-        <!-- Company (always visible) -->
-        <th class="px-6 py-3 hidden md:table-cell">Phone</th>
+                <td class="px-6 py-4">
+                    {{ $customer->Company_No ?? 'N/A' }}
+                </td>
 
-        <!-- Status (always visible) -->
-        <th class="px-6 py-3">Status</th>
+                <td class="px-6 py-4">
 
-        <!-- Actions (always visible) -->
-        <th class="px-6 py-3">Actions</th>
-    </tr>
-</thead>
+                    @if($customer->Status == 'Active')
+                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">
+                            Active
+                        </span>
 
+                    @elseif($customer->Status == 'Lead')
+                        <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">
+                            Lead
+                        </span>
 
-            <!-- Table Body -->
-<tbody class="divide-y divide-gray-200">
-@foreach($customers as $customer)
-    <tr class="hover:bg-gray-50">
+                    @else
+                        <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-700">
+                            Inactive
+                        </span>
+                    @endif
 
-        <td class="px-6 py-4 font-medium text-gray-900">
-            {{ $customer->Company_Name }}
-        </td>
+                </td>
 
-<td class="px-6 py-4 hidden md:table-cell">
-    {{ $customer->Company_Email }}
-</td>
+            </tr>
 
-        <td class="px-6 py-4 hidden md:table-cell">
-            {{ $customer->Company_No }}
-        </td>
+            @endforeach
 
-        <td class="px-6 py-4">
+        </tbody>
 
-            @if($customer->Status == 'Active')
-                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">
-                    Active
-                </span>
+    </table>
 
-            @elseif($customer->Status == 'Lead')
-                <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">
-                    Lead
-                </span>
-
-            @else
-                <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-700">
-                    Inactive
-                </span>
-            @endif
-
-        </td>
-
-        <td class="px-6 py-4">
-            <a href="{{ route('customers.show', $customer->Company_ID) }}"
-            class="text-cyan-600 hover:text-cyan-800">
-                View
-            </a>
-        </td>
-
-    </tr>
-@endforeach
-</tbody>
-
-        </table>
-    </div>
-
-    <div class="flex items-center justify-between px-6 py-4">
-<p class="text-sm text-gray-500">
-    Showing {{ $customers->firstItem() }}–{{ $customers->lastItem() }}
-    of {{ $customers->total() }} customers
-</p>
 </div>
-
-</div> <!-- end -->
+ <!-- end -->
 
 <div class="px-6 py-4 border-t">
    <div class="flex items-center justify-center gap-2 mt-6">

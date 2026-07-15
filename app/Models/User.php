@@ -10,16 +10,26 @@ class User extends Authenticatable
 
     protected $primaryKey = 'User_ID';
 
+    const CREATED_AT = 'Created_At';
+    const UPDATED_AT = 'Updated_At';
+
     protected $fillable = [
         'User_Name',
         'User_Email',
         'User_Password',
         'User_Role',
-        'Status'
+        'Status',
+        'Last_Login',
     ];
 
     protected $hidden = [
         'User_Password',
+    ];
+
+    protected $casts = [
+        'Created_At' => 'datetime',
+        'Updated_At' => 'datetime',
+        'Last_Login' => 'datetime',
     ];
 
     public function getAuthPassword()

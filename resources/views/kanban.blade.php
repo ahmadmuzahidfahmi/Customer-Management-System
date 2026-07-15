@@ -11,6 +11,16 @@
 
 <div class="flex gap-4 overflow-x-auto pb-4">
 
+    @php
+    $statusColors = [
+        'New' => ['header' => 'bg-gray-100', 'border' => 'border-gray-300', 'badge' => 'bg-gray-100 text-gray-700'],
+        'Contacted' => ['header' => 'bg-amber-100', 'border' => 'border-amber-300', 'badge' => 'bg-amber-100 text-amber-700'],
+        'Qualified' => ['header' => 'bg-blue-100', 'border' => 'border-blue-300', 'badge' => 'bg-blue-100 text-blue-700'],
+        'Won' => ['header' => 'bg-green-100', 'border' => 'border-green-300', 'badge' => 'bg-green-100 text-green-700'],
+        'Lost' => ['header' => 'bg-red-100', 'border' => 'border-red-300', 'badge' => 'bg-red-100 text-red-700'],
+    ];
+    @endphp
+
     @foreach($statuses as $status)
     <div class="bg-gray-50 rounded-lg w-72 flex-shrink-0">
 
@@ -21,13 +31,11 @@
             </span>
         </div>
 
-        <div
-            class="kanban-column p-2 space-y-2 min-h-[200px]"
-            data-status="{{ $status }}">
+        <div class="kanban-column p-2 space-y-2 min-h-[200px]" data-status="{{ $status }}">
 
             @foreach($leadsByStatus->get($status, collect()) as $lead)
             <div
-                class="kanban-card select-none bg-white rounded-lg shadow-sm border p-3 cursor-move"
+                class="kanban-card select-none bg-white rounded-lg shadow-sm border-l-4 border p-3 cursor-move {{ $statusColors[$status]['border'] }}"
                 data-id="{{ $lead->Lead_ID }}">
 
                 <p class="font-medium text-gray-800 text-sm">{{ $lead->Lead_Name }}</p>
@@ -58,21 +66,21 @@
     @endforeach
 
 </div>
-
 @endsection
 
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
 <script>
+const statusBorderColors = @json(collect($statusColors)->map(fn($c) => $c['border']));
+
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.kanban-column').forEach(column => {
-        console.log('Sortable initialized on:', column.dataset.status);
-
         new Sortable(column, {
             group: 'kanban',
             animation: 150,
             onEnd: (evt) => {
-                const leadId = evt.item.dataset.id;
+                const card = evt.item;
+                const leadId = card.dataset.id;
                 const newStatus = evt.to.dataset.status;
                 const newPosition = evt.newIndex + 1;
 
@@ -94,7 +102,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     return response.json();
                 })
-                .then(data => console.log('Saved:', data))
+                .then(data => {
+                    // Swap the card's left-border color to match its new status, no reload needed
+                    Object.values(statusBorderColors).forEach(cls => {
+                        card.classList.remove(...cls.split(' '));
+                    });
+                    const newColorClass = statusBorderColors[newStatus];
+                    if (newColorClass) {
+                        card.classList.add(...newColorClass.split(' '));
+                    }
+                })
                 .catch(error => {
                     console.error('Failed to save card position:', error);
                     alert('Could not save the change — reloading.');

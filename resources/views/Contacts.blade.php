@@ -32,7 +32,6 @@
     window.companyList = @json(
         \App\Models\Customer::pluck('Company_Name')->unique()->values()
     );
-
     </script>
 
 
@@ -47,48 +46,27 @@
                 <th class="px-6 py-3 text-left">Email</th>
                 <th class="px-6 py-3 text-left">Phone</th>
                 <th class="px-6 py-3 text-left">Position</th>
-                <th class="px-6 py-3 text-left">Actions</th>
             </tr>
         </thead>
 
-        <tbody class="divide-y">
+
+            <tbody class="divide-y">
 
             @foreach($contacts as $contact)
+        <tr
+            onclick="window.location='{{ route('contacts.show', $contact->Contact_ID) }}'"
+            class="cursor-pointer hover:bg-cyan-50">
 
-            <tr>
+            <td class="px-6 py-4">{{ $contact->Contact_Name }}</td>
+            <td class="px-6 py-4"> {{ $contact->company->Company_Name ?? 'N/A' }}</td>
+            <td class="px-6 py-4">{{ $contact->Contact_Email }}</td>
+            <td class="px-6 py-4">{{ $contact->Country_Code }} {{ $contact->Contact_No ?? 'N/A' }}</td>
+            <td class="px-6 py-4">{{ $contact->Contact_Role }}</td>    
 
-                <td class="px-6 py-4">
-                    {{ $contact->Contact_Name }}
-                </td>
+        </tr>
+        @endforeach
+    </tbody>
 
-                <td class="px-6 py-4">
-                    {{ $contact->company->Company_Name ?? 'N/A' }}
-                </td>
-
-                <td class="px-6 py-4">
-                    {{ $contact->Contact_Email }}
-                </td>
-
-                <td class="px-6 py-4">
-                    {{ $contact->Country_Code }} {{ $contact->Contact_No ?? 'N/A' }}
-                </td>
-
-                <td class="px-6 py-4">
-                    {{ $contact->Contact_Role }}
-                </td>
-
-                <td class="px-6 py-4">
-                    <a href="{{ route('contacts.show', $contact->Contact_ID) }}"
-                        class="text-cyan-600 hover:text-cyan-800">
-                            View
-                    </a>
-                </td>
-
-            </tr>
-
-            @endforeach
-
-        </tbody>
 
     </table>
 

@@ -40,113 +40,6 @@
     </div>
 </div>
 
-
-<div class="bg-white rounded-lg shadow p-4 mb-6">
-
-<form method="GET"
-      action="{{ route('leads') }}"
-      class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-    <!-- Lead Search -->
-    <div class="relative"
-         x-data="searchDropdown('leadList')">
-
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-            Search Lead
-        </label>
-
-        <input
-            type="text"
-            name="lead"
-            placeholder="Type lead name..."
-            value="{{ request('lead') }}"
-            class="w-full border rounded-lg px-3 py-2"
-            x-model="query"
-            @input="filterResults()"
-            @focus="open = true"
-            @click.away="open = false">
-
-        <div
-            x-show="open && filtered.length > 0"
-            class="absolute z-50 bg-white border w-full mt-1 rounded-lg shadow">
-
-            <template x-for="item in filtered" :key="item">
-
-                <div
-                    class="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    @click="select(item)"
-                    x-text="item">
-
-                </div>
-
-            </template>
-
-        </div>
-
-    </div>
-
-    <!-- Source Search -->
-    <div class="relative"
-         x-data="searchDropdown('sourceList')">
-
-        <label class="block text-sm font-medium text-gray-700 mb-1">
-            Source
-        </label>
-
-        <input
-            type="text"
-            name="source"
-            placeholder="Type source..."
-            value="{{ request('source') }}"
-            class="w-full border rounded-lg px-3 py-2"
-            x-model="query"
-            @input="filterResults()"
-            @focus="open = true"
-            @click.away="open = false">
-
-        <div
-            x-show="open && filtered.length > 0"
-            class="absolute z-50 bg-white border w-full mt-1 rounded-lg shadow">
-
-            <template x-for="item in filtered" :key="item">
-
-                <div
-                    class="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    @click="select(item)"
-                    x-text="item">
-
-                </div>
-
-            </template>
-
-        </div>
-
-    </div>
-
-    <!-- Buttons -->
-    <div class="flex items-end gap-2">
-
-        <button
-            type="submit"
-            class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700">
-
-            Search
-
-        </button>
-
-        <a href="{{ route('leads') }}"
-           class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
-
-            Reset
-
-        </a>
-
-    </div>
-
-</form>
-
-</div>
-
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 
     <!-- Total Leads -->
@@ -201,38 +94,24 @@
                     <th class="px-6 py-3 text-left">Last Update</th>
                     <th class="px-6 py-3 text-left">Status</th>
                     <th class="px-6 py-3 text-left">Assigned To</th>
-                    <th class="px-6 py-3 text-left">Actions</th>
                 </tr>
             </thead>
 
-            <tbody class="divide-y">
+<!-- Table body -->
+<tbody class="divide-y">
 
-                @foreach($leads as $lead)
-                <tr>
+    @foreach($leads as $lead)
+    <tr
+        onclick="window.location='{{ route('leads.show', $lead->Lead_ID) }}'"
+        class="cursor-pointer hover:bg-cyan-50">
 
-                    <td class="px-6 py-4">
-                        {{ $lead->Lead_Name }}
-                    </td>
-
-                    <td class="px-6 py-4">
-                        {{ $lead->company->Company_Name ?? 'No Company' }}
-                    </td>
-
-                    <td class="px-6 py-4">
-                        {{ $lead->Estimated_Value ?? 'unknown' }}
-                    </td>
-
-                    <td class="px-6 py-4">
-                        {{ $lead->Source ?? 'unknown' }}
-                    </td>
-
-                    <td class="px-6 py-4">
-                    {{ $lead->Updated_At ?? 'Unassigned' }}
-                    </td>
-
+        <td class="px-6 py-4">{{ $lead->Lead_Name }}</td>
+        <td class="px-6 py-4">{{ $lead->company->Company_Name ?? 'No Company' }}</td>
+        <td class="px-6 py-4">{{ $lead->Estimated_Value ?? 'unknown' }}</td>
+        <td class="px-6 py-4">{{ $lead->Source ?? 'unknown' }}</td>
+        <td class="px-6 py-4">{{ $lead->Updated_At ?? 'Unassigned' }}</td>
+                
         <td class="px-6 py-4">
-
-                        
             @if($lead->Status == 'New')
                 <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700">
                     New
@@ -258,24 +137,14 @@
                     Lost
                 </span>
             @endif
-        </td>
+            </td>
 
-        
-                        <td class="px-6 py-4">
-                        {{ $lead->user->User_Name ?? 'Unassigned' }}
-                        </td>
+        <td class="px-6 py-4">{{ $lead->user->User_Name ?? 'Unassigned' }}</td>
 
-                <td class="px-6 py-4">
-                    <a href="{{ route('leads.show', $lead->Lead_ID) }}"
-                    class="text-cyan-600 hover:text-cyan-800">
-                        View
-                    </a>
-                </td>
+    </tr>
+    @endforeach
 
-                </tr>
-                @endforeach
-
-            </tbody>
+</tbody>
 
         </table>
     </div>

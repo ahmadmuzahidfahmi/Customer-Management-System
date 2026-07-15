@@ -8,15 +8,25 @@ use App\Http\Controllers\LeadController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\KanbanController;
+use App\Http\Controllers\AuthController;
 
+Route::get('/', function () {
+    return auth()->check()
+        ? redirect()->route('dashboard')
+        : redirect()->route('login');
+});
+
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
+Route::post('/login', [AuthController::class, 'login'])->name('login.attempt')->middleware('guest');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+
+
+Route::middleware('auth')->group(function () {
 /*
 |--------------------------------------------------------------------------
 | Dashboard
 |--------------------------------------------------------------------------
 */
-Route::get('/', function () {
-    return redirect()->route('dashboard');
-});
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->name('dashboard');
@@ -165,3 +175,4 @@ Route::post('/notes', [NoteController::class, 'store'])->name('notes.store');
 Route::delete('/notes/{id}', [NoteController::class, 'destroy'])->name('notes.destroy');
 Route::put('/notes/{id}', [NoteController::class, 'update'])->name('notes.update');
 
+});
