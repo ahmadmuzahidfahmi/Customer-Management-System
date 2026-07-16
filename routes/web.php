@@ -9,6 +9,8 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\KanbanController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ActivityController;
 
 Route::get('/', function () {
     return auth()->check()
@@ -150,9 +152,9 @@ Route::get(
 |--------------------------------------------------------------------------
 */
 
-Route::get('/profile', function () {
-    return view('profile');
-})->name('profile');
+Route::get('/profile', [ProfileController::class, 'edit'])->name('profile');
+Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
 
 Route::get('/recycle-bin', [CustomerController::class, 'recycleBin'])
     ->name('recycle-bin');
@@ -175,4 +177,10 @@ Route::post('/notes', [NoteController::class, 'store'])->name('notes.store');
 Route::delete('/notes/{id}', [NoteController::class, 'destroy'])->name('notes.destroy');
 Route::put('/notes/{id}', [NoteController::class, 'update'])->name('notes.update');
 
+Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
+Route::post('/activities', [ActivityController::class, 'store'])->name('activities.store');
+Route::put('/activities/{id}', [ActivityController::class, 'update'])->name('activities.update');
+Route::post('/activities/{id}/complete', [ActivityController::class, 'complete'])->name('activities.complete');
+Route::post('/activities/{id}/cancel', [ActivityController::class, 'cancel'])->name('activities.cancel');
+Route::delete('/activities/{id}', [ActivityController::class, 'destroy'])->name('activities.destroy');
 });

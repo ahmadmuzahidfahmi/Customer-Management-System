@@ -89,9 +89,9 @@
             Customer Growth
         </h2>
 
-        <div class="h-64 flex items-center justify-center text-gray-400">
-            Graph will go here
-        </div> 
+    <div class="h-64">
+        <canvas id="customerGrowthChart"></canvas>
+    </div>
     </div>
 <!-- Recent Customers & Upcoming Follow-Ups -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -150,60 +150,105 @@
 
 </div>
 
-    <!-- Upcoming Follow-Ups -->
-    <div class="bg-white rounded-lg shadow p-6 mb-3">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">
-            Upcoming Follow-Ups
-        </h2>
+<!-- Upcoming Follow-Ups -->
+<div class="bg-white rounded-lg shadow p-6 mb-3">
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">
+        Upcoming Follow-Ups
+    </h2>
 
-        <div class="space-y-3">
-            <div class="border-l-4 border-blue-500 pl-3">
-                <p class="font-medium">John Doe</p>
-                <p class="text-sm text-gray-500">Product demo - Today</p>
-            </div>
+    <div class="space-y-3">
+        @forelse($upcomingFollowUps as $followUp)
+            @php
+                $borderColor = $followUp->isOverdue()
+                    ? 'border-red-500'
+                    : ($followUp->Dead_Line->isToday() ? 'border-yellow-500' : 'border-blue-500');
+            @endphp
 
-            <div class="border-l-4 border-yellow-500 pl-3">
-                <p class="font-medium">Sarah Lim</p>
-                <p class="text-sm text-gray-500">Follow-up call - Tomorrow</p>
+            <div class="border-l-4 {{ $borderColor }} pl-3">
+                <p class="font-medium">
+                    {{ $followUp->lead->Lead_Name ?? $followUp->contact->Contact_Name ?? 'Unlinked' }}
+                </p>
+                <p class="text-sm text-gray-500">
+                    {{ $followUp->Subject }} —
+                    {{ $followUp->Dead_Line->isToday() ? 'Today' : $followUp->Dead_Line->format('d M') }}
+                </p>
             </div>
-
-            <div class="border-l-4 border-green-500 pl-3">
-                <p class="font-medium">Ahmad Rahman</p>
-                <p class="text-sm text-gray-500">Contract discussion - 2 Jul</p>
-            </div>
-        </div>
+        @empty
+            <p class="text-sm text-gray-500">No upcoming follow-ups.</p>
+        @endforelse
     </div>
+</div>
 
-<!-- Recent Activity Feed ) -->
+<!-- Recent Activity Feed -->
 <div class="bg-white rounded-lg shadow p-6 col-span-1 lg:col-span-2">
     <h2 class="text-lg font-semibold text-gray-800 mb-4">
         Recent Activity
     </h2>
 
     <div class="space-y-4">
+        @forelse($recentActivities as $activity)
+            @php
+                $dotColor = $activity->Status === 'Completed'
+                    ? 'bg-green-500'
+                    : ($activity->Status === 'Cancelled' ? 'bg-gray-400' : 'bg-blue-500');
+            @endphp
 
-        <div class="flex items-start space-x-3">
-            <div class="w-2 h-2 mt-2 rounded-full bg-green-500"></div>
-            <div>
-                <p class="text-sm text-gray-800">
-                    <span class="font-semibold">Ahmad</span> added a new customer
-                </p>
-                <p class="text-xs text-gray-500">2 minutes ago</p>
+            <div class="flex items-start space-x-3">
+                <div class="w-2 h-2 mt-2 rounded-full {{ $dotColor }}"></div>
+                <div>
+                    <p class="text-sm text-gray-800">
+                        <span class="font-semibold">{{ $activity->creator->User_Name ?? 'Someone' }}</span>
+                        logged a {{ strtolower($activity->Activity_Type) }}
+                        @if($activity->lead)
+                            for <span class="font-medium">{{ $activity->lead->Lead_Name }}</span>
+                        @elseif($activity->contact)
+                            with <span class="font-medium">{{ $activity->contact->Contact_Name }}</span>
+                        @endif
+                        — {{ $activity->Subject }}
+                    </p>
+                    <p class="text-xs text-gray-500">{{ $activity->Created_At->diffForHumans() }}</p>
+                </div>
             </div>
-        </div>
-
-        <div class="flex items-start space-x-3">
-            <div class="w-2 h-2 mt-2 rounded-full bg-blue-500"></div>
-            <div>
-                <p class="text-sm text-gray-800">
-                    <span class="font-semibold">Sarah</span> updated customer details
-                </p>
-                <p class="text-xs text-gray-500">15 minutes ago</p>
-            </div>
-        </div>
-
+        @empty
+            <p class="text-sm text-gray-500">No recent activity.</p>
+        @endforelse
     </div>
 </div>
 </div>
+
+@push('scripts')
+<script type="module">
+    import Chart from 'chart.js/auto';
+
+    new Chart(document.getElementById('customerGrowthChart'), {
+        type: 'line',
+        data: {
+            labels: @json($growthLabels),
+            datasets: [{
+                label: 'Total Customers',
+                data: @json($growthData),
+                borderColor: 'rgb(70, 192, 189)',
+                backgroundColor: 'rgba(70, 192, 189, 0.1)',
+                tension: 0.3,
+                fill: true,
+                pointRadius: 3,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                }
+            }
+        }
+    });
+</script>
+@endpush
     
 @endsection

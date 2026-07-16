@@ -27,9 +27,10 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'Created_At' => 'datetime',
-        'Updated_At' => 'datetime',
-        'Last_Login' => 'datetime',
+        'Created_At'    => 'datetime',
+        'Updated_At'    => 'datetime',
+        'Last_Login'    => 'datetime',
+        'User_Password' => 'hashed', // auto-hashes on set, and won't re-hash an already-hashed value
     ];
 
     public function getAuthPassword()

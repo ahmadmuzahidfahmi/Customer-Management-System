@@ -63,4 +63,9 @@ public function notes()
 {
     return $this->hasMany(Note::class, 'Lead_ID', 'Lead_ID')->latest('Created_At');
 }
+
+public function activities()
+{
+    return $this->hasMany(Activity::class, 'Lead_ID', 'Lead_ID')->latest('Created_At');
+}
 }

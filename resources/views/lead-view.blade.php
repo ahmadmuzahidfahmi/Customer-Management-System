@@ -132,6 +132,12 @@
     'ownerId' => $lead->Lead_ID,
 ])
 
+@include('partials.activities', [
+    'activities' => $lead->activities,
+    'ownerField' => 'Lead_ID',
+    'ownerId' => $lead->Lead_ID,
+])
+
 </div>
 
 @endsection

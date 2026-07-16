@@ -101,6 +101,12 @@
     'ownerId' => $contact->Contact_ID,
 ])
 
+    @include('partials.activities', [
+        'activities' => $contact->activities,
+        'ownerField' => 'Contact_ID',
+        'ownerId' => $contact->Contact_ID,
+    ])
+
     <!-- Company Information -->
 
 <div class="bg-white rounded-lg shadow p-6 mt-6">

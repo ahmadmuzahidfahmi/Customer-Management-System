@@ -107,13 +107,26 @@
 @endunless
 
     <!-- Right -->
+<div class="flex items-center gap-3">
+
     <a href="{{ route('profile') }}" class="flex items-center gap-3 hover-grow">
         <div class="text-right hidden sm:block">
-            <p class="font-semibold">Admin</p>
-            <p class="text-xs text-indigo-200">System Manager</p>
+            <p class="font-semibold">{{ auth()->user()->User_Name }}</p>
+            <p class="text-xs text-indigo-200">{{ auth()->user()->User_Role }}</p>
         </div>
-        <div class="w-10 h-10 rounded-full bg-white text-indigo-700 flex items-center justify-center font-bold">A</div>
+        <div class="w-10 h-10 rounded-full bg-white text-indigo-700 flex items-center justify-center font-bold">
+            {{ strtoupper(substr(auth()->user()->User_Name, 0, 1)) }}
+        </div>
     </a>
+
+    <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit" class="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg text-sm whitespace-nowrap">
+            Logout
+        </button>
+    </form>
+
+</div>
 
 </div>
 
@@ -182,6 +195,13 @@
     @endif
 </div>
 
+<!-- Activities -->
+<a href="{{ route('activities.index') }}"
+   class="px-4 py-3 rounded-lg
+   {{ request()->routeIs('activities*') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+    Activities
+</a>
+
             <a href="{{ route('recycle-bin') }}"
                class="px-4 py-3 rounded-lg
                {{ request()->routeIs('recycle-bin') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
@@ -190,6 +210,7 @@
 
         </div>
     </div>
+
 
 </aside>
 
