@@ -9,11 +9,15 @@ use App\Models\Activity;
 
 class DashboardController extends Controller
 {
+    
     public function index()
     {
+
         $totalCustomers = Customer::count();
 
         $totalLeads = Leads::count();
+
+        $staleLeads = Leads::with('company')->stale(7)->orderBy('Status_Changed_At')->get();
 
         $wonLeads = Leads::where('Status', 'Won')->count();
 
@@ -42,6 +46,7 @@ class DashboardController extends Controller
         // Customer growth: cumulative total, month by month, last 12 months
     $months = collect(range(11, 0))->map(function ($i) {
         return now()->subMonths($i)->startOfMonth();
+        
     });
 
     $baselineCount = Customer::where('Created_At', '<', $months->first())->count();
@@ -60,18 +65,19 @@ class DashboardController extends Controller
         $growthData[] = $runningTotal;
     }
 
-        return view('dashboard', compact(
-            'totalCustomers',
-            'totalLeads',
-            'wonLeads',
-            'lostLeads',
-            'qualifiedLeads',
-            'contactedleads',
-            'recentCustomers',
-            'upcomingFollowUps',
-            'recentActivities',
-            'growthLabels',   // ← must be here
-            'growthData' 
-        ));
+return view('dashboard', compact(
+    'totalCustomers',
+    'totalLeads',
+    'staleLeads',
+    'wonLeads',
+    'lostLeads',
+    'qualifiedLeads',
+    'contactedleads',
+    'recentCustomers',
+    'upcomingFollowUps',
+    'recentActivities',
+    'growthLabels',
+    'growthData'
+));
     }
 }

@@ -202,11 +202,21 @@
     Activities
 </a>
 
-            <a href="{{ route('recycle-bin') }}"
-               class="px-4 py-3 rounded-lg
-               {{ request()->routeIs('recycle-bin') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
-                Recycle Bin
-            </a>
+<!-- Audit Log -->
+@if(auth()->check() && auth()->user()->User_Role === 'Admin')
+<a href="{{ route('audit-log') }}"
+   class="px-4 py-3 rounded-lg
+   {{ request()->routeIs('audit-log') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+    Audit Log
+</a>
+@endif
+
+<!-- Recyle bin -->
+<a href="{{ route('recycle-bin') }}"
+    class="px-4 py-3 rounded-lg
+    {{ request()->routeIs('recycle-bin') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+    Recycle Bin
+</a>
 
         </div>
     </div>

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\Auditable;
 
 class Note extends Model
 {
@@ -37,5 +38,10 @@ class Note extends Model
     public function lead()
     {
         return $this->belongsTo(Leads::class, 'Lead_ID', 'Lead_ID');
+    }
+
+        public function getAuditLabel(): string
+    {
+        return $this->Subject ?: 'Note #' . $this->Note_ID;
     }
 }

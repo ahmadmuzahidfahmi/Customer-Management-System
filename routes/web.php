@@ -11,6 +11,8 @@ use App\Http\Controllers\KanbanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\CalendarController;
 
 Route::get('/', function () {
     return auth()->check()
@@ -24,6 +26,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 
 
 Route::middleware('auth')->group(function () {
+Route::middleware('admin')->group(function () {
+Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log');
+});
 /*
 |--------------------------------------------------------------------------
 | Dashboard
@@ -183,4 +188,15 @@ Route::put('/activities/{id}', [ActivityController::class, 'update'])->name('act
 Route::post('/activities/{id}/complete', [ActivityController::class, 'complete'])->name('activities.complete');
 Route::post('/activities/{id}/cancel', [ActivityController::class, 'cancel'])->name('activities.cancel');
 Route::delete('/activities/{id}', [ActivityController::class, 'destroy'])->name('activities.destroy');
+
+Route::middleware('log.view')->group(function () {
+    Route::get('/customers/{id}', [CustomerController::class, 'show'])->name('customers.show');
+    Route::get('/contacts/{id}', [ContactController::class, 'show'])->name('contacts.show');
+    Route::get('/leads/{id}', [LeadController::class, 'show'])->name('leads.show');
+});
+Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log');
+
+Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar');
+Route::post('/calendar/reschedule', [CalendarController::class, 'reschedule'])->name('calendar.reschedule');
+
 });

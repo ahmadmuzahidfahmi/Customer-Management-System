@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Contact;
 use App\models\Note;
+use App\Traits\Auditable;
 
 class Customer extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, Auditable;
     protected $table = 'company'; // 👈 this tells Laravel to use "company" table
     protected $primaryKey = 'Company_ID'; // 👈 this tells Laravel to use "Company_ID" as the primary key
 
@@ -28,8 +29,14 @@ class Customer extends Model
     'Closed_Date' => 'datetime',
     'Created_At' => 'datetime',
     'Updated_At' => 'datetime',
+
+
 ];
 
+        public function getAuditLabel(): string
+    {
+        return $this->Company_Name;
+    }
 
 public function leads()
 {

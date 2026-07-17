@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\Auditable;
 
 class Leads extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, Auditable;
     protected $primaryKey = 'Lead_ID';
 
     const CREATED_AT = 'Created_At';
@@ -67,5 +68,16 @@ public function notes()
 public function activities()
 {
     return $this->hasMany(Activity::class, 'Lead_ID', 'Lead_ID')->latest('Created_At');
+}
+
+    public function getAuditLabel(): string
+    {
+        return $this->Lead_Name;
+    }
+
+    public function scopeStale($query, $days = 7)
+{
+    return $query->whereNotIn('Status', ['Won', 'Lost'])
+        ->where('Status_Changed_At', '<=', now()->subDays($days));
 }
 }
