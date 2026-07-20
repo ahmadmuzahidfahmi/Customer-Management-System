@@ -100,11 +100,19 @@
     'ownerField' => 'Contact_ID',
     'ownerId' => $contact->Contact_ID,
 ])
+    <!-- Activities -->
 
     @include('partials.activities', [
         'activities' => $contact->activities,
         'ownerField' => 'Contact_ID',
         'ownerId' => $contact->Contact_ID,
+    ])
+
+    <!-- Attachements -->
+    @include('partials.attachments', [
+    'attachments' => $contact->attachments,
+    'entityType' => 'Contacts',
+    'entityId' => $contact->Contact_ID,
     ])
 
     <!-- Company Information -->

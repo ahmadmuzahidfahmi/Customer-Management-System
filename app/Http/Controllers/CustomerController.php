@@ -68,11 +68,6 @@ public function show($id)
     $customer = Customer::with('leads', 'contacts')->findOrFail($id);
 
     return view('customer-view', compact('customer'));
-
-    $customer = Customer::with('contacts')
-    ->findOrFail($id);
-
-    return view('customer-view', compact('customer'));
 }
 
 public function edit($id)

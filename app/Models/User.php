@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
+    use HasApiTokens;
+
     protected $table = 'users';
 
     protected $primaryKey = 'User_ID';
@@ -30,7 +33,7 @@ class User extends Authenticatable
         'Created_At'    => 'datetime',
         'Updated_At'    => 'datetime',
         'Last_Login'    => 'datetime',
-        'User_Password' => 'hashed', // auto-hashes on set, and won't re-hash an already-hashed value
+        'User_Password' => 'hashed',
     ];
 
     public function getAuthPassword()

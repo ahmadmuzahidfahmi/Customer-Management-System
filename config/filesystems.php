@@ -36,6 +36,12 @@ return [
             'throw' => false,
         ],
 
+        'network' => [
+            'driver' => 'local',
+            'root'   => '\\\\10.10.0.130\\spspro\\Storage',
+            'throw'  => false,
+        ], 
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

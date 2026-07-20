@@ -80,4 +80,8 @@ public function activities()
     return $query->whereNotIn('Status', ['Won', 'Lost'])
         ->where('Status_Changed_At', '<=', now()->subDays($days));
 }
+public function attachments()
+{
+    return $this->morphMany(Attachment::class, 'entity', 'Entity_Type', 'Entity_ID', 'Lead_ID');
+}
 }

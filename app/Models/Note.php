@@ -44,4 +44,8 @@ class Note extends Model
     {
         return $this->Subject ?: 'Note #' . $this->Note_ID;
     }
+        public function attachments()
+    {
+        return $this->morphMany(Attachment::class, 'entity', 'Entity_Type', 'Entity_ID', 'Note_ID');
+    }
 }

@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Support\Facades\Route;
@@ -13,6 +12,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\AttachmentController;
+
 
 Route::get('/', function () {
     return auth()->check()
@@ -176,6 +177,15 @@ Route::get(
     '/recycle-bin/customer/{id}',
     [CustomerController::class, 'showDeleted']
 )->name('customers.trashed.show');
+
+/*
+|--------------------------------------------------------------------------
+| Attachements
+|--------------------------------------------------------------------------
+*/
+Route::post('/attachments', [AttachmentController::class, 'store'])->name('attachments.store');
+Route::get('/attachments/{id}', [AttachmentController::class, 'show'])->name('attachments.show');
+Route::delete('/attachments/{id}', [AttachmentController::class, 'destroy'])->name('attachments.destroy');
 
 // Note 
 Route::post('/notes', [NoteController::class, 'store'])->name('notes.store');

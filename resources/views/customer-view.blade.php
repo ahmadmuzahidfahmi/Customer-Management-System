@@ -173,80 +173,46 @@
 
     @if($customer->leads->count())
 
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm">
+<div class="overflow-x-auto">
+    <table class="w-full text-sm">
 
-                <thead class="bg-gray-50">
-                    <tr>
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left">Lead Name</th>
+                <th class="px-6 py-3 text-left">Customer</th>
+                <th class="px-6 py-3 text-left">Value</th>
+                <th class="px-6 py-3 text-left">Source</th>
+                <th class="px-6 py-3 text-left">Last Update</th>
+                <th class="px-6 py-3 text-left">Status</th>
+            </tr>
+        </thead>
+
+        <tbody class="divide-y">
+            @foreach($customer->leads as $lead)
                 <tr>
-                    <th class="px-6 py-3 text-left">Lead Name</th>
-                    <th class="px-6 py-3 text-left">Customer</th>
-                    <th class="px-6 py-3 text-left">Value</th>
-                    <th class="px-6 py-3 text-left">Source</th>
-                    <th class="px-6 py-3 text-left">Last Update</th>
-                    <th class="px-6 py-3 text-left">Status</th>
+                    <td class="px-6 py-4">{{ $lead->Lead_Name }}</td>
+                    <td class="px-6 py-4">{{ $lead->company->Company_Name ?? 'No Company' }}</td>
+                    <td class="px-6 py-4">{{ $lead->Estimated_Value ?? 'unknown' }}</td>
+                    <td class="px-6 py-4">{{ $lead->Source ?? 'unknown' }}</td>
+                    <td class="px-6 py-4">{{ $lead->Updated_At ?? 'unknown' }}</td>
+                    <td class="px-6 py-4">
+                        @if($lead->Status == 'won')
+                            <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">Won</span>
+                        @elseif($lead->Status == 'Qualified')
+                            <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">Qualified</span>
+                        @elseif($lead->Status == 'Contacted')
+                            <span class="px-2 py-1 text-xs rounded-full bg-amber-100 text-amber-700">Contacted</span>
+                        @else
+                            <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-700">Lost</span>
+                        @endif
+                    </td>
                 </tr>
-                    </tr>
-                </thead>
+            @endforeach
+        </tbody>
 
-                <tbody class="divide-y">
+    </table>
+</div>
 
-                    @foreach($customer->leads as $lead)
-
-                    <td class="px-6 py-4">
-                        {{ $lead->Lead_Name }}
-                    </td>
-
-                    <td class="px-6 py-4">
-                        {{ $lead->company->Company_Name ?? 'No Company' }}
-                    </td>
-
-                    <td class="px-6 py-4">
-                        {{ $lead->Estimated_Value ?? 'unknown' }}
-                    </td>
-
-                    <td class="px-6 py-4">
-                        {{ $lead->Source ?? 'unknown' }}
-                    </td>
-
-                    <td class="px-6 py-4">
-                    {{ $lead->Updated_At ?? 'unknown' }}
-                    </td>
-
-        <td class="px-6 py-4">
-
-            @if($lead->Status == 'won')
-                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">
-                    Won
-                </span>
-
-            @elseif($lead->Status == 'Qualified')
-                <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">
-                    Qualified
-                </span>
-
-            @elseif($lead->Status == 'Contacted')
-                <span class="px-2 py-1 text-xs rounded-full bg-amber-100 text-amber-700">
-                    Contacted
-                </span>
-
-            @else
-                <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-700">
-                    Lost
-                </span>
-            @endif
-        </td>
-
-                </tr>
-                @endforeach
-
-
-                    </tr>
-
-                </tbody>
-
-            </table>
-        </div>
 
     @else
 
@@ -266,10 +232,12 @@
 </div>
 
 <div class ="bg-white rounded-lg shadow p-6 mt-6">
-    <h2 class="text-lg font-semibold text-gray-800">
-Related Document
-    </h2>
-
+@include('partials.attachments', [
+    'attachments' => $customer->attachments,
+    'entityType' => 'Company',
+    'entityId' => $customer->Company_ID,
+])
 </div>
+
 
 @endsection

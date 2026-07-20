@@ -60,4 +60,8 @@ class Activity extends Model
             && $this->Dead_Line
             && $this->Dead_Line->isPast();
     }
+        public function attachments()
+    {
+        return $this->morphMany(Attachment::class, 'entity', 'Entity_Type', 'Entity_ID', 'Activity_ID');
+    }
 }

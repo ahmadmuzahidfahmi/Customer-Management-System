@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\models\Note;
+use App\Models\Note;
 use App\Traits\Auditable;
 
 
@@ -43,8 +43,12 @@ public function activities()
     return $this->hasMany(Activity::class, 'Contact_ID', 'Contact_ID')->latest('Created_At');
 }
 
-    public function getAuditLabel(): string
-    {
-        return $this->Contact_Name;
-    }
+public function getAuditLabel(): string
+{
+    return $this->Contact_Name;
+}
+public function attachments()
+{
+    return $this->morphMany(Attachment::class, 'entity', 'Entity_Type', 'Entity_ID', 'Contact_ID');
+}
 }

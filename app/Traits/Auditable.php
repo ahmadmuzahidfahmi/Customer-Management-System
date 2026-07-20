@@ -8,28 +8,30 @@ use Illuminate\Support\Facades\Request;
 
 trait Auditable
 {
-    public static function bootAuditable()
-    {
-        static::created(function ($model) {
-            $model->writeAuditLog('created', null, $model->getAttributes());
-        });
+public static function bootAuditable()
+{
+    static::created(function ($model) {
+        $model->writeAuditLog('created', null, $model->getAttributes());
+    });
 
-        static::updated(function ($model) {
-            $changes = $model->getChanges();
-            unset($changes['Updated_At'], $changes['Position']); // ignore noisy fields
+    static::updated(function ($model) {
+        $changes = $model->getChanges();
+        unset($changes['Updated_At'], $changes['Position']); // ignore noisy fields
 
-            if (empty($changes)) {
-                return;
-            }
+        if (empty($changes)) {
+            return;
+        }
 
-            $original = collect($model->getOriginal())->only(array_keys($changes))->toArray();
-            $model->writeAuditLog('updated', $original, $changes);
-        });
+        $original = collect($model->getOriginal())->only(array_keys($changes))->toArray();
+        $model->writeAuditLog('updated', $original, $changes);
+    });
 
-        static::deleted(function ($model) {
-            $model->writeAuditLog('deleted', null, null);
-        });
+    static::deleted(function ($model) {
+        $model->writeAuditLog('deleted', null, null);
+    });
 
+    // 'restored' and 'forceDeleted' events only exist on models using SoftDeletes.
+    if (in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses_recursive(static::class))) {
         static::restored(function ($model) {
             $model->writeAuditLog('restored', null, null);
         });
@@ -38,6 +40,7 @@ trait Auditable
             $model->writeAuditLog('force_deleted', null, null);
         });
     }
+}
 
     public function writeAuditLog(string $action, ?array $old, ?array $new): void
     {

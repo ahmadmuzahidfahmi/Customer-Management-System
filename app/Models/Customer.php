@@ -5,7 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Contact;
-use App\models\Note;
+use App\Models\Note;
+use App\Models\Attachment;
 use App\Traits\Auditable;
 
 class Customer extends Model
@@ -55,6 +56,10 @@ public function contacts()
 public function notes()
 {
     return $this->hasMany(Note::class, 'Company_ID', 'Company_ID')->latest('Created_At');
+}
+public function attachments()
+{
+    return $this->morphMany(Attachment::class, 'entity', 'Entity_Type', 'Entity_ID', 'Company_ID');
 }
 
 }
