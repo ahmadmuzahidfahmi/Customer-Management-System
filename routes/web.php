@@ -209,4 +209,18 @@ Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log'
 Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar');
 Route::post('/calendar/reschedule', [CalendarController::class, 'reschedule'])->name('calendar.reschedule');
 
+Route::get('/calendar', [CalendarController::class, 'index'])
+    ->name('calendar');
+
+    Route::get('/activities/{id}',
+    [ActivityController::class, 'show']
+)->name('activities.show');
+
+Route::get('/calendar/week',
+    [CalendarController::class, 'week'])
+    ->name('calendar.week');
+
+Route::get('/calendar/month',
+    [CalendarController::class, 'index'])
+    ->name('calendar.month');
 });

@@ -30,11 +30,11 @@
                     @endforeach
                 </select>
 
-                <input
-                    type="date"
-                    name="Dead_Line"
-                    class="w-full border rounded-lg px-3 py-2 text-sm"
-                    placeholder="Deadline (optional)">
+        <input
+            type="datetime-local"
+            name="Dead_Line"
+            class="w-full border rounded-lg px-3 py-2 text-sm">
+
             </div>
 
             <input
@@ -69,7 +69,7 @@
     <div class="space-y-3">
         @forelse($activities as $activity)
             <div class="border rounded-lg p-3 {{ $activity->isOverdue() ? 'border-red-300 bg-red-50' : '' }}" x-data="{ editing: false }">
-
+                
                 <!-- View mode -->
                 <div x-show="!editing">
                     <div class="flex justify-between items-start gap-2">
@@ -95,7 +95,7 @@
                             @endif
                             <p class="text-xs text-gray-500 mt-2">
                                 @if($activity->Dead_Line)
-                                    Due {{ $activity->Dead_Line->format('d M Y') }} ·
+                                Due {{ $activity->Dead_Line->format('d M, g:i A') }}
                                 @endif
                                 Assigned to {{ $activity->assignee->User_Name ?? 'Unassigned' }}
                                 · {{ $activity->Created_At->diffForHumans() }}
@@ -142,9 +142,11 @@
                         <textarea name="Activity_Detail" rows="2"
                                   class="w-full border rounded-lg px-3 py-2 text-sm">{{ $activity->Activity_Detail }}</textarea>
 
-                        <input type="date" name="Dead_Line"
-                               value="{{ $activity->Dead_Line?->format('Y-m-d') }}"
-                               class="w-full border rounded-lg px-3 py-2 text-sm">
+                        <input
+                            type="datetime-local"
+                            name="Dead_Line"
+                            value="{{ $activity->Dead_Line?->format('Y-m-d\TH:i') }}"
+                            class="w-full border rounded-lg px-3 py-2 text-sm">
 
                         <div class="flex gap-2">
                             <button type="submit" class="bg-cyan-600 text-white px-3 py-1.5 rounded-lg hover:bg-cyan-700 text-sm">Save</button>

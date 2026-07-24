@@ -28,7 +28,7 @@ class Activity extends Model
     ];
 
     protected $casts = [
-        'Dead_Line'    => 'date',
+        'Dead_Line'    => 'datetime',
         'Completed_At' => 'datetime',
         'Created_At'   => 'datetime',
         'Updated_At'   => 'datetime',

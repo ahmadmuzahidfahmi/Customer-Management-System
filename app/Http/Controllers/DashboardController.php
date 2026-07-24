@@ -65,6 +65,36 @@ class DashboardController extends Controller
         $growthData[] = $runningTotal;
     }
 
+$weeklyLabels = [];
+$weeklyData = [];
+
+for ($i = 6; $i >= 0; $i--) {
+
+    $date = now()->subDays($i);
+
+    $weeklyLabels[] = $date->format('D');
+
+    $weeklyData[] = Customer::whereDate(
+        'Created_At',
+        $date->toDateString()
+    )->count();
+}
+
+$weeklyLabels = [];
+$weeklyData = [];
+
+for ($i = 6; $i >= 0; $i--) {
+
+    $date = now()->subDays($i);
+
+    $weeklyLabels[] = $date->format('D');
+
+    $weeklyData[] = Activity::whereDate(
+        'Created_At',
+        $date->toDateString()
+    )->count();
+}
+
 return view('dashboard', compact(
     'totalCustomers',
     'totalLeads',
@@ -77,7 +107,9 @@ return view('dashboard', compact(
     'upcomingFollowUps',
     'recentActivities',
     'growthLabels',
-    'growthData'
+    'growthData',
+    'weeklyLabels',
+    'weeklyData'
 ));
     }
 }

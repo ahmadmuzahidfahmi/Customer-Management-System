@@ -117,7 +117,7 @@
                     New
             </span>
 
-            @elseif($lead->Status == 'won')
+            @elseif($lead->Status == 'Won')
                 <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">
                     Won
                 </span>

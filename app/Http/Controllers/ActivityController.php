@@ -5,13 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Activity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+
 
 class ActivityController extends Controller
 {
     public function index(Request $request)
     {
         $query = Activity::with(['lead', 'contact', 'assignee'])
-            ->latest('User_ID');
+        ->latest('Created_At');
 
         if ($request->filled('status')) {
             $query->where('Status', $request->status);
@@ -27,7 +29,16 @@ class ActivityController extends Controller
 
         $activities = $query->paginate(15)->withQueryString();
 
-        return view('activities.index', compact('activities'));
+        $dueToday = Activity::with(['lead', 'contact', 'assignee'])
+        ->where('Status', 'Pending')
+        ->whereDate('Dead_Line', today())
+        ->orderBy('Dead_Line')
+        ->get();
+
+        return view('activities.index', compact(
+        'activities',
+        'dueToday'
+            ));
     }
 
     public function store(Request $request)
@@ -47,8 +58,23 @@ class ActivityController extends Controller
                 'Subject' => 'An activity must be linked to a Lead or a Contact.',
             ]);
         }
+            $deadline = null;
+
+        if ($request->filled('Dead_Line')) {
+
+            if (strlen($request->Dead_Line) === 10) {
+
+                $deadline = Carbon::parse($request->Dead_Line)
+                    ->setTime(23, 59, 0);
+
+            } else {
+
+                $deadline = Carbon::parse($request->Dead_Line);
+            }
+        }
 
         Activity::create(array_merge($validated, [
+            'Dead_Line'   => $deadline,
             'User_ID'  => Auth::id(),
             'Assigned_To' => $validated['Assigned_To'] ?? Auth::id(),
             'Status'      => 'Pending',
@@ -56,6 +82,18 @@ class ActivityController extends Controller
 
         return back()->with('success', 'Activity logged.');
     }
+
+    public function show($id)
+{
+    $activity = Activity::with([
+        'lead',
+        'contact',
+        'creator',
+        'assignee'
+    ])->findOrFail($id);
+
+    return view('activity-view', compact('activity'));
+}
 
     public function update(Request $request, $id)
     {

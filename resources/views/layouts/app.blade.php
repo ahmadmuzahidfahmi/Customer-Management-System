@@ -196,20 +196,70 @@
 </div>
 
 <!-- Activities -->
-<a href="{{ route('activities.index') }}"
-   class="px-4 py-3 rounded-lg
-   {{ request()->routeIs('activities*') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
-    Activities
-</a>
+<div>
 
-<!-- Audit Log -->
-@if(auth()->check() && auth()->user()->User_Role === 'Admin')
-<a href="{{ route('audit-log') }}"
-   class="px-4 py-3 rounded-lg
-   {{ request()->routeIs('audit-log') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
-    Audit Log
-</a>
-@endif
+    <a href="{{ route('activities.index') }}"
+       class="block px-4 py-3 rounded-lg
+       {{
+            request()->routeIs('activities*')
+            || request()->routeIs('calendar')
+            || request()->routeIs('audit-log')
+            ? 'bg-cyan-500 text-white'
+            : 'text-gray-700 hover:bg-gray-100'
+       }}">
+        Activities
+    </a>
+
+    @if(
+        request()->routeIs('activities*')
+        || request()->routeIs('calendar')
+        || request()->routeIs('audit-log')
+    )
+
+        <div class="ml-4 mt-1 space-y-1">
+
+            <!-- Activity List -->
+            <a href="{{ route('activities.index') }}"
+               class="block px-4 py-2 rounded-lg text-sm
+               {{
+                    request()->routeIs('activities*')
+                    ? 'text-cyan-600 font-medium'
+                    : 'text-gray-600 hover:bg-gray-100'
+               }}">
+                Activity List
+            </a>
+
+            <!-- Calendar -->
+            <a href="{{ route('calendar') }}"
+               class="block px-4 py-2 rounded-lg text-sm
+               {{
+                    request()->routeIs('calendar')
+                    ? 'text-cyan-600 font-medium'
+                    : 'text-gray-600 hover:bg-gray-100'
+               }}">
+                Calendar
+            </a>
+
+            <!-- Audit Log (Admin only) -->
+            @if(auth()->check() && auth()->user()->User_Role === 'Admin')
+
+                <a href="{{ route('audit-log') }}"
+                   class="block px-4 py-2 rounded-lg text-sm
+                   {{
+                        request()->routeIs('audit-log')
+                        ? 'text-cyan-600 font-medium'
+                        : 'text-gray-600 hover:bg-gray-100'
+                   }}">
+                    Audit Log
+                </a>
+
+            @endif
+
+        </div>
+
+    @endif
+
+</div>
 
 <!-- Recyle bin -->
 <a href="{{ route('recycle-bin') }}"

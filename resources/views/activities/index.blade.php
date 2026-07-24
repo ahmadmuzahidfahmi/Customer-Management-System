@@ -49,6 +49,64 @@
         </form>
     </div>
 
+    <!-- Due Today -->
+@if($dueToday->count())
+<div class="bg-red-50 border border-yellow-200 rounded-lg shadow p-4">
+    
+    <div class="flex items-center justify-between mb-3">
+        <h2 class="text-lg font-semibold text-yellow-800">
+            Due Today ({{ $dueToday->count() }})
+        </h2>
+
+        <span class="text-sm text-yellow-700">
+            {{ now()->format('d M Y') }}
+        </span>
+    </div>
+
+    <div class="space-y-2">
+
+        @foreach($dueToday as $activity)
+
+            <a href="{{ route('activities.show', $activity->Activity_ID) }}"
+               class="block bg-white rounded-lg border p-3 hover:bg-red-100 transition">
+
+                <div class="flex justify-between items-center">
+
+                    <div>
+                        <p class="font-medium text-gray-800">
+                            {{ $activity->Subject }}
+                        </p>
+
+                        <p class="text-sm text-gray-500">
+                            {{ $activity->lead->Lead_Name
+                                ?? $activity->contact->Contact_Name
+                                ?? 'Unlinked' }}
+                        </p>
+                    </div>
+
+                    <div class="text-right">
+
+                        <p class="text-sm font-medium text-yellow-700">
+                            {{ $activity->Dead_Line?->format('h:i A') }}
+                        </p>
+
+                        <p class="text-xs text-gray-500">
+                            {{ $activity->Activity_Type }}
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </a>
+
+        @endforeach
+
+    </div>
+
+</div>
+@endif
+
     <!-- List -->
     <div class="bg-white rounded-lg shadow overflow-x-auto">
         <table class="w-full text-sm">
@@ -65,8 +123,10 @@
             </thead>
             <tbody>
                 @forelse($activities as $activity)
-                    <tr class="border-b {{ $activity->isOverdue() ? 'bg-red-50' : '' }}">
-                        <td class="px-4 py-3">{{ $activity->Activity_Type }}</td>
+                         <tr
+                        onclick="window.location='{{ route('activities.show', $activity->Activity_ID) }}'"
+                        class="border-b cursor-pointer hover:bg-gray-50 transition
+                            {{ $activity->isOverdue() ? 'bg-red-50 hover:bg-red-100' : '' }}">                        <td class="px-4 py-3">{{ $activity->Activity_Type }}</td>
                         <td class="px-4 py-3 font-medium">{{ $activity->Subject }}</td>
                         <td class="px-4 py-3">
                             @if($activity->lead)
@@ -97,7 +157,7 @@
                         </td>
                         <td class="px-4 py-3 text-right">
                             @if($activity->Status === 'Pending')
-                                <form method="POST" action="{{ route('activities.complete', $activity->Activity_ID) }}" class="inline">
+                                <form method="POST" action="{{ route('activities.complete', $activity->Activity_ID) }}" class="inline ">
                                     @csrf
                                     <button type="submit" class="text-green-600 hover:text-green-800">Complete</button>
                                 </form>

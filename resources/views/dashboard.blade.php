@@ -84,15 +84,50 @@
 </div>
 
     <!-- Customer Growth Graph -->
-    <div class="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">
+<div
+    class="bg-white rounded-lg shadow p-6 mb-6"
+    x-data="{ chartView: 'month' }">
+
+    <div class="flex justify-between items-center mb-4">
+
+        <h2 class="text-lg font-semibold text-gray-800">
             Customer Growth
         </h2>
+
+        <div class="flex gap-2">
+
+            <button
+                @click="chartView = 'month'; updateChart('month')"
+                :class="chartView === 'month'
+                    ? 'bg-cyan-600 text-white'
+                    : 'bg-gray-200 text-gray-700'"
+                class="px-3 py-1 rounded-lg text-sm">
+
+                Monthly
+
+            </button>
+
+            <button
+                @click="chartView = 'week'; updateChart('week')"
+                :class="chartView === 'week'
+                    ? 'bg-cyan-600 text-white'
+                    : 'bg-gray-200 text-gray-700'"
+                class="px-3 py-1 rounded-lg text-sm">
+
+                Weekly
+
+            </button>
+
+        </div>
+
+    </div>
 
     <div class="h-64">
         <canvas id="customerGrowthChart"></canvas>
     </div>
-    </div>
+
+</div>
+
 <!-- Recent Customers & Upcoming Follow-Ups -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
@@ -214,40 +249,62 @@
         @endforelse
     </div>
 </div>
-</div>
+
 
 @push('scripts')
-<script type="module">
-    import Chart from 'chart.js/auto';
+<script>
 
-    new Chart(document.getElementById('customerGrowthChart'), {
+window.monthLabels = @json($growthLabels);
+window.monthData = @json($growthData);
+
+window.weekLabels = @json($weeklyLabels);
+window.weekData = @json($weeklyData);
+
+let customerChart;
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    const ctx = document.getElementById('customerGrowthChart');
+
+    customerChart = new Chart(ctx, {
+
         type: 'line',
+
         data: {
-            labels: @json($growthLabels),
+            labels: monthLabels,
             datasets: [{
-                label: 'Total Customers',
-                data: @json($growthData),
-                borderColor: 'rgb(70, 192, 189)',
-                backgroundColor: 'rgba(70, 192, 189, 0.1)',
-                tension: 0.3,
+                label: 'Customers',
+                data: monthData,
+                borderColor: 'rgb(70,192,189)',
+                backgroundColor: 'rgba(70,192,189,0.1)',
                 fill: true,
-                pointRadius: 3,
+                tension: 0.3
             }]
         },
+
         options: {
             responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { precision: 0 }
-                }
-            }
+            maintainAspectRatio: false
         }
     });
+});
+
+window.updateChart = function(view) {
+
+    if (view === 'week') {
+
+        customerChart.data.labels = weekLabels;
+        customerChart.data.datasets[0].data = weekData;
+
+    } else {
+
+        customerChart.data.labels = monthLabels;
+        customerChart.data.datasets[0].data = monthData;
+    }
+
+    customerChart.update();
+};
+
 </script>
 @endpush
     

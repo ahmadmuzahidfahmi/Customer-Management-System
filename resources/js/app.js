@@ -5,6 +5,7 @@ import Chart from 'chart.js/auto';
 
 
 window.Alpine = Alpine;
+window.Chart = Chart;
 
 document.addEventListener('alpine:init', () => {
     Alpine.store('search', { query: '' });
