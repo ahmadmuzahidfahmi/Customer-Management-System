@@ -13,6 +13,7 @@ use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\AttachmentController;
+use App\Http\Controllers\EmailController;
 
 
 Route::get('/', function () {
@@ -208,6 +209,7 @@ Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log'
 
 Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar');
 Route::post('/calendar/reschedule', [CalendarController::class, 'reschedule'])->name('calendar.reschedule');
+Route::post('/emails/send', [EmailController::class, 'send'])->name('emails.send');
 
 Route::get('/calendar', [CalendarController::class, 'index'])
     ->name('calendar');

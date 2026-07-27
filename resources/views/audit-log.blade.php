@@ -50,7 +50,6 @@
                     <th class="px-6 py-3 text-left">Action</th>
                     <th class="px-6 py-3 text-left">Type</th>
                     <th class="px-6 py-3 text-left">Description</th>
-                    <th class="px-6 py-3 text-left">IP Address</th>
                 </tr>
             </thead>
             <tbody class="divide-y">

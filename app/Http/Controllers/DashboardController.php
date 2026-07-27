@@ -83,6 +83,15 @@ for ($i = 6; $i >= 0; $i--) {
 $weeklyLabels = [];
 $weeklyData = [];
 
+$dueToday = Activity::where('Status', 'Pending')
+    ->whereDate('Dead_Line', today())
+    ->count();
+
+$overdueActivities = Activity::where('Status', 'Pending')
+    ->where('Dead_Line', '<', now())
+    ->count();
+
+$staleLeadCount = Leads::stale(7)->count();
 for ($i = 6; $i >= 0; $i--) {
 
     $date = now()->subDays($i);

@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Traits\Auditable;
 
 class Leads extends Model
 {
-    use SoftDeletes, Auditable;
+    use SoftDeletes, Auditable, HasFactory;
     protected $primaryKey = 'Lead_ID';
 
     const CREATED_AT = 'Created_At';
@@ -53,6 +54,11 @@ class Leads extends Model
     public function company()
     {
         return $this->belongsTo(Customer::class, 'Company_ID', 'Company_ID');
+    }
+
+    public function contact()
+    {
+        return $this->belongsTo(Contact::class, 'Contact_ID', 'Contact_ID');
     }
 
     public function user()

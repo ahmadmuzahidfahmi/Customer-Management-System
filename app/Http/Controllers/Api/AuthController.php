@@ -14,6 +14,7 @@ class AuthController extends Controller
         $validated = $request->validate([
             'User_Name' => 'required|string',
             'password'  => 'required|string',
+            'read_only' => 'sometimes|boolean',
         ]);
 
         $user = User::where('User_Name', $validated['User_Name'])->first();
@@ -25,11 +26,18 @@ class AuthController extends Controller
             ], 401);
         }
 
-        $token = $user->createToken('api-token')->plainTextToken;
+        $readOnly = $request->boolean('read_only');
+        $abilities = $readOnly ? ['read'] : ['read', 'write'];
+
+        $token = $user->createToken(
+            $readOnly ? 'api-token-readonly' : 'api-token',
+            $abilities
+        )->plainTextToken;
 
         return response()->json([
             'success' => true,
             'token'   => $token,
+            'abilities' => $abilities,
             'user'    => [
                 'id'   => $user->User_ID,
                 'name' => $user->User_Name,

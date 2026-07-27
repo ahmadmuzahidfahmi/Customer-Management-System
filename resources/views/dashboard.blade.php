@@ -305,6 +305,7 @@ window.updateChart = function(view) {
     customerChart.update();
 };
 
+
 </script>
 @endpush
     

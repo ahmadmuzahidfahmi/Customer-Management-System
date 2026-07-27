@@ -2,6 +2,22 @@
 
 @section('content')
 
+@php
+    $activitiesJson = $activities->map(function ($group) {
+        return $group->map(function ($a) {
+            return [
+                'id' => $a->Activity_ID,
+                'subject' => $a->Subject,
+                'type' => $a->Activity_Type,
+                'status' => $a->Status,
+                'overdue' => $a->isOverdue(),
+                'time' => $a->Dead_Line?->format('g:i A'),
+                'url' => route('activities.show', $a->Activity_ID),
+            ];
+        })->values();
+    });
+@endphp
+
 <div x-data="{
         view: localStorage.getItem('calendarView') || 'week',
         creating: false,
@@ -9,6 +25,15 @@
         openCreate(dateTime) {
             this.createDateTime = dateTime;
             this.creating = true;
+        },
+        viewingDay: false,
+        dayModalDate: null,
+        dayModalActivities: [],
+        allDayActivities: {{ Js::from($activitiesJson) }},
+        openDay(date) {
+            this.dayModalDate = date;
+            this.dayModalActivities = this.allDayActivities[date] || [];
+            this.viewingDay = true;
         }
      }"
      x-init="$watch('view', value => localStorage.setItem('calendarView', value))"
@@ -31,6 +56,13 @@
                 <span class="text-lg leading-none">+</span> New Activity
 
             </button>
+
+            <a href="{{ route('calendar') }}"
+               class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300">
+
+                Today
+
+            </a>
 
             <button
                 @click="view = 'week'"
@@ -104,6 +136,13 @@
         </div>
 
     </div>
+
+    <!-- Weekly Empty State -->
+    @if($weeklyActivities->isEmpty())
+        <div x-show="view === 'week'" class="bg-cyan-50 border border-cyan-200 text-cyan-800 rounded-lg px-4 py-3 text-sm">
+            No activities scheduled this week.
+        </div>
+    @endif
 
     <!-- Weekly Calendar -->
     <div x-show="view === 'week'"
@@ -194,6 +233,13 @@
 
     </div>
 
+    <!-- Monthly Empty State -->
+    @if($activities->isEmpty())
+        <div x-show="view === 'month'" class="bg-cyan-50 border border-cyan-200 text-cyan-800 rounded-lg px-4 py-3 text-sm">
+            No activities scheduled this month.
+        </div>
+    @endif
+
     <!-- Monthly Calendar -->
     <div x-show="view === 'month'"
          class="bg-white rounded-lg shadow overflow-hidden">
@@ -280,9 +326,12 @@
 
                         @if($dayActivities->count() > 3)
 
-                            <div class="text-xs text-gray-500">
+                            <button
+                                type="button"
+                                @click="openDay('{{ $date }}')"
+                                class="text-xs text-cyan-700 hover:text-cyan-900 hover:underline">
                                 +{{ $dayActivities->count() - 3 }} more
-                            </div>
+                            </button>
 
                         @endif
 
@@ -376,6 +425,50 @@
                 </div>
 
             </form>
+
+        </div>
+
+    </div>
+
+    <!-- Day Detail Modal -->
+    <div x-show="viewingDay"
+         x-cloak
+         @click.self="viewingDay = false"
+         @keydown.escape.window="viewingDay = false"
+         class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md max-h-[80vh] flex flex-col">
+
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-gray-800" x-text="dayModalDate"></h2>
+                <button @click="viewingDay = false" type="button" class="text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
+            </div>
+
+            <div class="space-y-2 overflow-y-auto">
+                <template x-for="activity in dayModalActivities" :key="activity.id">
+                    <a :href="activity.url"
+                       class="block border rounded-lg p-3 hover:bg-gray-50"
+                       :class="activity.overdue ? 'border-red-300 bg-red-50' : 'border-gray-200'">
+
+                        <div class="flex items-center gap-2 flex-wrap mb-1">
+                            <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-cyan-100 text-cyan-700" x-text="activity.type"></span>
+                            <span class="text-xs font-medium px-2 py-0.5 rounded-full"
+                                  :class="activity.status === 'Completed' ? 'bg-green-100 text-green-700' :
+                                          (activity.status === 'Cancelled' ? 'bg-gray-200 text-gray-600' : 'bg-yellow-100 text-yellow-700')"
+                                  x-text="activity.status"></span>
+                            <span x-show="activity.overdue" class="text-xs font-medium px-2 py-0.5 rounded-full bg-red-100 text-red-700">Overdue</span>
+                        </div>
+
+                        <p class="font-semibold text-gray-800" x-text="activity.subject"></p>
+                        <p class="text-xs text-gray-500 mt-1" x-show="activity.time" x-text="'Due ' + activity.time"></p>
+
+                    </a>
+                </template>
+
+                <p x-show="dayModalActivities.length === 0" class="text-sm text-gray-500">
+                    No activities on this day.
+                </p>
+            </div>
 
         </div>
 

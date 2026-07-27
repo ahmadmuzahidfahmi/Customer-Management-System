@@ -14,6 +14,7 @@ class CustomerController extends Controller
         $customers = Customer::latest('Created_At')->paginate(15);
 
         return CustomerResource::collection($customers);
+        
     }
 
     public function store(Request $request)

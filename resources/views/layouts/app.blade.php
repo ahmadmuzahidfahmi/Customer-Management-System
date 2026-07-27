@@ -196,70 +196,27 @@
 </div>
 
 <!-- Activities -->
-<div>
+<a href="{{ route('activities.index') }}"
+   class="px-4 py-3 rounded-lg
+   {{ request()->routeIs('activities*') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+    Activities
+</a>
 
-    <a href="{{ route('activities.index') }}"
-       class="block px-4 py-3 rounded-lg
-       {{
-            request()->routeIs('activities*')
-            || request()->routeIs('calendar')
-            || request()->routeIs('audit-log')
-            ? 'bg-cyan-500 text-white'
-            : 'text-gray-700 hover:bg-gray-100'
-       }}">
-        Activities
-    </a>
+<!-- Audit Log -->
+@if(auth()->check() && auth()->user()->User_Role === 'Admin')
+<a href="{{ route('audit-log') }}"
+   class="px-4 py-3 rounded-lg
+   {{ request()->routeIs('audit-log') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+    Audit Log
+</a>
+@endif
 
-    @if(
-        request()->routeIs('activities*')
-        || request()->routeIs('calendar')
-        || request()->routeIs('audit-log')
-    )
-
-        <div class="ml-4 mt-1 space-y-1">
-
-            <!-- Activity List -->
-            <a href="{{ route('activities.index') }}"
-               class="block px-4 py-2 rounded-lg text-sm
-               {{
-                    request()->routeIs('activities*')
-                    ? 'text-cyan-600 font-medium'
-                    : 'text-gray-600 hover:bg-gray-100'
-               }}">
-                Activity List
-            </a>
-
-            <!-- Calendar -->
-            <a href="{{ route('calendar') }}"
-               class="block px-4 py-2 rounded-lg text-sm
-               {{
-                    request()->routeIs('calendar')
-                    ? 'text-cyan-600 font-medium'
-                    : 'text-gray-600 hover:bg-gray-100'
-               }}">
-                Calendar
-            </a>
-
-            <!-- Audit Log (Admin only) -->
-            @if(auth()->check() && auth()->user()->User_Role === 'Admin')
-
-                <a href="{{ route('audit-log') }}"
-                   class="block px-4 py-2 rounded-lg text-sm
-                   {{
-                        request()->routeIs('audit-log')
-                        ? 'text-cyan-600 font-medium'
-                        : 'text-gray-600 hover:bg-gray-100'
-                   }}">
-                    Audit Log
-                </a>
-
-            @endif
-
-        </div>
-
-    @endif
-
-</div>
+<!-- Calander -->
+<a href="{{ route('calendar') }}"
+   class="px-4 py-3 rounded-lg
+   {{ request()->routeIs('calendar') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+    Calendar
+</a>
 
 <!-- Recyle bin -->
 <a href="{{ route('recycle-bin') }}"
@@ -276,6 +233,29 @@
 
         <!-- Page content -->
 <main class="flex-1 p-6 overflow-x-auto">
+
+    @if(session('success'))
+        <div class="mb-4 px-4 py-3 rounded-lg bg-green-100 text-green-800 text-sm">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="mb-4 px-4 py-3 rounded-lg bg-red-100 text-red-800 text-sm">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div class="mb-4 px-4 py-3 rounded-lg bg-red-100 text-red-800 text-sm">
+            <ul class="list-disc list-inside">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     @yield('content')
 </main>
 
@@ -300,9 +280,3 @@
 </body>
 </html>
 </nav>
-
-
-
-
-
-
