@@ -38,7 +38,17 @@ class LeadController extends Controller
         $query->where('Status', $request->status);
     }
 
-    $leads = $query->paginate(10);
+    if ($request->filled('source')) {
+        $query->where('Source', $request->source);
+    }
+
+  $leads = $query->paginate(10)->withQueryString();
+
+    $sources = Leads::whereNotNull('Source')
+        ->where('Source', '!=', '')
+        ->distinct()
+        ->orderBy('Source')
+        ->pluck('Source');
 
     // KPI Data
     $totalLeads = Leads::count();
@@ -46,12 +56,13 @@ class LeadController extends Controller
     $contactedLeads = Leads::where('Status', 'Contacted')->count();
     $wonLeads = Leads::where('Status', 'Won')->count();
 
-        return view('leads', compact(
+    return view('leads', compact(
         'leads',
         'totalLeads',
         'newLeads',
         'contactedLeads',
-        'wonLeads'
+        'wonLeads',
+        'sources'
     ));
 }
 

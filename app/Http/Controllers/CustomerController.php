@@ -18,30 +18,65 @@ public function index(Request $request)
 {
     $query = Customer::query();
 
-    // Header search bar — searches across multiple fields at once
+    // Search
     if ($request->filled('search')) {
+
         $search = $request->search;
 
         $query->where(function ($q) use ($search) {
-            $q->where('Company_Name', 'like', '%' . $search . '%')
-              ->orWhere('Status', 'like', '%' . $search . '%')
-              ->orWhere('Company_Email', 'like', '%' . $search . '%')
-              ->orWhere('Company_No', 'like', '%' . $search . '%');
+
+            $q->where('Company_Name', 'like', "%{$search}%")
+              ->orWhere('Status', 'like', "%{$search}%")
+              ->orWhere('Company_Email', 'like', "%{$search}%")
+              ->orWhere('Company_No', 'like', "%{$search}%");
+
         });
     }
 
-    // Reserved for the future filter panel (applied on top of search, not instead of it)
-    if ($request->filled('company')) {
-        $query->where('Company_Name', 'like', '%' . $request->company . '%');
-    }
-
+    // Status filter
     if ($request->filled('status')) {
+
         $query->where('Status', $request->status);
+
     }
 
-    $customers = $query->paginate(10);
+    // Sorting
+    switch ($request->get('sort', 'newest')) {
 
-    return view('customers', compact('customers'));
+        case 'oldest':
+            $query->orderBy('Created_At', 'asc');
+            break;
+
+        case 'name_asc':
+            $query->orderBy('Company_Name', 'asc');
+            break;
+
+        case 'name_desc':
+            $query->orderBy('Company_Name', 'desc');
+            break;
+
+        default:
+            $query->orderBy('Created_At', 'desc');
+            break;
+    }
+
+    $customers = $query
+        ->paginate(10)
+        ->withQueryString();
+
+    // Dashboard cards
+    $customersCount = Customer::count();
+
+    $activeCustomers = Customer::where('Status', 'Active')->count();
+
+    $inactiveCustomers = Customer::where('Status', 'Inactive')->count();
+
+    return view('customers', compact(
+        'customers',
+        'customersCount',
+        'activeCustomers',
+        'inactiveCustomers'
+    ));
 }
 
 public function create()

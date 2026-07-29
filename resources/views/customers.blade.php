@@ -7,17 +7,48 @@
 </head>
 
 <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Customers</h1>
 
-    <a href="{{ route('customers.create') }}" class="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700">
+    <h1 class="text-2xl font-bold text-gray-800">
+        Customers
+    </h1>
+
+        <a href="{{ route('customers.create') }}"
+       class="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700">
         + Add Customer
     </a>
+
+</div>
+
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+    <div class="bg-white rounded-lg shadow p-4">
+        <p class="text-sm text-gray-500">Total Customers</p>
+        <p class="text-2xl font-bold text-cyan-600">
+            {{ $customersCount }}
+        </p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-4">
+        <p class="text-sm text-gray-500">Active</p>
+        <p class="text-2xl font-bold text-green-600">
+            {{ $activeCustomers }}
+        </p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-4">
+        <p class="text-sm text-gray-500">Inactive</p>
+        <p class="text-2xl font-bold text-red-600">
+            {{ $inactiveCustomers }}
+        </p>
+    </div>
 </div>
 
 <!-- Main content table -->
 <div class="bg-white rounded-lg shadow overflow-hidden">
 
-    <table class="w-full text-sm">
+   <div class="overflow-x-auto">
+    <table class="w-full text-sm min-w-[700px]">
 
         <thead class="bg-gray-50">
             <tr>
@@ -28,7 +59,9 @@
             </tr>
         </thead>
 
-        <tbody class="divide-y">
+<tbody class="divide-y divide-gray-100">
+            
+        @if($customers->count())
 
             @foreach($customers as $customer)
 
@@ -72,12 +105,35 @@
 
             @endforeach
 
+            @else
+
+        <tr>
+            <td colspan="4" class="py-10 text-center text-gray-500">
+                No customers found.
+            </td>
+        </tr>
+
+     @endif
+
         </tbody>
 
     </table>
+    </div>
 
 </div>
  <!-- end -->
+
+ <div class="px-6 py-3 text-sm text-gray-500">
+
+    Showing
+    {{ $customers->firstItem() ?? 0 }}
+    -
+    {{ $customers->lastItem() ?? 0 }}
+    of
+    {{ $customers->total() }}
+    customers
+
+</div>
 
 <div class="px-6 py-4 border-t">
    <div class="flex items-center justify-center gap-2 mt-6">

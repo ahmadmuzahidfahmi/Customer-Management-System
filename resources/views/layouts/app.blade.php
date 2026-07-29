@@ -5,7 +5,7 @@
     <title>Customer Management System</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">  
 
-    <link rel="icon" type="image/png" href="{{ asset('image/visivest Logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('Image/Visivest Logo.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
@@ -51,8 +51,12 @@
             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
         </div>
     @else
-        <form method="GET" action="{{ url()->current() }}" class="flex-1 relative">
-            <input
+<form
+    id="global-search-form"
+    method="GET"
+    action="{{ url()->current() }}"
+    class="flex-1 relative">            
+    <input
                 type="text"
                 name="search"
                 value="{{ request('search') }}"
@@ -88,17 +92,124 @@
             x-cloak
             class="absolute right-0 top-full mt-2 w-64 bg-white text-gray-800 rounded-lg shadow-lg p-4 z-50 space-y-2">
 
-            @if(request()->routeIs('customers'))
-                <p class="text-sm text-gray-500">Customer filters (status, industry...) — coming soon</p>
-            @elseif(request()->routeIs('leads'))
-                <p class="text-sm text-gray-500">Lead filters (source, status...) — coming soon</p>
-            @elseif(request()->routeIs('contacts'))
-                <p class="text-sm text-gray-500">Contact filters (role, company...) — coming soon</p>
-            @elseif(request()->routeIs('recycle-bin'))
-                <p class="text-sm text-gray-500">No filters for this page</p>
-            @else
-                <p class="text-sm text-gray-500">No filters for this page</p>
-            @endif
+@if(request()->routeIs('customers'))
+<div class="space-y-3">
+
+    <div>
+
+        <label class="block text-xs font-medium text-gray-500 mb-1">
+            Status
+        </label>
+
+        <select
+            name="status"
+            form="global-search-form"
+            onchange="document.getElementById('global-search-form').submit()"
+            class="w-full border rounded-lg px-2 py-1.5 text-sm">
+
+            <option value="">All statuses</option>
+
+            <option value="Active"
+                {{ request('status') === 'Active' ? 'selected' : '' }}>
+                Active
+            </option>
+
+            <option value="Lead"
+                {{ request('status') === 'Lead' ? 'selected' : '' }}>
+                Lead
+            </option>
+
+            <option value="Inactive"
+                {{ request('status') === 'Inactive' ? 'selected' : '' }}>
+                Inactive
+            </option>
+
+        </select>
+
+    </div>
+
+    <div>
+
+        <label class="block text-xs font-medium text-gray-500 mb-1">
+            Sort By
+        </label>
+
+        <select
+            name="sort"
+            form="global-search-form"
+            onchange="document.getElementById('global-search-form').submit()"
+            class="w-full border rounded-lg px-2 py-1.5 text-sm">
+
+            <option value="newest"
+                {{ request('sort','newest') === 'newest' ? 'selected' : '' }}>
+                Newest First
+            </option>
+
+            <option value="oldest"
+                {{ request('sort') === 'oldest' ? 'selected' : '' }}>
+                Oldest First
+            </option>
+
+            <option value="name_asc"
+                {{ request('sort') === 'name_asc' ? 'selected' : '' }}>
+                Name A–Z
+            </option>
+
+            <option value="name_desc"
+                {{ request('sort') === 'name_desc' ? 'selected' : '' }}>
+                Name Z–A
+            </option>
+
+        </select>
+
+    </div>
+
+</div>
+@elseif(request()->routeIs('leads'))
+    <div class="space-y-3">
+        <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
+            <select name="status" form="global-search-form" onchange="this.form.submit()"
+                    class="w-full border rounded-lg px-2 py-1.5 text-sm">
+                <option value="">All statuses</option>
+                <option value="New" {{ request('status') === 'New' ? 'selected' : '' }}>New</option>
+                <option value="Contacted" {{ request('status') === 'Contacted' ? 'selected' : '' }}>Contacted</option>
+                <option value="Qualified" {{ request('status') === 'Qualified' ? 'selected' : '' }}>Qualified</option>
+                <option value="Won" {{ request('status') === 'Won' ? 'selected' : '' }}>Won</option>
+                <option value="Lost" {{ request('status') === 'Lost' ? 'selected' : '' }}>Lost</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Source</label>
+            <select name="source" form="global-search-form" onchange="this.form.submit()"
+                    class="w-full border rounded-lg px-2 py-1.5 text-sm">
+                <option value="">All sources</option>
+                @foreach($sources ?? [] as $sourceOption)
+                    <option value="{{ $sourceOption }}" {{ request('source') === $sourceOption ? 'selected' : '' }}>
+                        {{ $sourceOption }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+@elseif(request()->routeIs('contacts'))
+    <div>
+        <label class="block text-xs font-medium text-gray-500 mb-1">Role</label>
+        <select name="role" form="global-search-form" onchange="this.form.submit()"
+                class="w-full border rounded-lg px-2 py-1.5 text-sm">
+            <option value="">All roles</option>
+            @foreach($roles ?? [] as $roleOption)
+                <option value="{{ $roleOption }}" {{ request('role') === $roleOption ? 'selected' : '' }}>
+                    {{ $roleOption }}
+                </option>
+            @endforeach
+        </select>
+    </div>
+@elseif(request()->routeIs('recycle-bin'))
+    <p class="text-sm text-gray-500">No filters for this page</p>
+@else
+    <p class="text-sm text-gray-500">No filters for this page</p>
+@endif
 
         </div>
     </div>
@@ -171,52 +282,128 @@
     Contacts
 </a>
 
+<div x-data="{
+    activeMenu:
+        @if(request()->routeIs('leads') || request()->routeIs('leads.kanban'))
+            'leads'
+        @elseif(request()->routeIs('activities*') || request()->routeIs('audit-log') || request()->routeIs('calendar'))
+            'activities'
+        @else
+            null
+        @endif
+}">
 <!-- Leads -->
 <div>
+    <!-- Main Leads Nav -->
     <a href="{{ route('leads') }}"
-       class="block px-4 py-3 rounded-lg
-       {{ request()->routeIs('leads') || request()->routeIs('leads.kanban') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
-        Leads
+       @click="activeMenu = 'leads'"
+       class="flex items-center justify-between px-4 py-3 rounded-lg
+       {{ request()->routeIs('leads') || request()->routeIs('leads.kanban')
+            ? 'bg-cyan-500 text-white'
+            : 'text-gray-700 hover:bg-gray-100' }}">
+
+        <span>Leads</span>
+
+        <svg class="w-4 h-4 transition-transform"
+            :class="{ 'rotate-180': activeMenu === 'leads' }"
+            fill="none"
+             stroke="currentColor"
+             viewBox="0 0 24 24">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7" />
+        </svg>
     </a>
 
-    @if(request()->routeIs('leads') || request()->routeIs('leads.kanban'))
-    <div class="ml-4 mt-1 space-y-1">
+    
+    <!-- Dropdown -->
+    <div x-show="activeMenu === 'leads'"
+         x-transition
+         class="ml-4 mt-2 space-y-1">
+
+        <!-- Table View -->
         <a href="{{ route('leads') }}"
            class="block px-4 py-2 rounded-lg text-sm
-           {{ request()->routeIs('leads') ? 'text-cyan-600 font-medium' : 'text-gray-600 hover:bg-gray-100' }}">
+           {{ request()->routeIs('leads')
+                ? 'bg-cyan-100 text-cyan-700 font-medium'
+                : 'text-gray-600 hover:bg-gray-100' }}">
             Table View
         </a>
+
+        <!-- Board View -->
         <a href="{{ route('leads.kanban') }}"
            class="block px-4 py-2 rounded-lg text-sm
-           {{ request()->routeIs('leads.kanban') ? 'text-cyan-600 font-medium' : 'text-gray-600 hover:bg-gray-100' }}">
+           {{ request()->routeIs('leads.kanban')
+                ? 'bg-cyan-100 text-cyan-700 font-medium'
+                : 'text-gray-600 hover:bg-gray-100' }}">
             Board View
         </a>
+
     </div>
-    @endif
+
 </div>
 
+
 <!-- Activities -->
-<a href="{{ route('activities.index') }}"
-   class="px-4 py-3 rounded-lg
-   {{ request()->routeIs('activities*') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
-    Activities
-</a>
+<div>
+    <!-- Main Activities Nav -->
+    <a href="{{ route('activities.index') }}"
+       @click="activeMenu = 'activities'"
+       class="flex items-center justify-between px-4 py-3 rounded-lg
+       {{ request()->routeIs('activities*') || request()->routeIs('audit-log') || request()->routeIs('calendar')
+            ? 'bg-cyan-500 text-white'
+            : 'text-gray-700 hover:bg-gray-100' }}">
 
-<!-- Audit Log -->
-@if(auth()->check() && auth()->user()->User_Role === 'Admin')
-<a href="{{ route('audit-log') }}"
-   class="px-4 py-3 rounded-lg
-   {{ request()->routeIs('audit-log') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
-    Audit Log
-</a>
-@endif
+        <span>Activities</span>
 
-<!-- Calander -->
-<a href="{{ route('calendar') }}"
-   class="px-4 py-3 rounded-lg
-   {{ request()->routeIs('calendar') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
-    Calendar
-</a>
+        <svg class="w-4 h-4 transition-transform"
+            :class="{ 'rotate-180': activeMenu === 'activities' }"           
+             fill="none"
+             stroke="currentColor"
+             viewBox="0 0 24 24">
+            <path stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 9l-7 7-7-7" />
+        </svg>
+    </a>
+
+    <!-- Dropdown Menu -->
+    <div x-show="activeMenu === 'activities'"
+         x-transition
+         class="ml-4 mt-2 space-y-1">
+
+        <a href="{{ route('activities.index') }}"
+           class="block px-4 py-2 rounded-lg
+           {{ request()->routeIs('activities*')
+                ? 'bg-cyan-100 text-cyan-700'
+                : 'text-gray-600 hover:bg-gray-100' }}">
+            Activities
+        </a>
+
+        @if(auth()->check() && auth()->user()->User_Role === 'Admin')
+        <a href="{{ route('audit-log') }}"
+           class="block px-4 py-2 rounded-lg
+           {{ request()->routeIs('audit-log')
+                ? 'bg-cyan-100 text-cyan-700'
+                : 'text-gray-600 hover:bg-gray-100' }}">
+            Audit Log
+        </a>
+        @endif
+
+        <a href="{{ route('calendar') }}"
+           class="block px-4 py-2 rounded-lg
+           {{ request()->routeIs('calendar')
+                ? 'bg-cyan-100 text-cyan-700'
+                : 'text-gray-600 hover:bg-gray-100' }}">
+            Calendar
+        </a>
+
+    </div>
+
+</div>
+</div>
 
 <!-- Recyle bin -->
 <a href="{{ route('recycle-bin') }}"

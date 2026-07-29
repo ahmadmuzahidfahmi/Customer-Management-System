@@ -35,6 +35,8 @@
     </script>
 
 
+
+<!-- Min content table -->
 <div class="bg-white rounded-lg shadow overflow-hidden">
 
     <table class="w-full text-sm">

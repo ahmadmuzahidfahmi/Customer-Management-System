@@ -11,34 +11,57 @@ use App\Models\Customer;
 
 class ContactController extends Controller
 {
-    public function index(Request $request)
+public function index(Request $request)
 {
-    $query = contact::query();
+    $query = Contact::with('company');
 
-    // Header search bar — searches across multiple fields at once
+    // Search
     if ($request->filled('search')) {
         $search = $request->search;
 
         $query->where(function ($q) use ($search) {
-            $q->where('Contact_Name', 'like', '%' . $search . '%')
-              ->orWhere('Contact_Email', 'like', '%' . $search . '%')
-              ->orWhere('Contact_Role', 'like', '%' . $search . '%')
-              ->orWhere('Contact_No', 'like', '%' . $search . '%');
+            $q->where('Contact_Name', 'like', "%{$search}%")
+              ->orWhere('Contact_Email', 'like', "%{$search}%")
+              ->orWhere('Contact_Role', 'like', "%{$search}%")
+              ->orWhere('Contact_No', 'like', "%{$search}%");
         });
     }
 
-    // Reserved for the future filter panel (applied on top of search, not instead of it)
-    if ($request->filled('contact')) {
-        $query->where('Contact_Name', 'like', '%' . $request->company . '%');
+    // Company filter
+    if ($request->filled('company')) {
+        $query->where('Company_ID', $request->company);
     }
 
-    if ($request->filled('status')) {
-        $query->where('Status', $request->status);
-    }
+    $contacts = $query->paginate(10)->withQueryString();
 
-    $contacts = $query->paginate(10);
+    $roles = Contact::whereNotNull('Contact_Role')
+        ->where('Contact_Role', '!=', '')
+        ->distinct()
+        ->orderBy('Contact_Role')
+        ->pluck('Contact_Role');
 
-    return view('contacts', compact('contacts'));
+    // Stats Cards
+    $contactsCount = Contact::count();
+
+    $withEmail = Contact::whereNotNull('Contact_Email')
+        ->where('Contact_Email', '!=', '')
+        ->count();
+
+    $withoutEmail = Contact::where(function ($q) {
+        $q->whereNull('Contact_Email')
+          ->orWhere('Contact_Email', '');
+    })->count();
+
+    $companies = Customer::orderBy('Company_Name')->get();
+
+    return view('contacts', compact(
+        'contacts',
+        'contactsCount',
+        'withEmail',
+        'withoutEmail',
+        'companies',
+        'roles'
+    ));
 }
 
 public function show($id)

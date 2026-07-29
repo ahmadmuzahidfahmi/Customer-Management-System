@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\LeadController;
 use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\ActivityController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\EmailController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,6 +37,7 @@ Route::middleware(['auth:sanctum', 'abilities:read'])->group(function () {
     Route::apiResource('leads', LeadController::class)->only(['index', 'show']);
     Route::apiResource('contacts', ContactController::class)->only(['index', 'show']);
     Route::apiResource('activities', ActivityController::class)->only(['index', 'show']);
+    Route::post('/emails/send', [EmailController::class, 'send']);
 });
 
 // Write operations — require a 'write' ability token
@@ -44,4 +46,5 @@ Route::middleware(['auth:sanctum', 'abilities:write'])->group(function () {
     Route::apiResource('leads', LeadController::class)->only(['store', 'update', 'destroy']);
     Route::apiResource('contacts', ContactController::class)->only(['store', 'update', 'destroy']);
     Route::apiResource('activities', ActivityController::class)->only(['store', 'update', 'destroy']);
+    Route::post('/emails/send', [EmailController::class, 'send']);
 });
