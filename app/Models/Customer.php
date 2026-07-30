@@ -20,6 +20,7 @@ class Customer extends Model
         'Company_ID',
         'Company_Name',
         'Company_Email',
+        'Country_Code',
         'Company_No',
         'Status',
         'Closed_Date',

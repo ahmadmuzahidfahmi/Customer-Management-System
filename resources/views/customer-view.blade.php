@@ -73,10 +73,27 @@
                 <p>{{ $customer->Company_Email }}</p>
             </div>
 
-            <div>
-                <p class="text-sm text-gray-500">Phone</p>
-                <p>{{ $customer->Company_No }}</p>
-            </div>
+<div>
+    <p class="text-sm text-gray-500">Phone</p>
+
+    @if($customer->Company_No)
+
+        <a
+            href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $customer->Company_No) }}"
+            target="_blank"
+            class="font-medium text-green-600 hover:text-green-700 hover:underline">
+
+            {{ $customer->Company_No }}
+
+        </a>
+
+    @else
+
+        <p class="font-medium">N/A</p>
+
+    @endif
+    
+</div>
 
             <div>
                 <p class="text-sm text-gray-500">Status</p>

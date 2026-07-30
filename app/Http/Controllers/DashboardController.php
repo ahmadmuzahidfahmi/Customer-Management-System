@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Customer;
 use App\Models\Leads;
 use App\Models\Activity;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -104,6 +105,18 @@ for ($i = 6; $i >= 0; $i--) {
     )->count();
 }
 
+$dueToday = Activity::whereDate('Dead_Line', today())
+    ->where('Status', '!=', 'Completed')
+    ->count();
+
+$overdueActivities = Activity::whereDate('Dead_Line', '<', today())
+    ->where('Status', '!=', 'Completed')
+    ->count();
+
+$completedThisWeek = Activity::where('Status', 'Completed')
+    ->whereDate('Created_At', '>=', now()->subDays(7))
+    ->count();
+
 return view('dashboard', compact(
     'totalCustomers',
     'totalLeads',
@@ -118,7 +131,11 @@ return view('dashboard', compact(
     'growthLabels',
     'growthData',
     'weeklyLabels',
-    'weeklyData'
+    'weeklyData',
+    'dueToday',
+    'overdueActivities',
+    'completedThisWeek'
 ));
     }
+
 }

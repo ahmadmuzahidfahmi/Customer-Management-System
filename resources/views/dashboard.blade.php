@@ -83,10 +83,61 @@
 
 </div>
 
+<!-- Activity Summary -->
+        <h2 class="text-lg font-semibold text-gray-800 mb-3">
+        Activity Summary
+        </h2>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+
+    <!-- Due Today -->
+    
+    <a href="{{ route('activities.index', ['filter' => 'today']) }}"
+    class="bg-white rounded-lg shadow p-4 border-l-4 border-yellow-500 hover:shadow-lg transition block">
+
+        <p class="text-sm text-gray-500">
+            Due Today
+        </p>
+
+        <p class="text-3xl font-bold text-yellow-600">
+            {{ $dueToday }}
+        </p>
+
+    </a>
+
+    <!-- Overdue -->
+    <a href="{{ route('activities.index', ['filter' => 'overdue']) }}"
+    class="bg-white rounded-lg shadow p-4 border-l-4 border-red-500 hover:shadow-lg transition block">
+
+        <p class="text-sm text-gray-500">
+            Overdue
+        </p>
+
+        <p class="text-3xl font-bold text-red-600">
+            {{ $overdueActivities }}
+        </p>
+
+    </a>
+
+    <!-- Completed -->
+    <a href="{{ route('activities.index', ['filter' => 'completed']) }}"
+    class="bg-white rounded-lg shadow p-4 border-l-4 border-green-500 hover:shadow-lg transition block">
+
+        <p class="text-sm text-gray-500">
+            Completed This Week
+        </p>
+
+        <p class="text-3xl font-bold text-green-600">
+            {{ $completedThisWeek }}
+        </p>
+
+    </a>
+
+</div>
+
     <!-- Customer Growth Graph -->
 <div
-    class="bg-white rounded-lg shadow p-6 mb-6"
-    x-data="{ chartView: 'month' }">
+    class="bg-rwhite rounded-lg shadow p-6 mb-6"
+    x-data="{ chatView: 'month' }">
 
     <div class="flex justify-between items-center mb-4">
 

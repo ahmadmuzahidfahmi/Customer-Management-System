@@ -81,21 +81,34 @@ public function index(Request $request)
 
 public function create()
 {
-    return view('customer-create');
+    $countries = config('countries');
+
+    return view('customer-create', compact('countries'));
 }
+
 public function store(Request $request)
 {
-        Customer::create([
-        'Company_Name' => $request->Company_Name,
-        'Company_Email' => $request->Company_Email,
-        'Company_No' => $request->Country_Code . $request->Company_No,
-        'Status' => $request->Status,
+    $validated = $request->validate([
+
+        'Company_Name' => 'required|string|max:255',
+
+        'Company_Email' => 'nullable|email|max:255',
+
+        'Country_Code' => 'required|string|max:10',
+
+        'Company_No' => 'required|string|max:20',
+
+        'Status' => 'required|string',
+
     ]);
+
+
+    Customer::create($validated);
+
 
     return redirect()
         ->route('customers')
         ->with('success', 'Customer added successfully.');
-
 }
 
 public function show($id)
@@ -109,19 +122,37 @@ public function edit($id)
 {
     $customer = Customer::findOrFail($id);
 
-    return view('customer-edit', compact('customer'));
+    $countries = config('countries');
+
+
+    return view('customer-edit', compact(
+        'customer',
+        'countries'
+    ));
 }
 
 public function update(Request $request, $id)
 {
     $customer = Customer::findOrFail($id);
 
-    $customer->update([
-        'Company_Name'  => $request->Company_Name,
-        'Company_Email' => $request->Company_Email,
-        'Company_No'    => $request->Company_No,
-        'Status'        => $request->Status,
+
+    $validated = $request->validate([
+
+        'Company_Name' => 'required|string|max:255',
+
+        'Company_Email' => 'nullable|email|max:255',
+
+        'Country_Code' => 'required|string|max:10',
+
+        'Company_No' => 'required|string|max:20',
+
+        'Status' => 'required|string',
+
     ]);
+
+
+    $customer->update($validated);
+
 
     return redirect()
         ->route('customers.show', $customer->Company_ID)

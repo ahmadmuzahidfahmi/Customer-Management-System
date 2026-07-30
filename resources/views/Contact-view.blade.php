@@ -76,12 +76,26 @@
                 </p>
             </div>
 
-            <div>
-                <p class="text-sm text-gray-500">Phone</p>
-                <p class="font-medium">
-                    {{ $contact->Country_Code }} {{ $contact->Contact_No ?? 'N/A' }}
-                </p>
-            </div>
+<div>
+    <p class="text-sm text-gray-500">Phone</p>
+
+    @if($contact->Contact_No)
+
+        <a
+            href="https://wa.me/{{ $contact->whatsapp_number }}"
+            target="_blank"
+            class="font-medium text-green-600 hover:text-green-700 hover:underline">
+
+            {{ $contact->Country_Code }} {{ $contact->Contact_No }}
+
+        </a>
+
+    @else
+
+        <p class="font-medium">N/A</p>
+
+    @endif
+</div>
 
             <div>
                 <p class="text-sm text-gray-500">Position</p>

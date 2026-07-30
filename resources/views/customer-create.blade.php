@@ -61,8 +61,22 @@
                     name="Country_Code"
                     class="border rounded-lg px-3 py-2">
 
-                    <option value="+60">🇲🇾 +60</option>
-                    <option value="+66">🇹🇭 +66</option>
+                    <option value="">
+                        Select Country
+                    </option>
+
+                    @foreach($countries as $country)
+
+                        <option
+                            value="{{ $country['code'] }}"
+                            {{ old('Country_Code') == $country['code'] ? 'selected' : '' }}>
+
+                            {{ $country['name'] }}
+                            ({{ $country['code'] }})
+
+                        </option>
+
+                    @endforeach
 
                 </select>
 

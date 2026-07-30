@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } } }
             }
         });
     }

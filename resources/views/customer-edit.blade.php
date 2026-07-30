@@ -1,16 +1,3 @@
-@php
-    $countryCode = '+60';
-    $phoneNumber = $customer->Company_No;
-
-    if (str_starts_with($customer->Company_No, '+60')) {
-        $countryCode = '+60';
-        $phoneNumber = substr($customer->Company_No, 3);
-    } elseif (str_starts_with($customer->Company_No, '+66')) {
-        $countryCode = '+66';
-        $phoneNumber = substr($customer->Company_No, 3);
-    }
-@endphp
-
 @extends('layouts.app')
 
 @section('content')
@@ -67,25 +54,29 @@
     <div class="flex gap-2">
 
         <select
-            name="country_code"
+            name="Country_Code"
             class="border rounded-lg px-3 py-2">
 
-            <option value="+60"
-                {{ $countryCode == '+60' ? 'selected' : '' }}>
-                🇲🇾 +60
-            </option>
+            @foreach($countries as $country)
 
-            <option value="+66"
-                {{ $countryCode == '+66' ? 'selected' : '' }}>
-                🇹🇭 +66
-            </option>
+                <option
+                    value="{{ $country['code'] }}"
+                    {{ $customer->Country_Code == $country['code'] ? 'selected' : '' }}>
+
+                    {{ $country['name'] }}
+                    ({{ $country['code'] }})
+
+                </option>
+
+            @endforeach
 
         </select>
 
+
         <input
             type="text"
-            name="phone_number"
-            value="{{ $phoneNumber }}"
+            name="Company_No"
+            value="{{ $customer->Company_No }}"
             class="flex-1 border rounded-lg px-3 py-2">
 
     </div>

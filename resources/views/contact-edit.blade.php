@@ -2,6 +2,13 @@
 
 @section('content')
 
+<head> 
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+
+</head>
+
 <h1 class="text-2xl font-bold mb-6">
     Edit Contact
 </h1>
@@ -40,17 +47,48 @@
                 class="w-full border rounded-lg px-3 py-2">
         </div>
 
-        <div>
-            <label class="block text-sm font-medium mb-1">
-                Phone Number
-            </label>
+<div>
+    <label class="block text-sm font-medium mb-1">
+        Country Code
+    </label>
 
-            <input
-                type="text"
-                name="Contact_No"
-                value="{{ $contact->Contact_No }}"
-                class="w-full border rounded-lg px-3 py-2">
-        </div>
+<select
+    name="Country_Code"
+    class="w-full border rounded-lg px-3 py-2">
+
+    <option value="">
+        Select Country
+    </option>
+
+    @foreach($countries as $country)
+
+        <option
+            value="{{ $country['code'] }}"
+            {{ $contact->Country_Code == $country['code'] ? 'selected' : '' }}>
+
+            {{ $country['name'] }}
+            ({{ $country['code'] }})
+
+        </option>
+
+    @endforeach
+
+</select>
+</div>
+
+
+<div>
+    <label class="block text-sm font-medium mb-1">
+        Phone Number
+    </label>
+
+    <input
+        type="text"
+        name="Contact_No"
+        value="{{ $contact->Contact_No }}"
+        placeholder="123456789"
+        class="w-full border rounded-lg px-3 py-2">
+</div>
 
                 <div>
             <label class="block text-sm font-medium mb-1">

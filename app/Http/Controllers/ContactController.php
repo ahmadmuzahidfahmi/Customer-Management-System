@@ -75,20 +75,37 @@ public function create()
 {
     $customers = Customer::orderBy('Company_Name')->get();
 
-    return view('contact-create', compact('customers'));
+    $countries = config('countries');
+
+    return view('contact-create', compact(
+        'customers',
+        'countries'
+    ));
 }
 
 public function store(Request $request)
 {
+    $validated = $request->validate([
 
-    Contact::create([
-        'Contact_Name' => $request->Contact_Name,
-        'Contact_Email' => $request->Contact_Email,
-        'Contact_No' => $request->Contact_No,
-        'Company_ID' => $request->Company_ID,
-        'Contact_Role' => $request->Contact_Role,
-        'Country_Code' => $request->Country_Code,
+        'Contact_Name' => 'required|string|max:255',
+
+        'Contact_Email' => 'nullable|email|max:255',
+
+        'Country_Code' => 'required|string|max:10',
+
+        'Contact_No' => 'required|string|max:20',
+
+        'Contact_Role' => 'nullable|string|max:255',
+
+        'Contact_Note' => 'nullable|string',
+
+        'Company_ID' => 'required|exists:company,Company_ID',
+
     ]);
+
+
+    Contact::create($validated);
+
 
     return redirect()
         ->route('contacts')
@@ -101,8 +118,13 @@ public function edit($id)
 
     $customers = Customer::orderBy('Company_Name')->get();
 
-    return view('contact-edit', compact('contact', 'customers'));
-}
+$countries = config('countries');
+
+return view('contact-edit', compact(
+    'contact',
+    'customers',
+    'countries'
+));}
 
 public function update(Request $request, $id)
 {
