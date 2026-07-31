@@ -57,28 +57,117 @@
 
             <div class="flex gap-2">
 
-                <select
-                    name="Country_Code"
-                    class="border rounded-lg px-3 py-2">
+<div
+    x-data="{
+        open:false,
+        selected:'{{ old('Country_Code', '+60') }}',
+        countries:@js($countries),
 
-                    <option value="">
-                        Select Country
-                    </option>
+        get selectedCountry(){
 
-                    @foreach($countries as $country)
+            return this.countries.find(
+                c => c.code === this.selected
+            );
 
-                        <option
-                            value="{{ $country['code'] }}"
-                            {{ old('Country_Code') == $country['code'] ? 'selected' : '' }}>
+        },
 
-                            {{ $country['name'] }}
-                            ({{ $country['code'] }})
+        selectCountry(country){
 
-                        </option>
+            this.selected = country.code;
+            this.open = false;
 
-                    @endforeach
+        }
 
-                </select>
+    }"
+
+    class="relative w-40"
+>
+
+
+<input
+    type="hidden"
+    name="Country_Code"
+    x-model="selected"
+>
+
+
+<!-- Selected value -->
+<button
+    type="button"
+    @click="open=!open"
+
+    class="
+    w-full
+    border
+    rounded-lg
+    px-3
+    py-2
+    text-left
+    bg-white
+    "
+>
+
+    <span x-text="selected"></span>
+
+</button>
+
+
+
+<!-- Dropdown -->
+<div
+    x-show="open"
+    @click.outside="open=false"
+
+    class="
+    absolute
+    z-50
+    w-full
+    bg-white
+    border
+    rounded-lg
+    shadow-lg
+    mt-1
+    max-h-60
+    overflow-y-auto
+    "
+>
+
+
+<template x-for="country in countries"
+:key="country.code">
+
+
+<div
+
+@click="selectCountry(country)"
+
+class="
+px-3
+py-2
+cursor-pointer
+hover:bg-gray-100
+"
+>
+
+<span x-text="country.name"></span>
+
+<span class="text-gray-500">
+(
+<span x-text="country.code"></span>
+)
+</span>
+
+
+</div>
+
+
+</template>
+
+
+</div>
+
+
+</div>
 
                 <input
                     type="text"

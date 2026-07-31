@@ -82,11 +82,11 @@
     @if($contact->Contact_No)
 
         <a
-            href="https://wa.me/{{ $contact->whatsapp_number }}"
+            href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $contact->Contact_No) }}"
             target="_blank"
             class="font-medium text-green-600 hover:text-green-700 hover:underline">
 
-            {{ $contact->Country_Code }} {{ $contact->Contact_No }}
+            {{ $contact->Country_Code }} {{ $contact->Contact_No }} 
 
         </a>
 
@@ -95,14 +95,8 @@
         <p class="font-medium">N/A</p>
 
     @endif
+    
 </div>
-
-            <div>
-                <p class="text-sm text-gray-500">Position</p>
-                <p class="font-medium">
-                    {{ $contact->Contact_Role ?? 'N/A' }}
-                </p>
-            </div>
 
             <div>
                 <p class="text-sm text-gray-500">Note</p>

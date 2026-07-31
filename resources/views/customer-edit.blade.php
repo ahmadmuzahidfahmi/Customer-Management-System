@@ -55,7 +55,7 @@
 
         <select
             name="Country_Code"
-            class="border rounded-lg px-3 py-2">
+            class="border rounded-lg px-3 py-2 w-40">
 
             @foreach($countries as $country)
 
@@ -77,9 +77,11 @@
             type="text"
             name="Company_No"
             value="{{ $customer->Company_No }}"
+            placeholder="123456789"
             class="flex-1 border rounded-lg px-3 py-2">
 
     </div>
+
 </div>
 
         <div>

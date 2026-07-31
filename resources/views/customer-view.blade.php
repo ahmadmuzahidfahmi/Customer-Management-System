@@ -83,7 +83,7 @@
             target="_blank"
             class="font-medium text-green-600 hover:text-green-700 hover:underline">
 
-            {{ $customer->Company_No }}
+            {{ $customer->Country_Code }} {{ $customer->Company_No }} 
 
         </a>
 

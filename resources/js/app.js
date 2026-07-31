@@ -35,6 +35,50 @@ window.searchDropdown = function (items = []) {
         }
     };
 };
+window.countryPicker = function () {
+
+    return {
+
+        open: false,
+
+        displayCode: '',
+
+        countries: [
+            { name: 'Malaysia', code: '+60' },
+            { name: 'Thailand', code: '+66' },
+            { name: 'Singapore', code: '+65' },
+            { name: 'Indonesia', code: '+62' },
+            { name: 'United States', code: '+1' },
+            { name: 'United Kingdom', code: '+44' }
+        ],
+
+        get filteredCountries() {
+
+            if (!this.displayCode) {
+                return this.countries;
+            }
+
+            return this.countries.filter(country =>
+                country.name.toLowerCase().includes(this.displayCode.toLowerCase()) ||
+                country.code.includes(this.displayCode)
+            );
+        },
+
+        select(country) {
+
+            this.displayCode =
+                country.code.replace('+', '');
+
+            this.open = false;
+        },
+
+        formatCode() {
+
+            this.displayCode =
+                this.displayCode.replace(/[^0-9]/g, '');
+        }
+    };
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('customerGrowthChart');

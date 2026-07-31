@@ -136,8 +136,8 @@
 
     <!-- Customer Growth Graph -->
 <div
-    class="bg-rwhite rounded-lg shadow p-6 mb-6"
-    x-data="{ chatView: 'month' }">
+    class="bg-white rounded-lg shadow p-6 mb-6"
+    x-data="{ chartView: 'month' }">
 
     <div class="flex justify-between items-center mb-4">
 
@@ -145,31 +145,40 @@
             Customer Growth
         </h2>
 
-        <div class="flex gap-2">
+<div class="flex flex-col items-end">
 
-            <button
-                @click="chartView = 'month'; updateChart('month')"
-                :class="chartView === 'month'
-                    ? 'bg-cyan-600 text-white'
-                    : 'bg-gray-200 text-gray-700'"
-                class="px-3 py-1 rounded-lg text-sm">
+    <div class="flex gap-2 bg-gray-100 p-1 rounded-lg">
 
-                Monthly
+        <!-- Monthly -->
+        <button
+            @click="chartView = 'month'; updateChart('month')"
+            :class="chartView === 'month'
+                ? 'bg-cyan-600 text-white shadow'
+                : 'text-gray-600 hover:bg-gray-200'"
+            class="px-4 py-2 rounded-md text-sm font-medium transition-all duration-200">
+            Monthly
+        </button>
 
-            </button>
+        <!-- Weekly -->
+        <button
+            @click="chartView = 'week'; updateChart('week')"
+            :class="chartView === 'week'
+                ? 'bg-cyan-600 text-white shadow'
+                : 'text-gray-600 hover:bg-gray-200'"
+            class="px-4 py-2 rounded-md text-sm font-medium transition-all duration-200">
+            Weekly
+        </button>
 
-            <button
-                @click="chartView = 'week'; updateChart('week')"
-                :class="chartView === 'week'
-                    ? 'bg-cyan-600 text-white'
-                    : 'bg-gray-200 text-gray-700'"
-                class="px-3 py-1 rounded-lg text-sm">
+    </div>
 
-                Weekly
+    <p class="text-xs text-gray-500 mt-2">
+        Viewing:
+        <span class="font-semibold text-cyan-600"
+              x-text="chartView === 'month' ? 'Monthly Data' : 'Weekly Data'">
+        </span>
+    </p>
 
-            </button>
-
-        </div>
+</div>
 
     </div>
 

@@ -53,46 +53,45 @@
 <!-- Phone Number -->
 <div>
     <label class="block text-sm font-medium mb-1">
-        Country Code
-    </label>
-
-    <select
-        name="Country_Code"
-        class="w-full border rounded-lg px-3 py-2">
-
-        <option value="">
-            Select Country
-        </option>
-
-        @foreach($countries as $country)
-
-            <option value="{{ $country['code'] }}"
-                {{ old('Country_Code') == $country['code'] ? 'selected' : '' }}>
-
-                {{ $country['name'] }}
-                ({{ $country['code'] }})
-
-            </option>
-
-        @endforeach
-
-    </select>
-</div>
-
-
-<div>
-    <label class="block text-sm font-medium mb-1">
         Phone Number
     </label>
 
-    <input
-        type="text"
-        name="Contact_No"
-        value="{{ old('Contact_No') }}"
-        placeholder="123456789"
-        class="w-full border rounded-lg px-3 py-2">
+    <div class="flex gap-2">
+
+        <select
+            name="Country_Code"
+            class="border rounded-lg px-3 py-2 w-40">
+
+            @foreach($countries as $country)
+
+                <option
+                    value="{{ $country['code'] }}"
+                    {{ old('Country_Code') == $country['code'] ? 'selected' : '' }}>
+
+                    {{ $country['name'] }}
+                    ({{ $country['code'] }})
+
+                </option>
+
+            @endforeach
+
+        </select>
+
+
+        <input
+            type="text"
+            name="Contact_No"
+            value="{{ old('Contact_No') }}"
+            placeholder="123456789"
+            class="flex-1 border rounded-lg px-3 py-2">
+
+    </div>
 
 </div>
+
+
+
+
 
         <!-- Position -->
         <div>
