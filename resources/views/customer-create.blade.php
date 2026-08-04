@@ -57,117 +57,117 @@
 
             <div class="flex gap-2">
 
-<div
-    x-data="{
-        open:false,
-        selected:'{{ old('Country_Code', '+60') }}',
-        countries:@js($countries),
+            <div
+                x-data="{
+                    open:false,
+                    selected:'{{ old('Country_Code', '+60') }}',
+                    countries:@js($countries),
 
-        get selectedCountry(){
+                    get selectedCountry(){
 
-            return this.countries.find(
-                c => c.code === this.selected
-            );
+                        return this.countries.find(
+                            c => c.code === this.selected
+                        );
 
-        },
+                    },
 
-        selectCountry(country){
+                    selectCountry(country){
 
-            this.selected = country.code;
-            this.open = false;
+                        this.selected = country.code;
+                        this.open = false;
 
-        }
+                    }
 
-    }"
+                }"
 
-    class="relative w-40"
->
-
-
-<input
-    type="hidden"
-    name="Country_Code"
-    x-model="selected"
->
+                class="relative w-40"
+            >
 
 
-<!-- Selected value -->
-<button
-    type="button"
-    @click="open=!open"
-
-    class="
-    w-full
-    border
-    rounded-lg
-    px-3
-    py-2
-    text-left
-    bg-white
-    "
->
-
-    <span x-text="selected"></span>
-
-</button>
+            <input
+                type="hidden"
+                name="Country_Code"
+                x-model="selected"
+            >
 
 
+            <!-- Selected value -->
+            <button
+                type="button"
+                @click="open=!open"
 
-<!-- Dropdown -->
-<div
-    x-show="open"
-    @click.outside="open=false"
+                class="
+                w-full
+                border
+                rounded-lg
+                px-3
+                py-2
+                text-left
+                bg-white
+                "
+            >
 
-    class="
-    absolute
-    z-50
-    w-full
-    bg-white
-    border
-    rounded-lg
-    shadow-lg
-    mt-1
-    max-h-60
-    overflow-y-auto
-    "
->
+                <span x-text="selected"></span>
 
-
-<template x-for="country in countries"
-:key="country.code">
+            </button>
 
 
-<div
 
-@click="selectCountry(country)"
+            <!-- Dropdown -->
+            <div
+                x-show="open"
+                @click.outside="open=false"
 
-class="
-px-3
-py-2
-cursor-pointer
-hover:bg-gray-100
-"
->
-
-<span x-text="country.name"></span>
-
-<span class="text-gray-500">
-(
-<span x-text="country.code"></span>
-)
-</span>
-
-
-</div>
+                class="
+                absolute
+                z-50
+                w-full
+                bg-white
+                border
+                rounded-lg
+                shadow-lg
+                mt-1
+                max-h-60
+                overflow-y-auto
+                "
+            >
 
 
-</template>
+            <template x-for="country in countries"
+            :key="country.code">
 
 
-</div>
+            <div
+
+            @click="selectCountry(country)"
+
+            class="
+            px-3
+            py-2
+            cursor-pointer
+            hover:bg-gray-100
+            "
+            >
+
+            <span x-text="country.name"></span>
+
+            <span class="text-gray-500">
+            (
+            <span x-text="country.code"></span>
+            )
+            </span>
 
 
-</div>
+            </div>
+
+
+            </template>
+
+
+            </div>
+
+
+            </div>
 
                 <input
                     type="text"
@@ -195,6 +195,24 @@ hover:bg-gray-100
             </select>
         </div>
 
+     <div class="mt pt-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-3">Notes (optional)</h2>
+
+        <div class="space-y-2">
+            <input
+                type="text"
+                name="Subject"
+                placeholder="Subject (optional)"
+                class="w-full border rounded-lg px-3 py-2 text-sm">
+
+            <textarea
+                name="Content"
+                rows="3"
+                placeholder="Write a note..."
+                class="w-full border rounded-lg px-3 py-2 text-sm"></textarea>
+        </div>
+    </div>
+
     </div>
 
     <div class="mt-6 flex gap-3">
@@ -212,9 +230,9 @@ hover:bg-gray-100
 
     </div>
 
-</form>
 
-    </div>
+
+</form>
 
 </div>
 

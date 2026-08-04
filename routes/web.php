@@ -24,10 +24,10 @@ Route::get('/', function () {
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login'])->name('login.attempt')->middleware('guest');
+Route::post('/login/guest', [AuthController::class, 'guestLogin'])->name('login.guest')->middleware('guest');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
-
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'guest.readonly'])->group(function () {
 Route::middleware('admin')->group(function () {
 Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log');
 });

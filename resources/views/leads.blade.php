@@ -33,10 +33,12 @@
            class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">
             Board View
         </a>
+    @unless(auth()->user()?->isGuest())
         <a href="{{ route('leads.create') }}"
            class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700">
             + Add Lead
         </a>
+    @endunless
     </div>
 </div>
 

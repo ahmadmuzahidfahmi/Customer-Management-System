@@ -2,13 +2,16 @@
 
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-lg font-semibold text-gray-800">Notes</h2>
-
+        
+        @unless(auth()->user()?->isGuest())
         <button
             @click="addingNote = !addingNote"
             type="button"
             class="w-8 h-8 flex items-center justify-center rounded-full bg-cyan-600 text-white hover:bg-cyan-700 text-lg leading-none">
             <span x-text="addingNote ? '✕' : '+'"></span>
         </button>
+        @endunless
+
     </div>
 
     <!-- Add Note Form (collapsed by default) -->
@@ -54,7 +57,7 @@
                     </div>
 
                 <div class="flex items-center gap-2">
-
+                @unless(auth()->user()?->isGuest())
                     <button
                         @click="editing = true"
                         type="button"
@@ -74,6 +77,7 @@
                             class="text-red-600 hover:text-red-800 text-sm">
                             Delete
                         </button>
+                @endunless
                     </form>
 
                 </div>

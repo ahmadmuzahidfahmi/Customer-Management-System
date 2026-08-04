@@ -102,9 +102,15 @@ public function store(Request $request)
 
     ]);
 
+$customer = Customer::create($validated);
 
-    Customer::create($validated);
-
+    if ($request->filled('Content')) {
+        Note::create([
+            'Subject'    => $request->input('Subject'),
+            'Content'    => $request->input('Content'),
+            'Company_ID' => $customer->Company_ID,
+        ]);
+    }
 
     return redirect()
         ->route('customers')

@@ -8,47 +8,6 @@
         <h1 class="text-2xl font-bold text-gray-800">Activities</h1>
     </div>
 
-    <!-- Filters -->
-    <div class="bg-white rounded-lg shadow p-4">
-        <form method="GET" action="{{ route('activities.index') }}" class="flex flex-wrap gap-3 items-end">
-
-            <div>
-                <label class="text-xs text-gray-500 block mb-1">Status</label>
-                <select name="status" class="border rounded-lg px-3 py-2 text-sm">
-                    <option value="">All</option>
-                    @foreach(['Pending', 'Completed', 'Cancelled'] as $status)
-                        <option value="{{ $status }}" @selected(request('status') === $status)>{{ $status }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div>
-                <label class="text-xs text-gray-500 block mb-1">Type</label>
-                <select name="type" class="border rounded-lg px-3 py-2 text-sm">
-                    <option value="">All</option>
-                    @foreach(['Call', 'Email', 'Meeting', 'Follow-Up', 'Other'] as $type)
-                        <option value="{{ $type }}" @selected(request('type') === $type)>{{ $type }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <label class="flex items-center gap-2 text-sm text-gray-700 pb-2">
-                <input type="checkbox" name="mine" value="1" @checked(request('mine'))>
-                My activities only
-            </label>
-
-            <button type="submit" class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 text-sm">
-                Filter
-            </button>
-
-            @if(request()->anyFilled(['status', 'type', 'mine']))
-                <a href="{{ route('activities.index') }}" class="text-sm text-gray-500 hover:text-gray-700 pb-2">
-                    Clear
-                </a>
-            @endif
-        </form>
-    </div>
-
     <!-- Due Today -->
 @if($dueToday->count())
 <div class="bg-red-50 border border-yellow-200 rounded-lg shadow p-4">
@@ -157,10 +116,12 @@
                         </td>
                         <td class="px-4 py-3 text-right">
                             @if($activity->Status === 'Pending')
+                                @unless(auth()->user()?->isGuest())
                                 <form method="POST" action="{{ route('activities.complete', $activity->Activity_ID) }}" class="inline ">
                                     @csrf
                                     <button type="submit" class="text-green-600 hover:text-green-800">Complete</button>
                                 </form>
+                                @endunless
                             @endif
                         </td>
                     </tr>

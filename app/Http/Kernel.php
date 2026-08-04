@@ -66,6 +66,7 @@ protected $middlewareAliases = [
     'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
     'log.view' => \App\Http\Middleware\LogPageView::class,
     'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+    'guest.readonly' => \App\Http\Middleware\EnsureGuestIsReadOnly::class,
     'abilities' => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
     'ability' => \Laravel\Sanctum\Http\Middleware\CheckForAnyAbility::class,
 ];

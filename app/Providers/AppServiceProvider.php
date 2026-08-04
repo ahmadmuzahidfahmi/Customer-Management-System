@@ -10,6 +10,8 @@ use App\Models\Leads;
 use App\Models\Activity;
 use App\Models\Note;
 use App\Observers\CustomerObserver;
+use Illuminate\Support\Facades\Blade;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,5 +28,9 @@ public function boot(): void
         'Activity' => Activity::class,
         'Notes'    => Note::class,
     ]);
-}
+
+    Blade::if('guestUser', function () {
+        return auth()->check() && auth()->user()->User_Role === 'Guest';
+    });
+    }
 }

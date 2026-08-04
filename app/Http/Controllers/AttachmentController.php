@@ -23,7 +23,7 @@ class AttachmentController extends Controller
         $storedName = Str::uuid() . '.' . $file->getClientOriginalExtension();
         $relativePath = $folder . '/' . $storedName;
 
-        Storage::disk('network')->putFileAs($folder, $file, $storedName);
+        Storage::disk('google')->putFileAs($folder, $file, $storedName);
 
         Attachment::create([
             'Entity_Type'   => $validated['Entity_Type'],
@@ -43,11 +43,11 @@ class AttachmentController extends Controller
     {
         $attachment = Attachment::findOrFail($id);
 
-        if (! Storage::disk('network')->exists($attachment->File_Path)) {
+        if (! Storage::disk('google')->exists($attachment->File_Path)) {
             abort(404, 'File no longer exists on the share.');
         }
 
-        return Storage::disk('network')->response(
+        return Storage::disk('google')->response(
             $attachment->File_Path,
             $attachment->Original_Name
         );
@@ -57,8 +57,8 @@ class AttachmentController extends Controller
     {
         $attachment = Attachment::findOrFail($id);
 
-        if (Storage::disk('network')->exists($attachment->File_Path)) {
-            Storage::disk('network')->delete($attachment->File_Path);
+        if (Storage::disk('google')->exists($attachment->File_Path)) {
+            Storage::disk('google')->delete($attachment->File_Path);
         }
 
         $attachment->delete();

@@ -18,6 +18,7 @@
         </div>
 
         <div class="flex gap-2">
+    @unless(auth()->user()?->isGuest())
 
             <button
                 type="button"
@@ -43,7 +44,7 @@
                 class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
                 Delete
             </button>
-
+    @endunless
         </form>
 
         </div>

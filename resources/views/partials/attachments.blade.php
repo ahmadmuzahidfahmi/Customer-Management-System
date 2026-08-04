@@ -2,13 +2,16 @@
 
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-lg font-semibold text-gray-800">Attachments</h2>
-
+       
+        @unless(auth()->user()?->isGuest())
         <button
             @click="addingFile = !addingFile"
             type="button"
             class="w-8 h-8 flex items-center justify-center rounded-full bg-cyan-600 text-white hover:bg-cyan-700 text-lg leading-none">
             <span x-text="addingFile ? '✕' : '+'"></span>
         </button>
+        @endunless
+
     </div>
 
     <!-- Upload Form -->
@@ -35,7 +38,7 @@
     </div>
 
     <!-- File List -->
-    <div class="space-y-2">
+    <div class="space-y-2 ">
         @forelse($attachments as $attachment)
             <div class="flex items-center justify-between border rounded-lg p-3">
 
@@ -75,5 +78,5 @@
             <p class="text-sm text-gray-500">No attachments yet.</p>
         @endforelse
     </div>
-
 </div>
+    

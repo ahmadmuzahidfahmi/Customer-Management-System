@@ -62,7 +62,7 @@
                     Customer • Deleted {{ $customer->deleted_at->diffForHumans() }}
                 </p>
             </div>
-
+        @unless(auth()->user()?->isGuest())
             <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity" onclick="event.stopPropagation()">
 
                 <form method="POST" action="{{ route('customers.restore', $customer->Company_ID) }}">
@@ -85,8 +85,8 @@
                         🗑
                     </button>
                 </form>
-
             </div>
+        @endunless
 
         </div>
 
@@ -114,7 +114,8 @@
                 </p>
             </div>
 
-            <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity" onclick="event.stopPropagation()">
+            @unless(auth()->user()?->isGuest())
+                <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity" onclick="event.stopPropagation()">
 
                 <form method="POST" action="{{ route('contacts.restore', $contact->Contact_ID) }}">
                     @csrf
@@ -122,7 +123,7 @@
                         type="submit"
                         title="Restore"
                         class="w-9 h-9 flex items-center justify-center rounded-lg bg-green-100 text-green-700 hover:bg-green-200">
-                        ↺
+                        ↺ 
                     </button>
                 </form>
 
@@ -136,8 +137,8 @@
                         🗑
                     </button>
                 </form>
-
             </div>
+            @endunless
 
         </div>
 
@@ -165,15 +166,15 @@
                 </p>
             </div>
 
-            <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity" onclick="event.stopPropagation()">
-
-                <form method="POST" action="{{ route('leads.restore', $lead->Lead_ID) }}">
-                    @csrf
-                    <button
-                        type="submit"
-                        title="Restore"
+            @unless(auth()->user()?->isGuest())
+                <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity" onclick="event.stopPropagation()">
+                    <form method="POST" action="{{ route('leads.restore', $lead->Lead_ID) }}">
+                        @csrf
+                        <button
+                            type="submit"
+                            title="Restore"
                         class="w-9 h-9 flex items-center justify-center rounded-lg bg-green-100 text-green-700 hover:bg-green-200">
-                        ↺
+                        ↺ 
                     </button>
                 </form>
 
@@ -187,8 +188,8 @@
                         🗑
                     </button>
                 </form>
-
             </div>
+            @endunless
 
         </div>
 

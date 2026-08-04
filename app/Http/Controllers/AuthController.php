@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -44,5 +47,28 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('login');
+    }
+
+        public function guestLogin(Request $request)
+    {
+        $guest = User::firstOrCreate(
+            ['User_Name' => 'guest'],
+            [
+                'User_Email'    => 'guest@example.com',
+                // Random, unusable password — guests never log in with a password.
+                'User_Password' => Hash::make(Str::random(40)),
+                'User_Role'     => 'Guest',
+                'Status'        => 'Active',
+            ]
+        );
+
+        Auth::login($guest);
+        $request->session()->regenerate();
+
+        $guest->timestamps = false;
+        $guest->Last_Login = now();
+        $guest->save();
+
+        return redirect()->intended(route('dashboard'));
     }
 }

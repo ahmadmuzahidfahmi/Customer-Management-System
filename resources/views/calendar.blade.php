@@ -48,90 +48,113 @@
 
         <div class="flex items-center gap-3">
 
-            <button
-                @click="openCreate('')"
-                type="button"
-                class="px-4 py-2 rounded-lg bg-cyan-600 text-white hover:bg-cyan-700 flex items-center gap-1">
+    <button
+        @click="openCreate('')"
+        class="bg-cyan-600 hover:bg-cyan-700 text-white px-5 py-2.5 rounded-lg shadow-sm font-medium flex items-center gap-2">
 
-                <span class="text-lg leading-none">+</span> New Activity
+        <span class="text-lg">+</span>
 
-            </button>
+        <span>New Activity</span>
 
-            <a href="{{ route('calendar') }}"
-               class="px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300">
+    </button>
 
+            <a
+                href="{{ route('calendar') }}"
+                class="px-3 py-2 rounded-lg border text-gray-600 hover:bg-gray-50">
                 Today
-
             </a>
 
-            <button
-                @click="view = 'week'"
-                :class="view === 'week'
-                    ? 'bg-cyan-600 text-white'
-                    : 'bg-gray-200 text-gray-700'"
-                class="px-4 py-2 rounded-lg">
+    <div class="flex bg-gray-100 rounded-lg p-1">
 
-                Weekly View
+        <button
+            @click="view='week'"
+            :class="view === 'week'
+                ? 'bg-cyan-600 text-white shadow'
+                : 'text-gray-600'"
+            class="px-4 py-2 rounded-md text-sm font-medium transition">
+            Week
+        </button>
 
-            </button>
+        <button
+            @click="view='month'"
+            :class="view === 'month'
+                ? 'bg-cyan-600 text-white shadow'
+                : 'text-gray-600'"
+            class="px-4 py-2 rounded-md text-sm font-medium transition">
+            Month
+        </button>
 
-            <button
-                @click="view = 'month'"
-                :class="view === 'month'
-                    ? 'bg-cyan-600 text-white'
-                    : 'bg-gray-200 text-gray-700'"
-                class="px-4 py-2 rounded-lg">
-
-                Monthly View
-
-            </button>
+    </div>
 
             <!-- Adaptive Previous/Next: moves by week in Weekly View, by month in Monthly View -->
 
-            <a x-show="view === 'month'"
-               href="{{ route('calendar', [
-                   'month' => $prevMonth->month,
-                   'year' => $prevMonth->year,
-                   'week' => request('week')
-               ]) }}"
-               class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">
+            
+  <div class="flex items-center bg-white rounded-lg shadow border overflow-hidden">
 
-                ← Previous
+    <!-- Previous Month -->
+    <a
+        x-show="view === 'month'"
+        href="{{ route('calendar', [
+            'month' => $prevMonth->month,
+            'year' => $prevMonth->year,
+            'week' => request('week')
+        ]) }}"
+        class="px-4 py-2 hover:bg-gray-50 transition">
+        ← <span class="hidden sm:inline">Prev</span>
+    </a>
 
-            </a>
+    <!-- Previous Week -->
+    <a
+        x-show="view === 'week'"
+        href="{{ route('calendar', [
+            'week' => $prevWeek,
+            'month' => $current->month,
+            'year' => $current->year
+        ]) }}"
+        class="px-4 py-2 hover:bg-gray-50 transition">
+        ← <span class="hidden sm:inline">Prev</span>
+    </a>
 
-            <a x-show="view === 'week'"
-               href="{{ route('calendar', ['week' => $prevWeek, 'month' => $current->month, 'year' => $current->year]) }}"
-               class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">
+    <!-- Current Date -->
+    <div class="px-6 py-2 border-x font-medium text-gray-700">
 
-                ← Previous
+        <span x-show="view === 'month'">
+            {{ $current->format('F Y') }}
+        </span>
 
-            </a>
+        <span x-show="view === 'week'">
+            {{ $weekStart->format('d M') }}
+            -
+            {{ $weekEnd->format('d M Y') }}
+        </span>
 
-            <div class="px-4 py-2 bg-white rounded-lg shadow">
-                <span x-show="view === 'month'">{{ $current->format('F Y') }}</span>
-                <span x-show="view === 'week'">{{ $weekStart->format('d M') }} – {{ $weekEnd->format('d M Y') }}</span>
-            </div>
+    </div>
 
-            <a x-show="view === 'month'"
-               href="{{ route('calendar', [
-                   'month' => $nextMonth->month,
-                   'year' => $nextMonth->year,
-                   'week' => request('week')
-               ]) }}"
-               class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">
+    <!-- Next Month -->
+    <a
+        x-show="view === 'month'"
+        href="{{ route('calendar', [
+            'month' => $nextMonth->month,
+            'year' => $nextMonth->year,
+            'week' => request('week')
+        ]) }}"
+        class="px-4 py-2 hover:bg-gray-50 transition">
+        <span class="hidden sm:inline">Next</span> →
+    </a>
 
-                Next →
+    <!-- Next Week -->
+    <a
+        x-show="view === 'week'"
+        href="{{ route('calendar', [
+            'week' => $nextWeek,
+            'month' => $current->month,
+            'year' => $current->year
+        ]) }}"
+        class="px-4 py-2 hover:bg-gray-50 transition">
+        <span class="hidden sm:inline">Next</span> →
+    </a>
 
-            </a>
-
-            <a x-show="view === 'week'"
-               href="{{ route('calendar', ['week' => $nextWeek, 'month' => $current->month, 'year' => $current->year]) }}"
-               class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">
-
-                Next →
-
-            </a>
+</div>
 
         </div>
 
@@ -181,8 +204,7 @@
 
             <div class="grid grid-cols-8 border-b min-h-[80px]">
 
-                <div class="border-r p-2 text-sm text-gray-500">
-                    @php
+            <div class="border-r bg-gray-50 p-2 text-sm text-gray-500 font-medium">                    @php
                         $displayHour = $hour % 12;
                         if ($displayHour === 0) {
                             $displayHour = 12;

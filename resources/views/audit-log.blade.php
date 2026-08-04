@@ -6,40 +6,6 @@
     <h1 class="text-2xl font-bold text-gray-800">Audit Log</h1>
 </div>
 
-<div class="bg-white rounded-lg shadow p-4 mb-6">
-    <form method="GET" action="{{ route('audit-log') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-
-        <input
-            type="text"
-            name="search"
-            value="{{ request('search') }}"
-            placeholder="Search description..."
-            class="border rounded-lg px-3 py-2">
-
-        <select name="action" class="border rounded-lg px-3 py-2">
-            <option value="">All Actions</option>
-            @foreach(['created','updated','deleted','restored','force_deleted','viewed','login','logout'] as $action)
-                <option value="{{ $action }}" {{ request('action') == $action ? 'selected' : '' }}>
-                    {{ ucfirst(str_replace('_',' ',$action)) }}
-                </option>
-            @endforeach
-        </select>
-
-        <select name="type" class="border rounded-lg px-3 py-2">
-            <option value="">All Types</option>
-            @foreach(['Customer','Contact','Lead','Note','Auth','Page'] as $type)
-                <option value="{{ $type }}" {{ request('type') == $type ? 'selected' : '' }}>{{ $type }}</option>
-            @endforeach
-        </select>
-
-        <div class="flex gap-2">
-            <button type="submit" class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700">Filter</button>
-            <a href="{{ route('audit-log') }}" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300">Reset</a>
-        </div>
-
-    </form>
-</div>
-
 <div class="bg-white rounded-lg shadow overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full text-sm">

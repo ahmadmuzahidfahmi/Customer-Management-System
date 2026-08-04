@@ -8,12 +8,14 @@
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-lg font-semibold text-gray-800">Activities</h2>
 
+    @unless(auth()->user()?->isGuest())
         <button
             @click="addingActivity = !addingActivity"
             type="button"
             class="w-8 h-8 flex items-center justify-center rounded-full bg-cyan-600 text-white hover:bg-cyan-700 text-lg leading-none">
             <span x-text="addingActivity ? '✕' : '+'"></span>
         </button>
+    @endunless
     </div>
 
     <!-- Log Activity Form (collapsed by default) -->
@@ -106,19 +108,25 @@
                             @if($activity->Status === 'Pending')
                                 <form method="POST" action="{{ route('activities.complete', $activity->Activity_ID) }}">
                                     @csrf
+                                    @unless(auth()->user()?->isGuest())
                                     <button type="submit" class="text-green-600 hover:text-green-800 text-sm">Complete</button>
+                                    @endunless
                                 </form>
                                 <form method="POST" action="{{ route('activities.cancel', $activity->Activity_ID) }}">
                                     @csrf
+                                    @unless(auth()->user()?->isGuest())
                                     <button type="submit" class="text-gray-500 hover:text-gray-700 text-sm">Cancel</button>
+                                    @endunless
                                 </form>
                             @endif
+                                @unless(auth()->user()?->isGuest())
                             <button @click="editing = true" type="button" class="text-cyan-600 hover:text-cyan-800 text-sm">Edit</button>
                             <form method="POST" action="{{ route('activities.destroy', $activity->Activity_ID) }}"
                                   onsubmit="return confirm('Delete this activity?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-red-600 hover:text-red-800 text-sm">Delete</button>
+                                @endunless
                             </form>
                         </div>
                     </div>

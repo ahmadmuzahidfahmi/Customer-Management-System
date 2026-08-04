@@ -60,8 +60,7 @@
                 type="text"
                 name="search"
                 value="{{ request('search') }}"
-                placeholder="@if(request()->routeIs('customers'))Search customers by name, status...@elseif(request()->routeIs('leads'))Search leads by name, source...@elseif(request()->routeIs('contacts'))Search contacts by name, email...@endif"
-                class="w-full rounded-lg pl-10 pr-3 py-2 text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-white">
+            placeholder="@if(request()->routeIs('customers'))Search customers by name, status...@elseif(request()->routeIs('leads'))Search leads by name, source...@elseif(request()->routeIs('contacts'))Search contacts by name, email...@elseif(request()->routeIs('activities.index'))Search activities...@endif"                class="w-full rounded-lg pl-10 pr-3 py-2 text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-white">
             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
         </form>
     @endif
@@ -179,6 +178,7 @@
                 <option value="Lost" {{ request('status') === 'Lost' ? 'selected' : '' }}>Lost</option>
             </select>
         </div>
+        
         <div>
             <label class="block text-xs font-medium text-gray-500 mb-1">Source</label>
             <select name="source" form="global-search-form" onchange="this.form.submit()"
@@ -205,6 +205,63 @@
             @endforeach
         </select>
     </div>
+@elseif(request()->routeIs('activities.index'))
+    <div class="space-y-3">
+        <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
+            <select name="status" form="global-search-form" onchange="this.form.submit()"
+                    class="w-full border rounded-lg px-2 py-1.5 text-sm">
+                <option value="">All</option>
+                <option value="Pending" {{ request('status') === 'Pending' ? 'selected' : '' }}>Pending</option>
+                <option value="Completed" {{ request('status') === 'Completed' ? 'selected' : '' }}>Completed</option>
+                <option value="Cancelled" {{ request('status') === 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Type</label>
+            <select name="type" form="global-search-form" onchange="this.form.submit()"
+                    class="w-full border rounded-lg px-2 py-1.5 text-sm">
+                <option value="">All</option>
+                @foreach(['Call', 'Email', 'Meeting', 'Follow-Up', 'Other'] as $type)
+                    <option value="{{ $type }}" {{ request('type') === $type ? 'selected' : '' }}>{{ $type }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <label class="flex items-center gap-2 text-sm text-gray-700">
+            <input type="checkbox" name="mine" value="1" form="global-search-form"
+                   onchange="this.form.submit()" {{ request('mine') ? 'checked' : '' }}>
+            My activities only
+        </label>
+    </div>
+@elseif(request()->routeIs('audit-log'))
+    <div class="space-y-3">
+        <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Action</label>
+            <select name="action" form="global-search-form" onchange="this.form.submit()"
+                    class="w-full border rounded-lg px-2 py-1.5 text-sm">
+                <option value="">All Actions</option>
+                @foreach(['created','updated','deleted','restored','force_deleted','viewed','login','logout'] as $action)
+                    <option value="{{ $action }}" {{ request('action') === $action ? 'selected' : '' }}>
+                        {{ ucfirst(str_replace('_',' ',$action)) }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-xs font-medium text-gray-500 mb-1">Type</label>
+            <select name="type" form="global-search-form" onchange="this.form.submit()"
+                    class="w-full border rounded-lg px-2 py-1.5 text-sm">
+                <option value="">All Types</option>
+                @foreach(['Customer','Contact','Lead','Note','Auth','Page'] as $type)
+                    <option value="{{ $type }}" {{ request('type') === $type ? 'selected' : '' }}>{{ $type }}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+
 @elseif(request()->routeIs('recycle-bin'))
     <p class="text-sm text-gray-500">No filters for this page</p>
 @else
@@ -244,6 +301,18 @@
     </div>
 
 </nav>
+
+@if(auth()->check() && auth()->user()->User_Role === 'Guest')
+    <div class="bg-amber-50 border-b border-amber-200 text-amber-800 text-sm px-6 py-2 text-center">
+        You're browsing as a guest — read-only mode. Sign in with a full account to make changes.
+    </div>
+@endif
+
+@if(session('guest_blocked'))
+    <div class="bg-red-50 border-b border-red-200 text-red-700 text-sm px-6 py-2 text-center">
+        {{ session('guest_blocked') }}
+    </div>
+@endif
 
 <div class="flex min-h-screen">
 

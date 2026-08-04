@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </head>
 
+@unless(auth()->user()?->isGuest())
+
 <div class="flex justify-between items-center mb-6">
 
     <h1 class="text-2xl font-bold text-gray-800">
@@ -18,7 +20,7 @@
     </a>
 
 </div>
-
+@endunless 
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
 

@@ -99,18 +99,6 @@
                 class="w-full border rounded-lg px-3 py-2">
         </div>
 
-        <div>
-            <label class="block text-sm font-medium mb-1">
-                Note
-            </label>
-
-            <input
-                type="text"
-                name="Contact_Note"
-                value="{{ $contact->Contact_Note }}"
-                class="w-full border rounded-lg px-3 py-2">
-        </div>
-
                 <!-- Company -->
 <div class="md:col-span-2">
     <label class="block text-sm font-medium mb-1">

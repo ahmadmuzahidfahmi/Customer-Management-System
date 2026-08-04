@@ -24,6 +24,8 @@
 
     <div class="flex gap-2">
 
+@unless(auth()->user()?->isGuest())
+
     <button
         type="button"
         @click="emailing = true"
@@ -48,6 +50,8 @@
             class="flex items-center justify-center w-36 h-12 bg-red-600 text-white rounded-lg hover:bg-red-700">
             Delete
         </button>
+    @endunless
+    
     </form>
 </div>
 
@@ -125,12 +129,13 @@
     ])
 
     <!-- Attachements -->
+<div class ="bg-white rounded-lg shadow p-6 mt-6">
     @include('partials.attachments', [
     'attachments' => $contact->attachments,
     'entityType' => 'Contacts',
     'entityId' => $contact->Contact_ID,
     ])
-
+</div>
     <!-- Company Information -->
 
 <div class="bg-white rounded-lg shadow p-6 mt-6">

@@ -110,20 +110,6 @@
 
             </select>
 
-        </div>
-
-                <div>
-            <label class="block text-sm font-medium mb-1">
-                Note
-            </label>
-
-            <input
-                type="text"
-                name="Company_Note"
-                value="{{ $customer->Company_Note }}"
-                class="w-full border rounded-lg px-3 py-2">
-        </div>
-
     </div>
 
     <div class="mt-6 flex gap-3">

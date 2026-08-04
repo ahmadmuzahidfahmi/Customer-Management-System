@@ -15,9 +15,11 @@
         Contacts
     </h1>
 
+@unless(auth()->user()?->isGuest())
     <a href="{{ route('contacts.create') }}" class="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700">
         + Add Contact
     </a>
+@endunless
 
 </div>
 

@@ -41,4 +41,8 @@ class User extends Authenticatable
     {
         return $this->User_Password;
     }
+    public function isGuest(): bool
+    {
+        return $this->User_Role === 'Guest';
+    }
 }

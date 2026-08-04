@@ -52,6 +52,21 @@
                     Sign in
                 </button>
             </form>
+            <div class="flex items-center gap-3 my-5">
+                <div class="flex-1 h-px bg-gray-200"></div>
+                <span class="text-xs text-gray-400 uppercase tracking-wide">or</span>
+                <div class="flex-1 h-px bg-gray-200"></div>
+            </div>
+
+            <form method="POST" action="{{ route('login.guest') }}">
+                @csrf
+                <button
+                    type="submit"
+                    class="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold rounded-lg py-2 transition-colors">
+                    Continue as Guest
+                </button>
+            </form>
+            <p class="text-xs text-gray-400 text-center mt-2">Guest access is read-only — you can browse, but not create, edit, or delete records.</p>
         </div>
     </div>
 

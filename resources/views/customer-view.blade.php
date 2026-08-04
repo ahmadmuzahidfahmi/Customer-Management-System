@@ -21,6 +21,7 @@
             </p>
         </div>
 
+@unless(auth()->user()?->isGuest())
 
 <div class="flex gap-2">
 
@@ -50,7 +51,7 @@
         </button>
     </form>
 </div>
-
+@endunless 
 
     </div>
 
