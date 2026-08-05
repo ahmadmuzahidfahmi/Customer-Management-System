@@ -5,7 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Contact;
 use App\Models\Customer;
-
+use App\Models\Note;
+use App\Models\Attachment;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 
 
@@ -86,30 +90,96 @@ public function create()
 public function store(Request $request)
 {
     $validated = $request->validate([
-
-        'Contact_Name' => 'required|string|max:255',
-
-        'Contact_Email' => 'nullable|email|max:255',
-
-        'Country_Code' => 'required|string|max:10',
-
-        'Contact_No' => 'required|string|max:20',
-
-        'Contact_Role' => 'nullable|string|max:255',
-
-        'Contact_Note' => 'nullable|string',
-
-        'Company_ID' => 'required|exists:company,Company_ID',
-
+        'Contact_Name'   => 'required|string|max:255',
+        'Contact_Email'  => 'nullable|email|max:255',
+        'Country_Code'   => 'required|string|max:10',
+        'Contact_No'     => 'required|string|max:20',
+        'Contact_Role'   => 'nullable|string|max:255',
+        'Contact_Note'   => 'nullable|string',
+        'Company_ID'     => 'required|exists:company,Company_ID',
+        'Notes'          => 'nullable|array',
+        'Notes.*.Subject' => 'nullable|string|max:255',
+        'Notes.*.Content'  => 'nullable|string',
+        'Attachments'    => 'nullable|array',
+        'Attachments.*'  => 'file|max:10240',
     ]);
 
+    $contact = Contact::create([
+        'Contact_Name'  => $validated['Contact_Name'],
+        'Contact_Email' => $validated['Contact_Email'] ?? null,
+        'Country_Code'  => $validated['Country_Code'],
+        'Contact_No'    => $validated['Contact_No'],
+        'Contact_Role'  => $validated['Contact_Role'] ?? null,
+        'Contact_Note'  => $validated['Contact_Note'] ?? null,
+        'Company_ID'    => $validated['Company_ID'],
+    ]);
 
-    Contact::create($validated);
+    // Notes
+    foreach ($request->input('Notes', []) as $note) {
+        if (! empty($note['Content'])) {
+            Note::create([
+                'Subject'    => $note['Subject'] ?? null,
+                'Content'    => $note['Content'],
+                'Contact_ID' => $contact->Contact_ID,
+            ]);
+        }
+    }
 
+    // Attachments
+    $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt'];
+    $folder = Attachment::FOLDER_MAP['Contacts'];
+    $failed = [];
+
+    foreach ($request->file('Attachments', []) as $file) {
+        if (! $file || ! in_array(strtolower($file->getClientOriginalExtension()), $allowedExtensions)) {
+            continue;
+        }
+
+        $originalName = $file->getClientOriginalName();
+        $extension = $file->getClientOriginalExtension();
+        $baseName = pathinfo($originalName, PATHINFO_FILENAME);
+        $safeBaseName = trim(preg_replace('/[\\/:*?"<>|]/', '-', $baseName)) ?: 'file';
+
+        $storedName = $safeBaseName . '.' . $extension;
+        $relativePath = $folder . '/' . $storedName;
+
+        try {
+            $counter = 1;
+            while (Storage::disk('google')->exists($relativePath)) {
+                $storedName = $safeBaseName . ' (' . $counter . ').' . $extension;
+                $relativePath = $folder . '/' . $storedName;
+                $counter++;
+            }
+
+            Storage::disk('google')->putFileAs($folder, $file, $storedName);
+
+            Attachment::create([
+                'Entity_Type'   => 'Contacts',
+                'Entity_ID'     => $contact->Contact_ID,
+                'Original_Name' => $originalName,
+                'Stored_Name'   => $storedName,
+                'File_Path'     => $relativePath,
+                'File_Type'     => $file->getClientMimeType(),
+                'File_Size'     => $file->getSize(),
+                'Uploaded_By'   => Auth::id(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Google Drive upload failed on contact create', [
+                'file' => $originalName,
+                'error' => $e->getMessage(),
+            ]);
+            $failed[] = $originalName;
+        }
+    }
+
+    $message = 'Contact created successfully.';
+    if ($failed) {
+        $message .= ' Some attachments failed to upload: ' . implode(', ', $failed);
+    }
 
     return redirect()
         ->route('contacts')
-        ->with('success', 'Contact created successfully.');
+        ->with($failed ? 'error' : 'success', $message);
 }
 
 public function edit($id)
@@ -172,9 +242,11 @@ public function restore($id)
 
 public function forceDelete($id)
 {
-    Contact::onlyTrashed()
+    $contact = Contact::onlyTrashed()
         ->where('Contact_ID', $id)
-        ->forceDelete();
+        ->firstOrFail();
+
+    $contact->forceDelete();
 
     return back();
 }

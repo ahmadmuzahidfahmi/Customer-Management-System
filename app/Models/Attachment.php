@@ -34,6 +34,8 @@ class Attachment extends Model
         'File_Type',
         'File_Size',
         'Uploaded_By',
+        'Is_On_Local',
+        'Is_On_Drive', 
     ];
 
     protected $casts = [

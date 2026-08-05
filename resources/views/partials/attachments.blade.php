@@ -21,14 +21,14 @@
             <input type="hidden" name="Entity_Type" value="{{ $entityType }}">
             <input type="hidden" name="Entity_ID" value="{{ $entityId }}">
 
-            <input
+            <input  
                 type="file"
-                name="file"
+                name="file[]"
+                multiple
                 required
                 class="w-full border rounded-lg px-3 py-2 text-sm bg-white">
 
-            <p class="text-xs text-gray-500">Max 10MB. Images, PDF, Word, Excel, or text files.</p>
-
+<p class="text-xs text-gray-500">Max 10MB each. Images, PDF, Word, Excel, or text files. You can select multiple files.</p>
             <button
                 type="submit"
                 class="bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 text-sm">
@@ -66,10 +66,20 @@
                     </div>
                 </a>
 
-                <form method="POST" action="{{ route('attachments.destroy', $attachment->Attachment_ID) }}"
-                      onsubmit="return confirm('Delete this file?');" class="shrink-0">
+                <form
+                    method="POST"
+                    action="{{ route('attachments.destroy', $attachment->Attachment_ID) }}"
+                    x-data
+                    @submit.prevent="
+                        if (!confirm('Delete this file?')) return;
+                        const deleteBackup = confirm('Also delete the backup copy in Google Drive?');
+                        $refs.deleteBackupInput.value = deleteBackup ? '1' : '0';
+                        $el.submit();
+                    "
+                    class="shrink-0">
                     @csrf
                     @method('DELETE')
+                    <input type="hidden" name="delete_backup" value="0" x-ref="deleteBackupInput">
                     <button type="submit" class="text-red-600 hover:text-red-800 text-sm">Delete</button>
                 </form>
 

@@ -256,13 +256,11 @@
 
 </div>
 
-<div class ="bg-white rounded-lg shadow p-6 mt-6">
 @include('partials.attachments', [
     'attachments' => $customer->attachments,
     'entityType' => 'Company',
     'entityId' => $customer->Company_ID,
 ])
-</div>
 
 <!-- Send Email Modal -->
 <div x-show="emailing"

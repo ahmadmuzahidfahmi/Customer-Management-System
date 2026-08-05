@@ -129,13 +129,12 @@
     ])
 
     <!-- Attachements -->
-<div class ="bg-white rounded-lg shadow p-6 mt-6">
     @include('partials.attachments', [
     'attachments' => $contact->attachments,
     'entityType' => 'Contacts',
     'entityId' => $contact->Contact_ID,
     ])
-</div>
+
     <!-- Company Information -->
 
 <div class="bg-white rounded-lg shadow p-6 mt-6">

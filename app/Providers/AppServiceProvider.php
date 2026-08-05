@@ -11,6 +11,8 @@ use App\Models\Activity;
 use App\Models\Note;
 use App\Observers\CustomerObserver;
 use Illuminate\Support\Facades\Blade;
+use App\Observers\ContactObserver;
+use App\Observers\LeadObserver;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -20,6 +22,8 @@ class AppServiceProvider extends ServiceProvider
 public function boot(): void
 {
     Customer::observe(CustomerObserver::class);
+    Contact::observe(ContactObserver::class);
+    Leads::observe(LeadObserver::class);
 
     Relation::morphMap([
         'Contacts' => Contact::class,

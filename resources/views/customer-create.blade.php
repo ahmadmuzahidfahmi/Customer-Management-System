@@ -19,8 +19,8 @@
 
     <div class="bg-white rounded-lg shadow p-6">
 
-<form action="{{ route('customers.store') }}" method="POST">
-    @csrf
+<form action="{{ route('customers.store') }}" method="POST" enctype="multipart/form-data">
+@csrf
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -195,23 +195,62 @@
             </select>
         </div>
 
-     <div class="mt pt-6">
-        <h2 class="text-lg font-semibold text-gray-800 mb-3">Notes (optional)</h2>
+<div class="md:col-span-2" x-data="{ notes: [{ subject: '', content: '' }] }">
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+                Notes (Optional)
+            </label>
 
-        <div class="space-y-2">
-            <input
-                type="text"
-                name="Subject"
-                placeholder="Subject (optional)"
-                class="w-full border rounded-lg px-3 py-2 text-sm">
+            <template x-for="(note, index) in notes" :key="index">
+                <div class="space-y-2 mb-3 border rounded-lg p-3 bg-gray-50">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-400" x-text="'Note ' + (index + 1)"></span>
+                        <button
+                            type="button"
+                            x-show="notes.length > 1"
+                            @click="notes.splice(index, 1)"
+                            class="text-red-500 hover:text-red-700 text-xs">
+                            Remove
+                        </button>
+                    </div>
 
-            <textarea
-                name="Content"
-                rows="3"
-                placeholder="Write a note..."
-                class="w-full border rounded-lg px-3 py-2 text-sm"></textarea>
+                    <input
+                        type="text"
+                        :name="`Notes[${index}][Subject]`"
+                        x-model="note.subject"
+                        placeholder="Subject (optional)"
+                        class="w-full border rounded-lg px-3 py-2 text-sm">
+
+                    <textarea
+                        :name="`Notes[${index}][Content]`"
+                        x-model="note.content"
+                        rows="3"
+                        placeholder="Write a note..."
+                        class="w-full border rounded-lg px-3 py-2 text-sm"></textarea>
+                </div>
+            </template>
+
+            <button
+                type="button"
+                @click="notes.push({ subject: '', content: '' })"
+                class="text-cyan-600 hover:text-cyan-800 text-sm font-medium">
+                + Add another note
+            </button>
         </div>
-    </div>
+
+        <!-- Attachments -->
+        <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+                Attachments (Optional)
+            </label>
+
+            <input
+                type="file"
+                name="Attachments[]"
+                multiple
+                class="w-full border rounded-lg px-3 py-2 text-sm bg-white">
+
+            <p class="text-xs text-gray-500 mt-1">Max 10MB each. Images, PDF, Word, Excel, or text files.</p>
+        </div>
 
     </div>
 
