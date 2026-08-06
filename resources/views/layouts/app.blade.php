@@ -60,7 +60,7 @@
                 type="text"
                 name="search"
                 value="{{ request('search') }}"
-            placeholder="@if(request()->routeIs('customers'))Search customers by name, status...@elseif(request()->routeIs('leads'))Search leads by name, source...@elseif(request()->routeIs('contacts'))Search contacts by name, email...@elseif(request()->routeIs('activities.index'))Search activities...@endif"                class="w-full rounded-lg pl-10 pr-3 py-2 text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-white">
+            placeholder="@if(request()->routeIs('customers'))Search customers by name, status...@elseif(request()->routeIs('leads'))Search leads by name, source...@elseif(request()->routeIs('contacts'))Search contacts by name, email, role...@elseif(request()->routeIs('activities.index'))Search activities...@endif"                class="w-full rounded-lg pl-10 pr-3 py-2 text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-white">
             <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
         </form>
     @endif
@@ -192,19 +192,22 @@
             </select>
         </div>
     </div>
-@elseif(request()->routeIs('contacts'))
+
+    @elseif(request()->routeIs('contacts'))
     <div>
-        <label class="block text-xs font-medium text-gray-500 mb-1">Role</label>
-        <select name="role" form="global-search-form" onchange="this.form.submit()"
+        <label class="block text-xs font-medium text-gray-500 mb-1">Sort By</label>
+        <select name="sort" form="global-search-form" onchange="this.form.submit()"
                 class="w-full border rounded-lg px-2 py-1.5 text-sm">
-            <option value="">All roles</option>
-            @foreach($roles ?? [] as $roleOption)
-                <option value="{{ $roleOption }}" {{ request('role') === $roleOption ? 'selected' : '' }}>
-                    {{ $roleOption }}
-                </option>
-            @endforeach
+            <option value="newest" {{ request('sort','newest') === 'newest' ? 'selected' : '' }}>Newest First</option>
+            <option value="oldest" {{ request('sort') === 'oldest' ? 'selected' : '' }}>Oldest First</option>
+            <option value="name_asc" {{ request('sort') === 'name_asc' ? 'selected' : '' }}>Name A–Z</option>
+            <option value="name_desc" {{ request('sort') === 'name_desc' ? 'selected' : '' }}>Name Z–A</option>
+            <option value="company_asc" {{ request('sort') === 'company_asc' ? 'selected' : '' }}>Company A–Z</option>
+            <option value="company_desc" {{ request('sort') === 'company_desc' ? 'selected' : '' }}>Company Z–A</option>
         </select>
     </div>
+    
+
 @elseif(request()->routeIs('activities.index'))
     <div class="space-y-3">
         <div>
@@ -483,7 +486,6 @@
 
         </div>
     </div>
-
 
 </aside>
 

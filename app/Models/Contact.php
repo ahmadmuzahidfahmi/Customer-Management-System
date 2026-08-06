@@ -32,6 +32,7 @@ public function company()
     'Contact_Note',
     'Company_ID',
     'Country_Code',
+    'Is_Pinned',
 ];
 
 public function notes()

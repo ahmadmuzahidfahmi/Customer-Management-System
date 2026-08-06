@@ -31,6 +31,18 @@ class NoteController extends Controller
         return back()->with('success', 'Note deleted.');
     }
 
+    public function bulkDestroy(Request $request)
+    {
+        $validated = $request->validate([
+            'ids'   => 'required|array',
+            'ids.*' => 'integer|exists:notes,Note_ID',
+        ]);
+
+        $count = Note::whereIn('Note_ID', $validated['ids'])->delete();
+
+        return back()->with('success', "$count note(s) deleted.");
+    }
+
     public function update(Request $request, $id)
 {
     $request->validate([

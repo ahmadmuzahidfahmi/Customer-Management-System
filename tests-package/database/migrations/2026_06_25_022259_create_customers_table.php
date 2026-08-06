@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('Note_ID')->nullable();
             $table->string('Status')->nullable();
             $table->timestamp('Closed_Date')->nullable();
+            $table->timestamp('Is_Pinned')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

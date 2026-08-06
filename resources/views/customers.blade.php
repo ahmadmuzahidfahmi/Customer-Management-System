@@ -46,6 +46,106 @@
     </div>
 </div>
 
+<!-- Pinned Customers -->
+@if($pinnedCustomers->count())
+<div class="flex justify-between items-center mb-1">
+
+    <h3 class="text-xl font-semibold text-gray-800">
+        Pinned Customers
+    </h3>
+</div>  
+
+<div class="bg-white rounded-lg shadow overflow-hidden mb-6">
+
+    <table class="w-full text-sm">
+
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left">Company</th>
+                <th class="px-6 py-3 text-left">Email</th>
+                <th class="px-6 py-3 text-left">Phone</th>
+                <th class="px-6 py-3 text-left">Status</th>
+            </tr>
+        </thead>
+
+        <tbody class="divide-y">
+
+            @foreach($pinnedCustomers as $customer)
+
+            <tr
+                onclick="window.location='{{ route('customers.show', $customer->Company_ID) }}'"
+                class="cursor-pointer hover:bg-cyan-50">
+
+                <td class="px-6 py-4">
+
+                    <div class="flex items-center gap-2 group">
+
+                        <span class="font-medium">
+                        {{ $customer->Company_Name }}
+                        </span>
+
+                        <form
+                            action="{{ route('customers.pin', $customer->Company_ID) }}"
+                            method="POST"
+                            onclick="event.stopPropagation()">
+
+                            @csrf
+
+                            <button
+                                type="submit"
+                                title="Unpin customer"
+                                class="text-lg hover:scale-110 transition">
+
+                                📌
+
+                            </button>
+
+                        </form>
+
+                    </div>
+                </td>
+
+                <td class="px-6 py-4">
+                    {{ $customer->Company_Email }}
+                </td>
+
+                <td class="px-6 py-4">
+                    {{ $customer->Country_Code }}
+                    {{ $customer->Company_No }}
+                </td>
+
+                <td class="px-6 py-4">
+
+                    @if($customer->Status == 'Active')
+                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">
+                            Active
+                        </span>
+
+                    @elseif($customer->Status == 'Lead')
+                        <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">
+                            Lead
+                        </span>
+
+                    @else
+                        <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-700">
+                            Inactive
+                        </span>
+                    @endif
+
+                </td>
+
+            </tr>
+
+            @endforeach
+
+        </tbody>
+
+    </table>
+
+</div>
+
+@endif
+
 <!-- Main content table -->
 <div class="bg-white rounded-lg shadow overflow-hidden">
 
@@ -72,7 +172,42 @@
                 class="cursor-pointer hover:bg-cyan-50">
 
                 <td class="px-6 py-4">
-                    {{ $customer->Company_Name }}
+
+<div class="group flex items-center gap-2">
+
+    <span>
+        {{ $customer->Company_Name }}
+    </span>
+
+    <form
+        action="{{ route('customers.pin', $customer->Company_ID) }}"
+        method="POST"
+        onclick="event.stopPropagation()"
+        class="relative">
+
+        @csrf
+
+        <button
+            type="submit"
+            title="{{ $customer->Is_Pinned ? 'Unpin' : 'Pin' }}"
+            class="
+                opacity-0
+                group-hover:opacity-100
+                transition
+                duration-75
+                hover:scale-110
+                {{ $customer->Is_Pinned ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}
+                 transition duration-200 hover:scale-110
+            ">
+
+            {{ $customer->Is_Pinned ? '📌' : '📍' }}
+
+        </button>
+
+    </form>
+
+</div>
+
                 </td>
 
                 <td class="px-6 py-4">

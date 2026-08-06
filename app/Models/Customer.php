@@ -26,6 +26,7 @@ class Customer extends Model
         'Closed_Date',
         'Created_At',
         'Updated_At',
+        'Is_Pinned',
     ];
 
     protected $casts = [

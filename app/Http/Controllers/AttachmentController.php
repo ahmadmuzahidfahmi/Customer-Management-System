@@ -156,4 +156,140 @@ class AttachmentController extends Controller
             $deleteBackup ? 'Attachment and backup deleted.' : 'Attachment deleted. Backup kept in Google Drive.'
         );
     }
+
+    public function bulkDestroy(Request $request)
+{
+    $validated = $request->validate([
+        'ids'   => 'required|array',
+        'ids.*' => 'integer|exists:attachments,Attachment_ID',
+    ]);
+
+    $deleteBackup = $request->boolean('delete_backup');
+    $attachments = Attachment::whereIn('Attachment_ID', $validated['ids'])->get();
+    $count = 0;
+
+    foreach ($attachments as $attachment) {
+        try {
+            if (Storage::disk('network')->exists($attachment->File_Path)) {
+                Storage::disk('network')->delete($attachment->File_Path);
+            }
+        } catch (\Throwable $e) {
+            Log::error('Bulk local delete failed', ['attachment_id' => $attachment->Attachment_ID, 'error' => $e->getMessage()]);
+        }
+
+        if ($deleteBackup) {
+            try {
+                if (Storage::disk('google')->exists($attachment->File_Path)) {
+                    Storage::disk('google')->delete($attachment->File_Path);
+                }
+            } catch (\Throwable $e) {
+                Log::error('Bulk backup delete failed', ['attachment_id' => $attachment->Attachment_ID, 'error' => $e->getMessage()]);
+            }
+        }
+
+        $attachment->delete();
+        $count++;
+    }
+
+    return back()->with(
+        'success',
+        "$count attachment(s) deleted" . ($deleteBackup ? ' (including backups).' : '. Backups kept in Google Drive.')
+    );
+}
+
+public function resync($id)
+    {
+        $attachment = Attachment::findOrFail($id);
+        $fixed = [];
+        $stillFailing = [];
+
+        if (! $attachment->Is_On_Local) {
+            try {
+                if (Storage::disk('google')->exists($attachment->File_Path)) {
+                    $contents = Storage::disk('google')->get($attachment->File_Path);
+                    Storage::disk('network')->put($attachment->File_Path, $contents);
+                    $attachment->Is_On_Local = true;
+                    $fixed[] = 'local copy';
+                } else {
+                    $stillFailing[] = 'local copy (source missing on Drive too)';
+                }
+            } catch (\Throwable $e) {
+                Log::error('Resync to local failed', ['attachment_id' => $id, 'error' => $e->getMessage()]);
+                $stillFailing[] = 'local copy';
+            }
+        }
+
+        if (! $attachment->Is_On_Drive) {
+            try {
+                if (Storage::disk('network')->exists($attachment->File_Path)) {
+                    $contents = Storage::disk('network')->get($attachment->File_Path);
+                    Storage::disk('google')->put($attachment->File_Path, $contents);
+                    $attachment->Is_On_Drive = true;
+                    $fixed[] = 'Drive backup';
+                } else {
+                    $stillFailing[] = 'Drive backup (source missing locally too)';
+                }
+            } catch (\Throwable $e) {
+                Log::error('Resync to Drive failed', ['attachment_id' => $id, 'error' => $e->getMessage()]);
+                $stillFailing[] = 'Drive backup';
+            }
+        }
+
+        $attachment->save();
+
+        if ($fixed && ! $stillFailing) {
+            return back()->with('success', 'Restored: ' . implode(', ', $fixed) . '.');
+        }
+        if ($fixed && $stillFailing) {
+            return back()->with('error', 'Restored: ' . implode(', ', $fixed) . '. Still missing: ' . implode(', ', $stillFailing) . '.');
+        }
+        if ($stillFailing) {
+            return back()->with('error', 'Could not restore: ' . implode(', ', $stillFailing) . '.');
+        }
+
+        return back()->with('success', 'Already fully synced.');
+    }
+
+    public function syncStatus()
+    {
+        $attachments = Attachment::with('entity')
+            ->where('Is_On_Local', false)
+            ->orWhere('Is_On_Drive', false)
+            ->orderBy('Created_At', 'desc')
+            ->get();
+
+        return view('attachments-sync-status', compact('attachments'));
+    }
+
+    public function verifyAll()
+    {
+        $attachments = Attachment::all();
+        $updated = 0;
+
+        foreach ($attachments as $attachment) {
+            $onLocal = false;
+            $onDrive = false;
+
+            try {
+                $onLocal = Storage::disk('network')->exists($attachment->File_Path);
+            } catch (\Throwable $e) {
+                Log::error('Verify local check failed', ['attachment_id' => $attachment->Attachment_ID, 'error' => $e->getMessage()]);
+            }
+
+            try {
+                $onDrive = Storage::disk('google')->exists($attachment->File_Path);
+            } catch (\Throwable $e) {
+                Log::error('Verify drive check failed', ['attachment_id' => $attachment->Attachment_ID, 'error' => $e->getMessage()]);
+            }
+
+            if ($attachment->Is_On_Local !== $onLocal || $attachment->Is_On_Drive !== $onDrive) {
+                $attachment->Is_On_Local = $onLocal;
+                $attachment->Is_On_Drive = $onDrive;
+                $attachment->save();
+                $updated++;
+            }
+        }
+
+        return back()->with('success', "Verification complete. $updated record(s) updated.");
+    }
 }

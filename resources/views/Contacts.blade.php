@@ -36,7 +36,93 @@
     );
     </script>
 
+<!-- Pinned Contacts -->
+@if($pinnedContacts->count())
+<div class="flex justify-between items-center mb-1">
 
+    <h3 class="text-xl font-semibold text-gray-800">
+        Pinned Contacts
+    </h3>
+</div>  
+
+<div class="bg-white rounded-lg shadow overflow-hidden mb-6">
+
+    <table class="w-full text-sm">
+
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left">Name</th>
+                <th class="px-6 py-3 text-left">Company</th>
+                <th class="px-6 py-3 text-left">Email</th>
+                <th class="px-6 py-3 text-left">Phone</th>
+                <th class="px-6 py-3 text-left">Position</th>
+            </tr>
+        </thead>
+
+        <tbody class="divide-y">
+
+            @foreach($pinnedContacts as $contact)
+
+            <tr
+                onclick="window.location='{{ route('contacts.show', $contact->Contact_ID) }}'"
+                class="cursor-pointer hover:bg-cyan-50">
+
+                <td class="px-6 py-4">
+
+                    <div class="flex items-center gap-2 group">
+
+                        <span class="font-medium">
+                        {{ $contact->Contact_Name }}
+                        </span>
+
+                        <form
+                            action="{{ route('contacts.pin', $contact->Contact_ID) }}"
+                            method="POST"
+                            onclick="event.stopPropagation()">
+
+                            @csrf
+
+                            <button
+                                type="submit"
+                                title="Unpin contact"
+                                class="text-lg hover:scale-110 transition">
+
+                                📌
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                <td class="px-6 py-4"> {{ $contact->company->Company_Name ?? 'N/A' }}</td>
+
+                </td>
+
+                <td class="px-6 py-4">
+                    {{ $contact->Contact_Email }}
+                </td>
+
+                <td class="px-6 py-4">
+                    {{ $contact->Country_Code }}
+                    {{ $contact->Contact_No }}
+                </td>
+
+                <td class="px-6 py-4">
+                    {{ $contact->Contact_Role }}
+                </td>
+
+            </tr>
+
+            @endforeach
+
+        </tbody>
+
+    </table>
+
+</div>
+
+@endif
 
 <!-- Min content table -->
 <div class="bg-white rounded-lg shadow overflow-hidden">
@@ -54,14 +140,47 @@
         </thead>
 
 
-            <tbody class="divide-y">
+        <tbody class="divide-y">
 
             @foreach($contacts as $contact)
         <tr
             onclick="window.location='{{ route('contacts.show', $contact->Contact_ID) }}'"
             class="cursor-pointer hover:bg-cyan-50">
 
-            <td class="px-6 py-4">{{ $contact->Contact_Name }}</td>
+            <td class="px-6 py-4"><div class="group flex items-center gap-2">
+
+    <span>
+        {{ $contact->Contact_Name }}
+    </span>
+
+    <form
+        action="{{ route('contacts.pin', $contact->Contact_ID) }}"
+        method="POST"
+        onclick="event.stopPropagation()"
+        class="relative">
+
+        @csrf
+
+        <button
+            type="submit"
+            title="{{ $contact->Is_Pinned ? 'Unpin' : 'Pin' }}"
+            class="
+                opacity-0
+                group-hover:opacity-100
+                transition
+                duration-75
+                hover:scale-110
+                {{ $contact->Is_Pinned ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}
+                 transition duration-200 hover:scale-110
+            ">
+
+            {{ $contact->Is_Pinned ? '📌' : '📍' }}
+
+        </button>
+
+    </form>
+
+</div></td>
             <td class="px-6 py-4"> {{ $contact->company->Company_Name ?? 'N/A' }}</td>
             <td class="px-6 py-4">{{ $contact->Contact_Email }}</td>
             <td class="px-6 py-4">{{ $contact->Country_Code }} {{ $contact->Contact_No ?? 'N/A' }}</td>

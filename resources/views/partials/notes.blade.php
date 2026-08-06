@@ -1,8 +1,21 @@
-<div class="bg-white rounded-lg shadow p-4 mt-6" x-data="{ addingNote: false }">
+<div class="bg-white rounded-lg shadow p-4 mt-6" x-data="{
+    addingNote: false,
+    selected: [],
+    allIds: {{ Js::from($notes->pluck('Note_ID')) }},
+    toggleAll() {
+        this.selected = this.selected.length === this.allIds.length ? [] : [...this.allIds];
+    }
+}">
+
+    <!-- Hidden form the checkboxes submit into -->
+    <form id="bulk-note-form" method="POST" action="{{ route('notes.bulkDestroy') }}">
+        @csrf
+        @method('DELETE')
+    </form>
 
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-lg font-semibold text-gray-800">Notes</h2>
-        
+
         @unless(auth()->user()?->isGuest())
         <button
             @click="addingNote = !addingNote"
@@ -41,6 +54,33 @@
         </form>
     </div>
 
+    @if($notes->count() > 0)
+        @unless(auth()->user()?->isGuest())
+        <!-- Select-all + bulk action bar -->
+        <div class="flex items-center justify-between mb-3 pb-3 border-b">
+            <label class="flex items-center gap-2 text-sm text-gray-600">
+                <input
+                    type="checkbox"
+                    :checked="selected.length === allIds.length"
+                    @change="toggleAll()">
+                Select all
+            </label>
+
+            <button
+                type="button"
+                x-show="selected.length > 0"
+                x-cloak
+                @click="
+                    if (!confirm(`Delete ${selected.length} selected note(s)?`)) return;
+                    document.getElementById('bulk-note-form').submit();
+                "
+                class="bg-red-600 text-white px-3 py-1.5 rounded-lg hover:bg-red-700 text-sm">
+                Delete Selected (<span x-text="selected.length"></span>)
+            </button>
+        </div>
+        @endunless
+    @endif
+
     <!-- Notes List -->
 <div class="space-y-3">
     @forelse($notes as $note)
@@ -49,11 +89,23 @@
             <!-- View mode -->
             <div x-show="!editing">
                 <div class="flex justify-between items-start">
-                    <div>
-                        @if($note->Subject)
-                            <p class="font-semibold text-gray-800">{{ $note->Subject }}</p>
-                        @endif
-                        <p class="text-gray-700 text-sm mt-1">{{ $note->Content }}</p>
+                    <div class="flex items-start gap-3 min-w-0">
+                        @unless(auth()->user()?->isGuest())
+                        <input
+                            type="checkbox"
+                            form="bulk-note-form"
+                            name="ids[]"
+                            value="{{ $note->Note_ID }}"
+                            x-model="selected"
+                            class="mt-1 shrink-0">
+                        @endunless
+
+                        <div>
+                            @if($note->Subject)
+                                <p class="font-semibold text-gray-800">{{ $note->Subject }}</p>
+                            @endif
+                            <p class="text-gray-700 text-sm mt-1">{{ $note->Content }}</p>
+                        </div>
                     </div>
 
                 <div class="flex items-center gap-2">

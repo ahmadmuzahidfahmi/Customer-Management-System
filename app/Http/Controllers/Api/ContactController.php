@@ -13,6 +13,11 @@ class ContactController extends Controller
     {
         $contacts = Contact::latest('Contact_ID')->paginate(15);
 
+        $pinnedContacts = Contact::with('company')
+         ->where('Is_Pinned', 1)
+        ->orderBy('Contact_Name')
+        ->get();
+
         return ContactResource::collection($contacts);
     }
 

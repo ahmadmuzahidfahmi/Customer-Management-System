@@ -42,6 +42,8 @@ class Attachment extends Model
         'Created_At' => 'datetime',
         'Updated_At' => 'datetime',
         'File_Size'  => 'integer',
+        'Is_On_Local' => 'boolean',
+        'Is_On_Drive' => 'boolean',
     ];
 
     public function entity()
@@ -72,6 +74,49 @@ class Attachment extends Model
         }
 
         return $bytes . ' B';
+    }
+
+    public function isFullySynced(): bool
+    {
+        return $this->Is_On_Local && $this->Is_On_Drive;
+    }
+
+    public function syncStatusLabel(): string
+    {
+        if ($this->Is_On_Local && $this->Is_On_Drive) return 'Synced';
+        if ($this->Is_On_Local && ! $this->Is_On_Drive) return 'Backup missing';
+        if (! $this->Is_On_Local && $this->Is_On_Drive) return 'Local missing';
+        return 'Missing everywhere';
+    }
+
+    public function entityLabel(): string
+    {
+        $entity = $this->entity;
+
+        if (! $entity) {
+            return $this->Entity_Type . ' #' . $this->Entity_ID . ' (record no longer exists)';
+        }
+
+        return match ($this->Entity_Type) {
+            'Company'  => $entity->Company_Name,
+            'Contacts' => $entity->Contact_Name,
+            'Leads'    => $entity->Lead_Name,
+            'Activity' => $entity->Subject ?: ('Activity #' . $entity->Activity_ID),
+            'Notes'    => $entity->Subject ?: ('Note #' . $entity->Note_ID),
+            default    => $this->Entity_Type . ' #' . $this->Entity_ID,
+        };
+    }
+
+    public function entityUrl(): ?string
+    {
+        if (! $this->entity) return null;
+
+        return match ($this->Entity_Type) {
+            'Company'  => route('customers.show', $this->Entity_ID),
+            'Contacts' => route('contacts.show', $this->Entity_ID),
+            'Leads'    => route('leads.show', $this->Entity_ID),
+            default    => null, // Activity/Notes don't have a standalone page
+        };
     }
 
     protected function getAuditLabel(): string

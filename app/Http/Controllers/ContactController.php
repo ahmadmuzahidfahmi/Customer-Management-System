@@ -20,20 +20,50 @@ public function index(Request $request)
     $query = Contact::with('company');
 
     // Search
-    if ($request->filled('search')) {
+if ($request->filled('search')) {
         $search = $request->search;
 
         $query->where(function ($q) use ($search) {
             $q->where('Contact_Name', 'like', "%{$search}%")
               ->orWhere('Contact_Email', 'like', "%{$search}%")
               ->orWhere('Contact_Role', 'like', "%{$search}%")
-              ->orWhere('Contact_No', 'like', "%{$search}%");
+              ->orWhere('Contact_No', 'like', "%{$search}%")
+              ->orWhereHas('company', function ($q2) use ($search) {
+                  $q2->where('Company_Name', 'like', "%{$search}%");
+              });
         });
     }
 
     // Company filter
     if ($request->filled('company')) {
         $query->where('Company_ID', $request->company);
+    }
+
+switch ($request->get('sort', 'newest')) {
+        case 'oldest':
+            $query->orderBy('Created_At', 'asc');
+            break;
+        case 'name_asc':
+            $query->orderBy('Contact_Name', 'asc');
+            break;
+        case 'name_desc':
+            $query->orderBy('Contact_Name', 'desc');
+            break;
+        case 'company_asc':
+            $query->join('company', 'contacts.Company_ID', '=', 'company.Company_ID')
+                  ->orderBy('company.Company_Name', 'asc')
+                  ->orderBy('contacts.Contact_Name', 'asc')
+                  ->select('contacts.*');
+            break;
+        case 'company_desc':
+            $query->join('company', 'contacts.Company_ID', '=', 'company.Company_ID')
+                  ->orderBy('company.Company_Name', 'desc')
+                  ->orderBy('contacts.Contact_Name', 'asc')
+                  ->select('contacts.*');
+            break;
+        default:
+            $query->orderBy('Created_At', 'desc');
+            break;
     }
 
     $contacts = $query->paginate(10)->withQueryString();
@@ -56,6 +86,11 @@ public function index(Request $request)
           ->orWhere('Contact_Email', '');
     })->count();
 
+    $pinnedContacts = Contact::with('company')
+    ->where('Is_Pinned', 1)
+    ->orderBy('Contact_Name')
+    ->get();
+
     $companies = Customer::orderBy('Company_Name')->get();
 
     return view('contacts', compact(
@@ -64,7 +99,8 @@ public function index(Request $request)
         'withEmail',
         'withoutEmail',
         'companies',
-        'roles'
+        'roles',
+        'pinnedContacts'
     ));
 }
 
@@ -214,6 +250,17 @@ public function update(Request $request, $id)
         ->route('contacts.show', $contact->Contact_ID)
         ->with('success', 'Contact updated successfully.');
 } 
+
+public function togglePin($id)
+{
+    $contact = Contact::findOrFail($id);
+
+    $contact->update([
+        'Is_Pinned' => !$contact->Is_Pinned
+    ]);
+
+    return back();
+}
 
 public function destroy($id)
 {

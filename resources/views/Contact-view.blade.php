@@ -102,40 +102,11 @@
     
 </div>
 
-            <div>
-                <p class="text-sm text-gray-500">Note</p>
-                <p class="font-medium">
-                {{ $contact->Contact_Note ?? 'No notes available.' }}
-                </p>
-            </div>
-
         </div>
 
     </div>
 
-    <!-- Note -->
-
-    @include('partials.notes', [
-    'notes' => $contact->notes()->latest('Created_At')->get(),
-    'ownerField' => 'Contact_ID',
-    'ownerId' => $contact->Contact_ID,
-])
-    <!-- Activities -->
-
-    @include('partials.activities', [
-        'activities' => $contact->activities,
-        'ownerField' => 'Contact_ID',
-        'ownerId' => $contact->Contact_ID,
-    ])
-
-    <!-- Attachements -->
-    @include('partials.attachments', [
-    'attachments' => $contact->attachments,
-    'entityType' => 'Contacts',
-    'entityId' => $contact->Contact_ID,
-    ])
-
-    <!-- Company Information -->
+        <!-- Company Information -->
 
 <div class="bg-white rounded-lg shadow p-6 mt-6">
 
@@ -159,6 +130,29 @@
         @endif
 
     </div>
+</div>
+
+    <!-- Note -->
+
+    @include('partials.notes', [
+    'notes' => $contact->notes()->latest('Created_At')->get(),
+    'ownerField' => 'Contact_ID',
+    'ownerId' => $contact->Contact_ID,
+])
+    <!-- Activities -->
+
+    @include('partials.activities', [
+        'activities' => $contact->activities,
+        'ownerField' => 'Contact_ID',
+        'ownerId' => $contact->Contact_ID,
+    ])
+
+    <!-- Attachements -->
+    @include('partials.attachments', [
+    'attachments' => $contact->attachments,
+    'entityType' => 'Contacts',
+    'entityId' => $contact->Contact_ID,
+    ])
 
     <!-- Send Email Modal -->
     <div x-show="emailing"
@@ -213,7 +207,5 @@
         </div>
 
     </div>
-
-</div>
 
 @endsection

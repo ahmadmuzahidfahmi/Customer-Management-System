@@ -66,6 +66,11 @@ Route::put('/customers/{id}', [CustomerController::class, 'update'])
 
 Route::delete('/customers/{id}', [CustomerController::class, 'destroy'])
     ->name('customers.destroy');
+Route::post('/customers/{id}/contacts', [CustomerController::class, 'addContact'])->name('customers.addContact');
+Route::post('/customers/{id}/contacts/link', [CustomerController::class, 'linkContact'])->name('customers.linkContact');
+Route::post('/customers/{id}/leads', [CustomerController::class, 'addLead'])->name('customers.addLead');
+Route::post('/customers/{id}/leads/link', [CustomerController::class, 'linkLead'])->name('customers.linkLead');
+Route::post('/customers/{id}/pin', [CustomerController::class, 'togglePin'] )->name('customers.pin');
 
 /*
 |--------------------------------------------------------------------------
@@ -140,18 +145,13 @@ Route::put('/contacts/{id}', [ContactController::class, 'update'])
 Route::delete('/contacts/{id}', [ContactController::class, 'destroy'])
     ->name('contacts.destroy');
 
-    Route::post('/contacts/{id}/restore',
-    [ContactController::class, 'restore'])
-    ->name('contacts.restore');
+Route::post('/contacts/{id}/restore',[ContactController::class, 'restore'])->name('contacts.restore');
 
-    Route::delete('/contacts/{id}/force-delete',
-    [ContactController::class, 'forceDelete'])
-    ->name('contacts.forceDelete');
+Route::delete('/contacts/{id}/force-delete', [ContactController::class, 'forceDelete'])->name('contacts.forceDelete');
 
-Route::get(
-    '/recycle-bin/contact/{id}',
-    [ContactController::class, 'showDeleted']
-)->name('contacts.trashed.show');
+Route::get('/recycle-bin/contact/{id}',[ContactController::class, 'showDeleted'])->name('contacts.trashed.show');
+
+Route::post('/contacts/{id}/pin',[ContactController::class, 'togglePin'])->name('contacts.pin');
 
 /*
 |--------------------------------------------------------------------------
@@ -184,12 +184,17 @@ Route::get(
 | Attachements
 |--------------------------------------------------------------------------
 */
+Route::get('/attachments/sync-status', [AttachmentController::class, 'syncStatus'])->name('attachments.syncStatus');
 Route::post('/attachments', [AttachmentController::class, 'store'])->name('attachments.store');
+Route::post('/attachments/{id}/resync', [AttachmentController::class, 'resync'])->name('attachments.resync');
+Route::delete('/attachments/bulk-destroy', [AttachmentController::class, 'bulkDestroy'])->name('attachments.bulkDestroy');
 Route::get('/attachments/{id}', [AttachmentController::class, 'show'])->name('attachments.show');
 Route::delete('/attachments/{id}', [AttachmentController::class, 'destroy'])->name('attachments.destroy');
+Route::post('/attachments/verify-all', [AttachmentController::class, 'verifyAll'])->name('attachments.verifyAll');
 
 // Note 
 Route::post('/notes', [NoteController::class, 'store'])->name('notes.store');
+Route::delete('/notes/bulk-destroy', [NoteController::class, 'bulkDestroy'])->name('notes.bulkDestroy');
 Route::delete('/notes/{id}', [NoteController::class, 'destroy'])->name('notes.destroy');
 Route::put('/notes/{id}', [NoteController::class, 'update'])->name('notes.update');
 

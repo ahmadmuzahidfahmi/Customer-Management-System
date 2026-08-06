@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('Company_ID')->nullable();
             $table->unsignedBigInteger('User_ID')->nullable();
             $table->string('Country_Code')->nullable();
+            $table->timestamp('Closed_Date')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

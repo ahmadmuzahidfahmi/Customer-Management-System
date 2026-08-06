@@ -62,6 +62,10 @@ public function index(Request $request)
             break;
     }
 
+    $pinnedCustomers = Customer::where('Is_Pinned', true)
+    ->orderBy('Company_Name')
+    ->get();
+
     $customers = $query
         ->paginate(10)
         ->withQueryString();
@@ -77,7 +81,9 @@ public function index(Request $request)
         'customers',
         'customersCount',
         'activeCustomers',
-        'inactiveCustomers'
+        'inactiveCustomers',
+        'pinnedCustomers'
+
     ));
 }
 
@@ -85,7 +91,19 @@ public function create()
 {
     $countries = config('countries');
 
-    return view('customer-create', compact('countries'));
+    $existingContacts = Contact::with('company')->orderBy('Contact_Name')->get()->map(fn ($c) => [
+        'id'      => $c->Contact_ID,
+        'name'    => $c->Contact_Name,
+        'company' => $c->company->Company_Name ?? null,
+    ]);
+
+    $existingLeads = Leads::with('company')->orderBy('Lead_Name')->get()->map(fn ($l) => [
+        'id'      => $l->Lead_ID,
+        'name'    => $l->Lead_Name,
+        'company' => $l->company->Company_Name ?? null,
+    ]);
+
+    return view('customer-create', compact('countries', 'existingContacts', 'existingLeads'));
 }
 
 public function store(Request $request)
@@ -121,6 +139,7 @@ public function store(Request $request)
             ]);
         }
     }
+    
 
     // Attachments
     $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt'];
@@ -184,6 +203,44 @@ $isOnLocal = false;
             $failed[] = $originalName;
         }
     }
+            // Contacts
+    foreach ($request->input('Contacts', []) as $contactData) {
+        if (! empty($contactData['Contact_Name'])) {
+            \App\Models\Contact::create([
+                'Contact_Name'  => $contactData['Contact_Name'],
+                'Contact_Email' => $contactData['Contact_Email'] ?? null,
+                'Country_Code'  => $contactData['Country_Code'] ?? '+60',
+                'Contact_No'    => $contactData['Contact_No'] ?? null,
+                'Contact_Role'  => $contactData['Contact_Role'] ?? null,
+                'Company_ID'    => $customer->Company_ID,
+            ]);
+        }
+    }
+
+    // Leads
+    foreach ($request->input('Leads', []) as $leadData) {
+        if (! empty($leadData['Lead_Name'])) {
+            \App\Models\Leads::create([
+                'Lead_Name'       => $leadData['Lead_Name'],
+                'Source'          => $leadData['Source'] ?? null,
+                'Status'          => $leadData['Status'] ?? 'New',
+                'Estimated_Value' => $leadData['Estimated_Value'] ?? null,
+                'Company_ID'      => $customer->Company_ID,
+            ]);
+        }
+    }
+
+        // Link existing contacts (reassign them to this new company)
+    if ($request->filled('Existing_Contacts')) {
+        Contact::whereIn('Contact_ID', $request->input('Existing_Contacts'))
+            ->update(['Company_ID' => $customer->Company_ID]);
+    }
+
+    // Link existing leads (reassign them to this new company)
+    if ($request->filled('Existing_Leads')) {
+        Leads::whereIn('Lead_ID', $request->input('Existing_Leads'))
+            ->update(['Company_ID' => $customer->Company_ID]);
+    }
 
     $message = 'Customer added successfully.';
     if ($failed) {
@@ -193,13 +250,45 @@ $isOnLocal = false;
     return redirect()
         ->route('customers')
         ->with($failed ? 'error' : 'success', $message);
-}
+    }
 
 public function show($id)
 {
     $customer = Customer::with('leads', 'contacts')->findOrFail($id);
 
-    return view('customer-view', compact('customer'));
+    $contactIds = $customer->contacts()->pluck('Contact_ID');
+    $leadIds = $customer->leads()->pluck('Lead_ID');
+
+    $allAttachments = Attachment::with('entity')
+        ->where(function ($q) use ($customer, $contactIds, $leadIds) {
+            $q->where(fn ($q2) => $q2->where('Entity_Type', 'Company')->where('Entity_ID', $customer->Company_ID))
+              ->orWhere(fn ($q2) => $q2->where('Entity_Type', 'Contacts')->whereIn('Entity_ID', $contactIds))
+              ->orWhere(fn ($q2) => $q2->where('Entity_Type', 'Leads')->whereIn('Entity_ID', $leadIds));
+        })
+        ->latest('Created_At')
+        ->get();
+
+    $allOtherContacts = Contact::with('company')
+        ->where('Company_ID', '!=', $customer->Company_ID)
+        ->orderBy('Contact_Name')
+        ->get()
+        ->map(fn ($c) => [
+            'id'      => $c->Contact_ID,
+            'name'    => $c->Contact_Name,
+            'company' => $c->company->Company_Name ?? null,
+        ]);
+
+    $allOtherLeads = Leads::with('company')
+        ->where('Company_ID', '!=', $customer->Company_ID)
+        ->orderBy('Lead_Name')
+        ->get()
+        ->map(fn ($l) => [
+            'id'      => $l->Lead_ID,
+            'name'    => $l->Lead_Name,
+            'company' => $l->company->Company_Name ?? null,
+        ]);
+
+    return view('customer-view', compact('customer', 'allAttachments', 'allOtherContacts', 'allOtherLeads'));
 }
 
 public function edit($id)
@@ -242,6 +331,91 @@ public function update(Request $request, $id)
         ->route('customers.show', $customer->Company_ID)
         ->with('success', 'Customer updated successfully.');
 }
+
+public function togglePin($id)
+{
+    $customer = Customer::findOrFail($id);
+
+    $customer->update([
+        'Is_Pinned' => !$customer->Is_Pinned
+    ]);
+
+    return back();
+}
+
+public function addContact(Request $request, $id)
+    {
+        $customer = Customer::findOrFail($id);
+
+        $validated = $request->validate([
+            'Contact_Name'  => 'required|string|max:255',
+            'Contact_Email' => 'nullable|email|max:255',
+            'Country_Code'  => 'nullable|string|max:10',
+            'Contact_No'    => 'nullable|string|max:20',
+            'Contact_Role'  => 'nullable|string|max:255',
+        ]);
+
+        Contact::create([
+            'Contact_Name'  => $validated['Contact_Name'],
+            'Contact_Email' => $validated['Contact_Email'] ?? null,
+            'Country_Code'  => $validated['Country_Code'] ?? '+60',
+            'Contact_No'    => $validated['Contact_No'] ?? null,
+            'Contact_Role'  => $validated['Contact_Role'] ?? null,
+            'Company_ID'    => $customer->Company_ID,
+        ]);
+
+        return back()->with('success', 'Contact added.');
+    }
+
+    public function linkContact(Request $request, $id)
+    {
+        $customer = Customer::findOrFail($id);
+
+        $validated = $request->validate([
+            'Contact_ID' => 'required|exists:contacts,Contact_ID',
+        ]);
+
+        Contact::where('Contact_ID', $validated['Contact_ID'])
+            ->update(['Company_ID' => $customer->Company_ID]);
+
+        return back()->with('success', 'Contact linked to this customer.');
+    }
+
+    public function addLead(Request $request, $id)
+    {
+        $customer = Customer::findOrFail($id);
+
+        $validated = $request->validate([
+            'Lead_Name'       => 'required|string|max:255',
+            'Source'          => 'nullable|string|max:255',
+            'Status'          => 'nullable|string',
+            'Estimated_Value' => 'nullable|numeric',
+        ]);
+
+        Leads::create([
+            'Lead_Name'       => $validated['Lead_Name'],
+            'Source'          => $validated['Source'] ?? null,
+            'Status'          => $validated['Status'] ?? 'New',
+            'Estimated_Value' => $validated['Estimated_Value'] ?? null,
+            'Company_ID'      => $customer->Company_ID,
+        ]);
+
+        return back()->with('success', 'Lead added.');
+    }
+
+    public function linkLead(Request $request, $id)
+    {
+        $customer = Customer::findOrFail($id);
+
+        $validated = $request->validate([
+            'Lead_ID' => 'required|exists:leads,Lead_ID',
+        ]);
+
+        Leads::where('Lead_ID', $validated['Lead_ID'])
+            ->update(['Company_ID' => $customer->Company_ID]);
+
+        return back()->with('success', 'Lead linked to this customer.');
+    }
 
 public function destroy($id)
 {
