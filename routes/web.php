@@ -153,6 +153,9 @@ Route::get('/recycle-bin/contact/{id}',[ContactController::class, 'showDeleted']
 
 Route::post('/contacts/{id}/pin',[ContactController::class, 'togglePin'])->name('contacts.pin');
 
+Route::post('/contacts/{id}/leads', [ContactController::class, 'addLead'])->name('contacts.addLead');
+
+Route::post('/contacts/{id}/leads/link', [ContactController::class, 'linkLead'])->name('contacts.linkLead');
 /*
 |--------------------------------------------------------------------------
 | Profile

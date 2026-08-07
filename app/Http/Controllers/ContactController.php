@@ -7,6 +7,7 @@ use App\Models\Contact;
 use App\Models\Customer;
 use App\Models\Note;
 use App\Models\Attachment;
+use App\Models\Leads;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
@@ -106,9 +107,20 @@ switch ($request->get('sort', 'newest')) {
 
 public function show($id)
 {
-    $contact = Contact::findOrFail($id);
+    $contact = Contact::with('company', 'leads')->findOrFail($id);
 
-    return view('contact-view', compact('contact'));
+    $allOtherLeads = \App\Models\Leads::with('company')
+        ->where('Contact_ID', '!=', $contact->Contact_ID)
+        ->orWhereNull('Contact_ID')
+        ->orderBy('Lead_Name')
+        ->get()
+        ->map(fn ($l) => [
+            'id'      => $l->Lead_ID,
+            'name'    => $l->Lead_Name,
+            'company' => $l->company->Company_Name ?? null,
+        ]);
+
+    return view('contact-view', compact('contact', 'allOtherLeads'));
 }
 
 public function create()
@@ -261,6 +273,45 @@ public function togglePin($id)
 
     return back();
 }
+
+public function addLead(Request $request, $id)
+    {
+        $contact = Contact::findOrFail($id);
+
+        $validated = $request->validate([
+            'Lead_Name'       => 'required|string|max:255',
+            'Source'          => 'nullable|string|max:255',
+            'Status'          => 'nullable|string',
+            'Estimated_Value' => 'nullable|numeric',
+        ]);
+
+        Leads::create([
+            'Lead_Name'       => $validated['Lead_Name'],
+            'Source'          => $validated['Source'] ?? null,
+            'Status'          => $validated['Status'] ?? 'New',
+            'Estimated_Value' => $validated['Estimated_Value'] ?? null,
+            'Contact_ID'      => $contact->Contact_ID,
+            'Company_ID'      => $contact->Company_ID,
+        ]);
+
+        return back()->with('success', 'Lead added.');
+    }
+
+    public function linkLead(Request $request, $id)
+    {
+        $contact = Contact::findOrFail($id);
+
+        $validated = $request->validate([
+            'Lead_ID' => 'required|exists:leads,Lead_ID',
+        ]);
+
+        Leads::where('Lead_ID', $validated['Lead_ID'])->update([
+            'Contact_ID' => $contact->Contact_ID,
+            'Company_ID' => $contact->Company_ID,
+        ]);
+
+        return back()->with('success', 'Lead linked to this contact.');
+    }
 
 public function destroy($id)
 {

@@ -78,12 +78,6 @@
 
 </div>
 
-    <div class="bg-white rounded-lg shadow overflow-hidden">
-            <div class="px-6 py-4 border-b">
-        <h2 class="text-lg font-semibold text-gray-800">
-            Leads List
-        </h2>
-    </div>
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
 

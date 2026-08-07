@@ -6,7 +6,16 @@
 
 @section('content')
 
-<div x-data="{ emailing: false, tab: 'overview' }" class="space-y-6">
+<div x-data="{
+    emailing: false,
+    tab: '{{ request('tab', 'overview') }}',
+    setTab(name) {
+        this.tab = name;
+        const url = new URL(window.location);
+        url.searchParams.set('tab', name);
+        window.history.replaceState({}, '', url);
+    }
+}" class="space-y-6">
 
     <!-- Header -->
     <div class="flex justify-between items-center">
@@ -52,26 +61,33 @@
     </form>
 </div>
 @endunless 
+</div>
 
-    </div>
-
-    <!-- Quick stats strip -->
+<!-- Quick stats strip -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="bg-white rounded-lg shadow p-4 text-center">
-            <p class="text-2xl font-bold text-gray-800">{{ $customer->contacts->count() }}</p>
-            <p class="text-xs text-gray-500">Contacts</p>
+            <p class="text-2xl font-bold text-gray-800">
+                RM {{ number_format($customer->leads->sum('Estimated_Value'), 0) }}
+            </p>
+            <p class="text-xs text-gray-500">Pipeline Value</p>
         </div>
         <div class="bg-white rounded-lg shadow p-4 text-center">
-            <p class="text-2xl font-bold text-gray-800">{{ $customer->leads->count() }}</p>
-            <p class="text-xs text-gray-500">Leads</p>
+            <p class="text-2xl font-bold text-gray-800">
+                {{ $customer->leads->whereIn('Status', ['New', 'Contacted', 'Qualified'])->count() }}
+            </p>
+            <p class="text-xs text-gray-500">Open Leads</p>
         </div>
         <div class="bg-white rounded-lg shadow p-4 text-center">
-            <p class="text-2xl font-bold text-gray-800">{{ $customer->notes()->count() }}</p>
-            <p class="text-xs text-gray-500">Notes</p>
+            <p class="text-2xl font-bold text-gray-800">
+                {{ $customer->leads->where('Status', 'Won')->count() }}
+            </p>
+            <p class="text-xs text-gray-500">Won Leads</p>
         </div>
         <div class="bg-white rounded-lg shadow p-4 text-center">
-            <p class="text-2xl font-bold text-gray-800">{{ $allAttachments->count() }}</p>
-            <p class="text-xs text-gray-500">Attachments</p>
+            <p class="text-sm font-bold text-gray-800">
+                {{ $customer->Created_At?->format('M j, Y') ?? 'Unknown' }}
+            </p>
+            <p class="text-xs text-gray-500">Customer Since</p>
         </div>
     </div>
 
@@ -79,50 +95,49 @@
     <div class="flex gap-2 border-b overflow-x-auto">
 
         <button
-            @click="tab='overview'"
+            @click="setTab('overview')"
             :class="tab==='overview' ? 'border-cyan-600 text-cyan-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
             class="px-4 py-2 border-b-2 font-medium text-sm whitespace-nowrap">
             Overview
         </button>
 
         <button
-            @click="tab='contacts'"
+            @click="setTab('contacts')"
             :class="tab==='contacts' ? 'border-cyan-600 text-cyan-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
             class="px-4 py-2 border-b-2 font-medium text-sm whitespace-nowrap">
             Contacts ({{ $customer->contacts->count() }})
         </button>
 
         <button
-            @click="tab='leads'"
+            @click="setTab('leads')"
             :class="tab==='leads' ? 'border-cyan-600 text-cyan-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
             class="px-4 py-2 border-b-2 font-medium text-sm whitespace-nowrap">
             Leads ({{ $customer->leads->count() }})
         </button>
 
         <button
-            @click="tab='activities'"
+            @click="setTab('activities')"
             :class="tab==='activities' ? 'border-cyan-600 text-cyan-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
             class="px-4 py-2 border-b-2 font-medium text-sm whitespace-nowrap">
             Activities
         </button>
 
         <button
-            @click="tab='notes'"
+            @click="setTab('notes')"
             :class="tab==='notes' ? 'border-cyan-600 text-cyan-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
             class="px-4 py-2 border-b-2 font-medium text-sm whitespace-nowrap">
             Notes ({{ $customer->notes()->count() }})
         </button>
 
         <button
-            @click="tab='attachments'"
+            @click="setTab('attachments')"
             :class="tab==='attachments' ? 'border-cyan-600 text-cyan-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
             class="px-4 py-2 border-b-2 font-medium text-sm whitespace-nowrap">
             Attachments ({{ $allAttachments->count() }})
         </button>
-
     </div>
 
-    <!-- Overview Tab -->
+ <!-- Overview Tab -->
     <div x-show="tab === 'overview'">
         <div class="bg-white rounded-lg shadow p-6">
 
@@ -188,7 +203,6 @@
         </div>
     </div>
 
-    <!-- Contacts Tab -->
 <!-- Contacts Tab -->
     <div x-show="tab === 'contacts'" x-cloak x-data="{
         addingContact: false,
@@ -410,7 +424,6 @@ class="bg-white border rounded-lg shadow-sm hover:shadow-md hover:bg-cyan-50 tra
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-6 py-3 text-left">Lead Name</th>
-                                <th class="px-6 py-3 text-left">Customer</th>
                                 <th class="px-6 py-3 text-left">Value</th>
                                 <th class="px-6 py-3 text-left">Source</th>
                                 <th class="px-6 py-3 text-left">Last Update</th>
@@ -420,9 +433,10 @@ class="bg-white border rounded-lg shadow-sm hover:shadow-md hover:bg-cyan-50 tra
 
                         <tbody class="divide-y">
                             @foreach($customer->leads as $lead)
-                                <tr>
+                                <tr
+                                    onclick="window.location='{{ route('leads.show', $lead->Lead_ID) }}'"
+                                    class="cursor-pointer hover:bg-cyan-50">
                                     <td class="px-6 py-4">{{ $lead->Lead_Name }}</td>
-                                    <td class="px-6 py-4">{{ $lead->company->Company_Name ?? 'No Company' }}</td>
                                     <td class="px-6 py-4">{{ $lead->Estimated_Value ?? 'unknown' }}</td>
                                     <td class="px-6 py-4">{{ $lead->Source ?? 'unknown' }}</td>
                                     <td class="px-6 py-4">{{ $lead->Updated_At ?? 'unknown' }}</td>
@@ -446,7 +460,7 @@ class="bg-white border rounded-lg shadow-sm hover:shadow-md hover:bg-cyan-50 tra
 
             @else
 
-                <div class="text-center py-8 text-gray-500">
+                <div class="text-gray-500 text-sm py-4">
                     No leads linked to this customer.
                 </div>
 

@@ -53,6 +53,10 @@ public function attachments()
 {
     return $this->morphMany(Attachment::class, 'entity', 'Entity_Type', 'Entity_ID', 'Contact_ID');
 }
+public function leads()
+{
+    return $this->hasMany(Leads::class, 'Contact_ID', 'Contact_ID')->latest('Created_At');
+}
 
 public function getWhatsappNumberAttribute()
 {

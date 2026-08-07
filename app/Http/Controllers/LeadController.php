@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Leads;
 use App\Models\Customer;
+use App\Models\Contact;  
 use App\Models\User;
 use App\Models\Note;
-
-
-
 use Illuminate\Database\Eloquent\Model;
+
+
+
 class LeadController extends Controller
 {
 
@@ -78,11 +79,10 @@ public function show($id)
 
 public function create()
 {
-    $users = User::all(); // optional
+    $users = User::all();
+    $customers = Customer::with('contacts')->orderBy('Company_Name')->get();
 
-    $customers = Customer::orderBy('Company_Name')->get();
-
-    return view('lead-create', compact('users','customers'));
+    return view('lead-create', compact('users', 'customers'));
 }
 
 public function store(Request $request)
@@ -91,15 +91,25 @@ public function store(Request $request)
         'Lead_Name' => 'required|string|max:255',
     ]);
 
+    $companyId = $request->Company_ID;
+
+    // If a contact is picked, their company always wins — keeps the two fields consistent
+    // even if the client-side JS is bypassed or something goes wrong.
+    if ($request->filled('Contact_ID')) {
+        $contact = Contact::find($request->Contact_ID);
+        if ($contact) {
+            $companyId = $contact->Company_ID;
+        }
+    }
+
     Leads::create([
         'Lead_Name'        => $request->Lead_Name,
         'Source'           => $request->Source,
         'User_ID'          => $request->User_ID,
         'Status'           => $request->Status,
         'Estimated_Value'  => $request->Estimated_Value,
-        'Company_ID'       => $request->Company_ID,
+        'Company_ID'       => $companyId,
         'Contact_ID'       => $request->Contact_ID,
-        ''
     ]);
 
     return redirect()
@@ -110,25 +120,29 @@ public function store(Request $request)
 public function edit($id)
 {
     $lead = Leads::findOrFail($id);
-
-    $customers = Customer::orderBy('Company_Name')->get();
-
+    $customers = Customer::with('contacts')->orderBy('Company_Name')->get();
     $users = User::all();
 
-    return view('lead-edit', compact(
-        'lead',
-        'customers',
-        'users'
-    ));
+    return view('lead-edit', compact('lead', 'customers', 'users'));
 }
 
 public function update(Request $request, $id)
 {
     $lead = Leads::findOrFail($id);
 
+    $companyId = $request->Company_ID;
+
+    if ($request->filled('Contact_ID')) {
+        $contact = Contact::find($request->Contact_ID);
+        if ($contact) {
+            $companyId = $contact->Company_ID;
+        }
+    }
+
     $lead->update([
         'Lead_Name'       => $request->Lead_Name,
-        'Company_ID'      => $request->Company_ID,
+        'Company_ID'      => $companyId,
+        'Contact_ID'      => $request->Contact_ID,
         'Source'          => $request->Source,
         'User_ID'         => $request->User_ID,
         'Status'          => $request->Status,
@@ -139,6 +153,7 @@ public function update(Request $request, $id)
         ->route('leads.show', $lead->Lead_ID)
         ->with('success', 'Lead updated successfully.');
 }
+
 public function destroy($id)
 {
     $lead = Leads::findOrFail($id);

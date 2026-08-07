@@ -37,244 +37,232 @@
         <!-- Middle - search bar -->
 
 @unless(request()->routeIs('dashboard'))
-<div class="flex-1 max-w-xl mx-6 hidden md:flex items-center gap-2"
-     x-data="{ filterOpen: false }">
 
-    @if(request()->routeIs('recycle-bin'))
-        {{-- No <form>, no reload — binds straight to the Alpine store --}}
-        <div class="flex-1 relative">
-            <input
-                type="text"
-                x-model="$store.search.query"
-                placeholder="Search recycle bin..."
-                class="w-full rounded-lg pl-10 pr-3 py-2 text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-white">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
-        </div>
-    @else
-<form
-    id="global-search-form"
-    method="GET"
-    action="{{ url()->current() }}"
-    class="flex-1 relative">            
-    <input
-                type="text"
-                name="search"
-                value="{{ request('search') }}"
-            placeholder="@if(request()->routeIs('customers'))Search customers by name, status...@elseif(request()->routeIs('leads'))Search leads by name, source...@elseif(request()->routeIs('contacts'))Search contacts by name, email, role...@elseif(request()->routeIs('activities.index'))Search activities...@endif"                class="w-full rounded-lg pl-10 pr-3 py-2 text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-white">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
-        </form>
-    @endif
+@php
+    $hasSearch = request()->routeIs([
+        'customers',
+        'contacts',
+        'leads',
+        'leads.kanban',
+        'activities.index',
+        'audit-log',
+        'recycle-bin',
+    ]);
 
-    <div  class="relative flex items-center gap-2">
-        <button
-            @click="filterOpen = !filterOpen"
-            type="button"
-            class="flex items-center gap-1 bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg text-sm whitespace-nowrap">
-            ⚙️ Filters
-        </button>
+    $hasFilters = request()->routeIs([
+        'customers',
+        'contacts',
+        'leads',
+        'activities.index',
+        'audit-log',
+    ]);
+@endphp
+
+@if($hasSearch || $hasFilters)
+
+<div
+    class="flex-1 max-w-xl mx-6 hidden md:flex items-center gap-2"
+    x-data="{ filterOpen: false }">
+
+    @if($hasSearch)
 
         @if(request()->routeIs('recycle-bin'))
-            <a href="#" @click.prevent="$store.search.query = ''"
-               class="flex items-center gap-1 bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg text-sm whitespace-nowrap">
-                ✕ Reset
-            </a>
+
+            <div class="flex-1 relative">
+                <input
+                    type="text"
+                    x-model="$store.search.query"
+                    placeholder="Search recycle bin..."
+                    class="w-full rounded-lg pl-10 pr-3 py-2 text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-white">
+
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    🔍
+                </span>
+            </div>
+
         @else
+
+            <form
+                id="global-search-form"
+                method="GET"
+                action="{{ url()->current() }}"
+                class="flex-1 relative">
+
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ request('search') }}"
+                    placeholder="Search..."
+                    class="w-full rounded-lg pl-10 pr-3 py-2 text-gray-800 bg-white/95 focus:outline-none focus:ring-2 focus:ring-white">
+
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    🔍
+                </span>
+
+            </form>
+
+        @endif
+
+    @endif
+
+<div
+        class="relative flex items-center gap-2">
+
+        @if($hasFilters)
+            <button
+                @click="filterOpen = !filterOpen"
+                type="button"
+                class="flex items-center gap-1 bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg text-sm whitespace-nowrap">
+                ⚙️ Filters
+            </button>
+        @endif
+
+        @if(request()->anyFilled(['search', 'status', 'type', 'source', 'sort', 'mine', 'action']))
             <a href="{{ url()->current() }}"
                class="flex items-center gap-1 bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg text-sm whitespace-nowrap">
                 ✕ Reset
             </a>
         @endif
 
-        <div
-            x-show="filterOpen"
-            @click.away="filterOpen = false"
-            x-cloak
-            class="absolute right-0 top-full mt-2 w-64 bg-white text-gray-800 rounded-lg shadow-lg p-4 z-50 space-y-2">
+        @if($hasFilters)
+            <div
+                x-show="filterOpen"
+                @click.away="filterOpen = false"
+                x-cloak
+                class="absolute right-0 top-full mt-2 w-64 bg-white text-gray-800 rounded-lg shadow-lg p-4 z-50 space-y-2">
 
-@if(request()->routeIs('customers'))
-<div class="space-y-3">
+                @if(request()->routeIs('customers'))
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
+                            <select name="status" form="global-search-form" onchange="this.form.submit()"
+                                    class="w-full border rounded-lg px-2 py-1.5 text-sm">
+                                <option value="">All statuses</option>
+                                <option value="Active" {{ request('status') === 'Active' ? 'selected' : '' }}>Active</option>
+                                <option value="Lead" {{ request('status') === 'Lead' ? 'selected' : '' }}>Lead</option>
+                                <option value="Inactive" {{ request('status') === 'Inactive' ? 'selected' : '' }}>Inactive</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Sort By</label>
+                            <select name="sort" form="global-search-form" onchange="this.form.submit()"
+                                    class="w-full border rounded-lg px-2 py-1.5 text-sm">
+                                <option value="newest" {{ request('sort','newest') === 'newest' ? 'selected' : '' }}>Newest First</option>
+                                <option value="oldest" {{ request('sort') === 'oldest' ? 'selected' : '' }}>Oldest First</option>
+                                <option value="name_asc" {{ request('sort') === 'name_asc' ? 'selected' : '' }}>Name A–Z</option>
+                                <option value="name_desc" {{ request('sort') === 'name_desc' ? 'selected' : '' }}>Name Z–A</option>
+                            </select>
+                        </div>
+                    </div>
 
-    <div>
+                @elseif(request()->routeIs('leads'))
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
+                            <select name="status" form="global-search-form" onchange="this.form.submit()"
+                                    class="w-full border rounded-lg px-2 py-1.5 text-sm">
+                                <option value="">All statuses</option>
+                                <option value="New" {{ request('status') === 'New' ? 'selected' : '' }}>New</option>
+                                <option value="Contacted" {{ request('status') === 'Contacted' ? 'selected' : '' }}>Contacted</option>
+                                <option value="Qualified" {{ request('status') === 'Qualified' ? 'selected' : '' }}>Qualified</option>
+                                <option value="Won" {{ request('status') === 'Won' ? 'selected' : '' }}>Won</option>
+                                <option value="Lost" {{ request('status') === 'Lost' ? 'selected' : '' }}>Lost</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Source</label>
+                            <select name="source" form="global-search-form" onchange="this.form.submit()"
+                                    class="w-full border rounded-lg px-2 py-1.5 text-sm">
+                                <option value="">All sources</option>
+                                @foreach($sources ?? [] as $sourceOption)
+                                    <option value="{{ $sourceOption }}" {{ request('source') === $sourceOption ? 'selected' : '' }}>
+                                        {{ $sourceOption }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
 
-        <label class="block text-xs font-medium text-gray-500 mb-1">
-            Status
-        </label>
+                @elseif(request()->routeIs('contacts'))
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Sort By</label>
+                        <select name="sort" form="global-search-form" onchange="this.form.submit()"
+                                class="w-full border rounded-lg px-2 py-1.5 text-sm">
+                            <option value="newest" {{ request('sort','newest') === 'newest' ? 'selected' : '' }}>Newest First</option>
+                            <option value="oldest" {{ request('sort') === 'oldest' ? 'selected' : '' }}>Oldest First</option>
+                            <option value="name_asc" {{ request('sort') === 'name_asc' ? 'selected' : '' }}>Name A–Z</option>
+                            <option value="name_desc" {{ request('sort') === 'name_desc' ? 'selected' : '' }}>Name Z–A</option>
+                            <option value="company_asc" {{ request('sort') === 'company_asc' ? 'selected' : '' }}>Company A–Z</option>
+                            <option value="company_desc" {{ request('sort') === 'company_desc' ? 'selected' : '' }}>Company Z–A</option>
+                        </select>
+                    </div>
 
-        <select
-            name="status"
-            form="global-search-form"
-            onchange="document.getElementById('global-search-form').submit()"
-            class="w-full border rounded-lg px-2 py-1.5 text-sm">
+                @elseif(request()->routeIs('activities.index'))
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
+                            <select name="status" form="global-search-form" onchange="this.form.submit()"
+                                    class="w-full border rounded-lg px-2 py-1.5 text-sm">
+                                <option value="">All</option>
+                                <option value="Pending" {{ request('status') === 'Pending' ? 'selected' : '' }}>Pending</option>
+                                <option value="Completed" {{ request('status') === 'Completed' ? 'selected' : '' }}>Completed</option>
+                                <option value="Cancelled" {{ request('status') === 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Type</label>
+                            <select name="type" form="global-search-form" onchange="this.form.submit()"
+                                    class="w-full border rounded-lg px-2 py-1.5 text-sm">
+                                <option value="">All</option>
+                                @foreach(['Call', 'Email', 'Meeting', 'Follow-Up', 'Other'] as $type)
+                                    <option value="{{ $type }}" {{ request('type') === $type ? 'selected' : '' }}>{{ $type }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <label class="flex items-center gap-2 text-sm text-gray-700">
+                            <input type="checkbox" name="mine" value="1" form="global-search-form"
+                                   onchange="this.form.submit()" {{ request('mine') ? 'checked' : '' }}>
+                            My activities only
+                        </label>
+                    </div>
 
-            <option value="">All statuses</option>
+                @elseif(request()->routeIs('audit-log'))
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Action</label>
+                            <select name="action" form="global-search-form" onchange="this.form.submit()"
+                                    class="w-full border rounded-lg px-2 py-1.5 text-sm">
+                                <option value="">All Actions</option>
+                                @foreach(['created','updated','deleted','restored','force_deleted','viewed','login','logout'] as $action)
+                                    <option value="{{ $action }}" {{ request('action') === $action ? 'selected' : '' }}>
+                                        {{ ucfirst(str_replace('_',' ',$action)) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-500 mb-1">Type</label>
+                            <select name="type" form="global-search-form" onchange="this.form.submit()"
+                                    class="w-full border rounded-lg px-2 py-1.5 text-sm">
+                                <option value="">All Types</option>
+                                @foreach(['Customer','Contact','Lead','Note','Auth','Page'] as $type)
+                                    <option value="{{ $type }}" {{ request('type') === $type ? 'selected' : '' }}>{{ $type }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
 
-            <option value="Active"
-                {{ request('status') === 'Active' ? 'selected' : '' }}>
-                Active
-            </option>
+                @endif
 
-            <option value="Lead"
-                {{ request('status') === 'Lead' ? 'selected' : '' }}>
-                Lead
-            </option>
-
-            <option value="Inactive"
-                {{ request('status') === 'Inactive' ? 'selected' : '' }}>
-                Inactive
-            </option>
-
-        </select>
-
-    </div>
-
-    <div>
-
-        <label class="block text-xs font-medium text-gray-500 mb-1">
-            Sort By
-        </label>
-
-        <select
-            name="sort"
-            form="global-search-form"
-            onchange="document.getElementById('global-search-form').submit()"
-            class="w-full border rounded-lg px-2 py-1.5 text-sm">
-
-            <option value="newest"
-                {{ request('sort','newest') === 'newest' ? 'selected' : '' }}>
-                Newest First
-            </option>
-
-            <option value="oldest"
-                {{ request('sort') === 'oldest' ? 'selected' : '' }}>
-                Oldest First
-            </option>
-
-            <option value="name_asc"
-                {{ request('sort') === 'name_asc' ? 'selected' : '' }}>
-                Name A–Z
-            </option>
-
-            <option value="name_desc"
-                {{ request('sort') === 'name_desc' ? 'selected' : '' }}>
-                Name Z–A
-            </option>
-
-        </select>
+            </div>
+        @endif
 
     </div>
 
 </div>
-@elseif(request()->routeIs('leads'))
-    <div class="space-y-3">
-        <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
-            <select name="status" form="global-search-form" onchange="this.form.submit()"
-                    class="w-full border rounded-lg px-2 py-1.5 text-sm">
-                <option value="">All statuses</option>
-                <option value="New" {{ request('status') === 'New' ? 'selected' : '' }}>New</option>
-                <option value="Contacted" {{ request('status') === 'Contacted' ? 'selected' : '' }}>Contacted</option>
-                <option value="Qualified" {{ request('status') === 'Qualified' ? 'selected' : '' }}>Qualified</option>
-                <option value="Won" {{ request('status') === 'Won' ? 'selected' : '' }}>Won</option>
-                <option value="Lost" {{ request('status') === 'Lost' ? 'selected' : '' }}>Lost</option>
-            </select>
-        </div>
-        
-        <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">Source</label>
-            <select name="source" form="global-search-form" onchange="this.form.submit()"
-                    class="w-full border rounded-lg px-2 py-1.5 text-sm">
-                <option value="">All sources</option>
-                @foreach($sources ?? [] as $sourceOption)
-                    <option value="{{ $sourceOption }}" {{ request('source') === $sourceOption ? 'selected' : '' }}>
-                        {{ $sourceOption }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-    </div>
 
-    @elseif(request()->routeIs('contacts'))
-    <div>
-        <label class="block text-xs font-medium text-gray-500 mb-1">Sort By</label>
-        <select name="sort" form="global-search-form" onchange="this.form.submit()"
-                class="w-full border rounded-lg px-2 py-1.5 text-sm">
-            <option value="newest" {{ request('sort','newest') === 'newest' ? 'selected' : '' }}>Newest First</option>
-            <option value="oldest" {{ request('sort') === 'oldest' ? 'selected' : '' }}>Oldest First</option>
-            <option value="name_asc" {{ request('sort') === 'name_asc' ? 'selected' : '' }}>Name A–Z</option>
-            <option value="name_desc" {{ request('sort') === 'name_desc' ? 'selected' : '' }}>Name Z–A</option>
-            <option value="company_asc" {{ request('sort') === 'company_asc' ? 'selected' : '' }}>Company A–Z</option>
-            <option value="company_desc" {{ request('sort') === 'company_desc' ? 'selected' : '' }}>Company Z–A</option>
-        </select>
-    </div>
-    
-
-@elseif(request()->routeIs('activities.index'))
-    <div class="space-y-3">
-        <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
-            <select name="status" form="global-search-form" onchange="this.form.submit()"
-                    class="w-full border rounded-lg px-2 py-1.5 text-sm">
-                <option value="">All</option>
-                <option value="Pending" {{ request('status') === 'Pending' ? 'selected' : '' }}>Pending</option>
-                <option value="Completed" {{ request('status') === 'Completed' ? 'selected' : '' }}>Completed</option>
-                <option value="Cancelled" {{ request('status') === 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
-            </select>
-        </div>
-
-        <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">Type</label>
-            <select name="type" form="global-search-form" onchange="this.form.submit()"
-                    class="w-full border rounded-lg px-2 py-1.5 text-sm">
-                <option value="">All</option>
-                @foreach(['Call', 'Email', 'Meeting', 'Follow-Up', 'Other'] as $type)
-                    <option value="{{ $type }}" {{ request('type') === $type ? 'selected' : '' }}>{{ $type }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <label class="flex items-center gap-2 text-sm text-gray-700">
-            <input type="checkbox" name="mine" value="1" form="global-search-form"
-                   onchange="this.form.submit()" {{ request('mine') ? 'checked' : '' }}>
-            My activities only
-        </label>
-    </div>
-@elseif(request()->routeIs('audit-log'))
-    <div class="space-y-3">
-        <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">Action</label>
-            <select name="action" form="global-search-form" onchange="this.form.submit()"
-                    class="w-full border rounded-lg px-2 py-1.5 text-sm">
-                <option value="">All Actions</option>
-                @foreach(['created','updated','deleted','restored','force_deleted','viewed','login','logout'] as $action)
-                    <option value="{{ $action }}" {{ request('action') === $action ? 'selected' : '' }}>
-                        {{ ucfirst(str_replace('_',' ',$action)) }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-
-        <div>
-            <label class="block text-xs font-medium text-gray-500 mb-1">Type</label>
-            <select name="type" form="global-search-form" onchange="this.form.submit()"
-                    class="w-full border rounded-lg px-2 py-1.5 text-sm">
-                <option value="">All Types</option>
-                @foreach(['Customer','Contact','Lead','Note','Auth','Page'] as $type)
-                    <option value="{{ $type }}" {{ request('type') === $type ? 'selected' : '' }}>{{ $type }}</option>
-                @endforeach
-            </select>
-        </div>
-    </div>
-
-@elseif(request()->routeIs('recycle-bin'))
-    <p class="text-sm text-gray-500">No filters for this page</p>
-@else
-    <p class="text-sm text-gray-500">No filters for this page</p>
 @endif
 
-        </div>
-    </div>
-
-</div>
 @endunless
 
     <!-- Right -->
