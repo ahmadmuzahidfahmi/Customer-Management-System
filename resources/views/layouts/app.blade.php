@@ -268,8 +268,11 @@
     <!-- Right -->
 <div class="flex items-center gap-3">
 
-    <a href="{{ route('profile') }}" class="flex items-center gap-3 hover-grow">
-        <div class="text-right hidden sm:block">
+    <a href="{{ route('profile') }}"
+     class="flex items-center gap-3 px-3 py-2 rounded-lg
+          hover:bg-white/10 hover:shadow-md hover:scale-105
+          transition-all duration-200">       
+           <div class="text-right hidden sm:block">
             <p class="font-semibold">{{ auth()->user()->User_Name }}</p>
             <p class="text-xs text-indigo-200">{{ auth()->user()->User_Role }}</p>
         </div>
@@ -310,7 +313,7 @@
     <!-- Sidebar -->
 <aside
     :class="sidebarOpen ? 'w-72 translate-x-0' : 'w-0 -translate-x-full md:translate-x-0'"
-    class="fixed md:sticky top-0 md:top-[72px] left-0 h-full md:h-[calc(100vh-72px)] bg-white shadow-lg z-[50] transition-all duration-300 overflow-hidden">
+    class="sticky top-[72px] md:top-[72px] left-0 h-full md:h-[calc(100vh-72px)] bg-white shadow-lg z-[50] transition-all duration-300 overflow-hidden">
 
     <div class="flex flex-col h-full w-72 overflow-y-auto">
         <!-- Sidebar Header -->

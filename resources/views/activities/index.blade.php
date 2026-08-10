@@ -77,7 +77,7 @@
                     <th class="px-4 py-3">Assigned</th>
                     <th class="px-4 py-3">Deadline</th>
                     <th class="px-4 py-3">Status</th>
-                    <th class="px-4 py-3"></th>
+                    <th class="px-4 py-3">Action</th>
                 </tr>
             </thead>
             <tbody>

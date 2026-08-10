@@ -55,4 +55,33 @@ class AuthController extends Controller
             'message' => 'Logged out',
         ]);
     }
+
+    public function showRegisterForm()
+    {
+        return view('auth.register');
+    }
+
+    public function register(Request $request)
+    {
+        $validated = $request->validate([
+            'User_Name'  => ['required', 'string', 'max:255', 'unique:users,User_Name'],
+            'User_Email' => ['required', 'email', 'max:255', 'unique:users,User_Email'],
+            'password'   => ['required', 'confirmed', 'min:8'],
+        ]);
+
+        $user = User::create([
+            'User_Name'     => $validated['User_Name'],
+            'User_Email'    => $validated['User_Email'],
+            'User_Password' => Hash::make($validated['password']),
+            // New self-registered accounts get the least-privileged real role.
+            // Promoting someone to Admin is a deliberate separate action, not automatic.
+            'User_Role'     => 'Staff',
+            'Status'        => 'Active',
+        ]);
+
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        return redirect()->intended(route('dashboard'));
+    }
 }

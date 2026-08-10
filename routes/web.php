@@ -26,6 +26,8 @@ Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login')->m
 Route::post('/login', [AuthController::class, 'login'])->name('login.attempt')->middleware('guest');
 Route::post('/login/guest', [AuthController::class, 'guestLogin'])->name('login.guest')->middleware('guest');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register')->middleware('guest');
+Route::post('/register', [AuthController::class, 'register'])->name('register.attempt')->middleware('guest');
 
 Route::middleware(['auth', 'guest.readonly'])->group(function () {
 Route::middleware('admin')->group(function () {

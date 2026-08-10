@@ -198,6 +198,11 @@
 <div class="px-6 py-4 border-t">
    <div class="flex items-center justify-center gap-2 mt-6">
 
+    @php
+    $current = $contacts->currentPage();
+    $last = $contacts->lastPage();
+    @endphp
+
     @if ($contacts->onFirstPage())
         <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded-lg">
             Previous
@@ -209,15 +214,50 @@
         </a>
     @endif
 
-    @for ($i = 1; $i <= $contacts->lastPage(); $i++)
+@if($last > 1)
+
+    {{-- First Page --}}
+    <a href="{{ $contacts->url(1) }}"
+       class="px-4 py-2 rounded-lg
+       {{ $current == 1
+           ? 'bg-cyan-600 text-white'
+           : 'bg-white border hover:bg-gray-50' }}">
+        1
+    </a>
+
+    {{-- Left Dots --}}
+    @if($current > 3)
+        <span class="px-2 text-gray-500">...</span>
+    @endif
+
+    {{-- Nearby Pages --}}
+    @for($i = max(2, $current - 1); $i <= min($last - 1, $current + 1); $i++)
         <a href="{{ $contacts->url($i) }}"
            class="px-4 py-2 rounded-lg
-           {{ $contacts->currentPage() == $i
+           {{ $current == $i
                ? 'bg-cyan-600 text-white'
                : 'bg-white border hover:bg-gray-50' }}">
             {{ $i }}
         </a>
     @endfor
+
+    {{-- Right Dots --}}
+    @if($current < $last - 2)
+        <span class="px-2 text-gray-500">...</span>
+    @endif
+
+    {{-- Last Page --}}
+    @if($last > 1)
+        <a href="{{ $contacts->url($last) }}"
+           class="px-4 py-2 rounded-lg
+           {{ $current == $last
+               ? 'bg-cyan-600 text-white'
+               : 'bg-white border hover:bg-gray-50' }}">
+            {{ $last }}
+        </a>
+    @endif
+
+@endif
 
     @if ($contacts->hasMorePages())
         <a href="{{ $contacts->nextPageUrl() }}"

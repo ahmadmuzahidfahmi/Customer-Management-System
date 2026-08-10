@@ -78,7 +78,7 @@
 
 </div>
 
-    <div class="overflow-x-auto">
+    <div class="bg-white rounded-lg shadow overflow-hidden">
         <table class="w-full text-sm">
 
             <thead class="bg-gray-50">

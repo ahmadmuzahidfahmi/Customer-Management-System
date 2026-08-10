@@ -11,8 +11,8 @@ class CustomerController extends Controller
 {
     public function index()
     {
-        $customers = Customer::latest('created_at')->paginate(15);
-
+        $customers = Customer::latest('Created_At')->paginate(15);
+        
         return CustomerResource::collection($customers);
     }
 

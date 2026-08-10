@@ -167,46 +167,37 @@
 
             @foreach($customers as $customer)
 
-            <tr
+<tr
                 onclick="window.location='{{ route('customers.show', $customer->Company_ID) }}'"
-                class="cursor-pointer hover:bg-cyan-50">
+                class="group cursor-pointer hover:bg-cyan-50">
 
                 <td class="px-6 py-4">
 
-<div class="group flex items-center gap-2">
+                    <div class="flex items-center gap-2">
 
-    <span>
-        {{ $customer->Company_Name }}
-    </span>
+                        <span>
+                            {{ $customer->Company_Name }}
+                        </span>
 
-    <form
-        action="{{ route('customers.pin', $customer->Company_ID) }}"
-        method="POST"
-        onclick="event.stopPropagation()"
-        class="relative">
+                        <form
+                            action="{{ route('customers.pin', $customer->Company_ID) }}"
+                            method="POST"
+                            onclick="event.stopPropagation()"
+                            class="relative">
 
-        @csrf
+                            @csrf
 
-        <button
-            type="submit"
-            title="{{ $customer->Is_Pinned ? 'Unpin' : 'Pin' }}"
-            class="
-                opacity-0
-                group-hover:opacity-100
-                transition
-                duration-75
-                hover:scale-110
-                {{ $customer->Is_Pinned ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}
-                 transition duration-200 hover:scale-110
-            ">
+                            <button
+                                type="submit"
+                                title="{{ $customer->Is_Pinned ? 'Unpin' : 'Pin' }}"
+                                class="transition duration-200 hover:scale-110
+                                {{ $customer->Is_Pinned ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}">
+                                {{ $customer->Is_Pinned ? '📌' : '📍' }}
+                            </button>
 
-            {{ $customer->Is_Pinned ? '📌' : '📍' }}
+                        </form>
 
-        </button>
-
-    </form>
-
-</div>
+                    </div>
 
                 </td>
 
@@ -219,27 +210,16 @@
                 </td>
 
                 <td class="px-6 py-4">
-
                     @if($customer->Status == 'Active')
-                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">
-                            Active
-                        </span>
-
+                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">Active</span>
                     @elseif($customer->Status == 'Lead')
-                        <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">
-                            Lead
-                        </span>
-
+                        <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">Lead</span>
                     @else
-                        <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-700">
-                            Inactive
-                        </span>
+                        <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-700">Inactive</span>
                     @endif
-
                 </td>
 
             </tr>
-
             @endforeach
 
             @else
