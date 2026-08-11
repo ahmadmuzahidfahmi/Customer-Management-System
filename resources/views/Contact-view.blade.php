@@ -151,29 +151,28 @@
         </div>
 
         <!-- Company Information -->
-        <div class="bg-white rounded-lg shadow p-6 mt-6">
+    <div class="bg-white rounded-lg shadow p-6 mt-6">
 
-            <h2 class="text-lg font-semibold mb-4">
-                Company
-            </h2>
+        <h2 class="text-lg font-semibold mb-4">
+            Company
+        </h2>
 
-            <div class="flex justify-between items-center border-b py-4">
+        <div
+            @if($contact->company)
+                onclick="window.location='{{ route('customers.show', $contact->company->Company_ID) }}'"
+            @endif
+            class="flex justify-between items-center border-b py-4
+                {{ $contact->company ? 'cursor-pointer hover:bg-cyan-50 transition rounded-lg px-3' : '' }}">
 
-                <div>
-                    <p class="font-medium">
-                        {{ $contact->company->Company_Name ?? 'Not Assigned' }}
-                    </p>
-                </div>
-
-                @if($contact->company)
-                    <a href="{{ route('customers.show', $contact->company->Company_ID) }}"
-                       class="text-cyan-600 hover:text-cyan-800 text-sm font-medium">
-                        View
-                    </a>
-                @endif
-
+            <div>
+                <p class="font-medium">
+                    {{ $contact->company->Company_Name ?? 'Not Assigned' }}
+                </p>
             </div>
+
         </div>
+
+    </div>
 
     </div>
 

@@ -84,6 +84,8 @@ class AttachmentController extends Controller
                 'Is_On_Drive'   => $isOnDrive,
             ]);
 
+            
+
             $uploaded++;
             if (! $isOnLocal || ! $isOnDrive) {
                 $partial[] = $originalName;

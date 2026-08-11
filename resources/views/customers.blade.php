@@ -240,6 +240,7 @@
 </div>
  <!-- end -->
 
+ <!-- Pagination -->
  <div class="px-6 py-3 text-sm text-gray-500">
 
     Showing

@@ -195,6 +195,7 @@
 
 </div>
 
+<!-- Pagination -->
 <div class="px-6 py-4 border-t">
    <div class="flex items-center justify-center gap-2 mt-6">
 

@@ -1,0 +1,353 @@
+{
+  "info": {
+    "name": "Mini CRM API",
+    "description": "REST API collection for the Mini CRM Laravel application. Covers Auth (Sanctum token-based), Customers, Leads, Contacts, and Activities.\n\nSetup: run the 'Login' request first — it will automatically save the returned token into the {{token}} collection variable, which every other request uses for the Authorization header.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000/api", "type": "string" },
+    { "key": "token", "value": "", "type": "string" },
+    { "key": "customer_id", "value": "1", "type": "string" },
+    { "key": "lead_id", "value": "1", "type": "string" },
+    { "key": "contact_id", "value": "1", "type": "string" },
+    { "key": "activity_id", "value": "1", "type": "string" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login (full access — read + write)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.token) { pm.collectionVariables.set('token', json.token); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"User_Name\": \"admin\",\n  \"password\": \"password\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/login", "host": ["{{base_url}}"], "path": ["login"] },
+            "description": "Returns a Sanctum token with both 'read' and 'write' abilities. The test script above automatically saves the token for use in every other request in this collection."
+          }
+        },
+        {
+          "name": "Login (read-only)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"User_Name\": \"admin\",\n  \"password\": \"password\",\n  \"read_only\": true\n}"
+            },
+            "url": { "raw": "{{base_url}}/login", "host": ["{{base_url}}"], "path": ["login"] },
+            "description": "Returns a Sanctum token with only the 'read' ability. Use this to test that write endpoints correctly return 403 for a read-only token."
+          }
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/user", "host": ["{{base_url}}"], "path": ["user"] }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": { "raw": "{{base_url}}/logout", "host": ["{{base_url}}"], "path": ["logout"] },
+            "description": "Revokes the currently used token."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customers",
+      "item": [
+        {
+          "name": "List Customers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/customers", "host": ["{{base_url}}"], "path": ["customers"] }
+          }
+        },
+        {
+          "name": "Get Single Customer",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/customers/{{customer_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["customers", "{{customer_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Customer",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Company_Name\": \"Acme Corp\",\n  \"Company_Email\": \"contact@acme.example.com\",\n  \"Company_No\": \"0123456789\",\n  \"Status\": \"Active\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/customers", "host": ["{{base_url}}"], "path": ["customers"] },
+            "description": "Status must be one of: Active, Lead, Inactive. Requires a write-ability token."
+          }
+        },
+        {
+          "name": "Update Customer",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Company_Name\": \"Acme Corp (Updated)\",\n  \"Company_Email\": \"contact@acme.example.com\",\n  \"Company_No\": \"0123456789\",\n  \"Status\": \"Inactive\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/customers/{{customer_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["customers", "{{customer_id}}"]
+            },
+            "description": "Requires a write-ability token."
+          }
+        },
+        {
+          "name": "Delete Customer",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/customers/{{customer_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["customers", "{{customer_id}}"]
+            },
+            "description": "Requires a write-ability token."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Leads",
+      "item": [
+        {
+          "name": "List Leads",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/leads", "host": ["{{base_url}}"], "path": ["leads"] }
+          }
+        },
+        {
+          "name": "Get Single Lead",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/leads/{{lead_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["leads", "{{lead_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Lead",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Lead_Name\": \"New Website Redesign\",\n  \"Company_ID\": {{customer_id}},\n  \"Estimated_Value\": 15000,\n  \"Source\": \"Referral\",\n  \"Status\": \"New\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/leads", "host": ["{{base_url}}"], "path": ["leads"] },
+            "description": "Status must be one of: New, Contacted, Qualified, Won, Lost. Company_ID must reference an existing customer. Requires a write-ability token."
+          }
+        },
+        {
+          "name": "Update Lead",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Lead_Name\": \"New Website Redesign\",\n  \"Company_ID\": {{customer_id}},\n  \"Estimated_Value\": 18000,\n  \"Source\": \"Referral\",\n  \"Status\": \"Qualified\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/leads/{{lead_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["leads", "{{lead_id}}"]
+            },
+            "description": "Requires a write-ability token."
+          }
+        },
+        {
+          "name": "Delete Lead",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/leads/{{lead_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["leads", "{{lead_id}}"]
+            },
+            "description": "Requires a write-ability token."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Contacts",
+      "item": [
+        {
+          "name": "List Contacts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/contacts", "host": ["{{base_url}}"], "path": ["contacts"] }
+          }
+        },
+        {
+          "name": "Get Single Contact",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/contacts/{{contact_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["contacts", "{{contact_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Contact",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Contact_Name\": \"Jane Doe\",\n  \"Contact_Email\": \"jane@acme.example.com\",\n  \"Contact_No\": \"0198765432\",\n  \"Country_Code\": \"+60\",\n  \"Contact_Role\": \"Marketing Manager\",\n  \"Contact_Note\": \"Prefers email over phone calls\",\n  \"Company_ID\": {{customer_id}}\n}"
+            },
+            "url": { "raw": "{{base_url}}/contacts", "host": ["{{base_url}}"], "path": ["contacts"] },
+            "description": "Company_ID must reference an existing customer. Requires a write-ability token."
+          }
+        },
+        {
+          "name": "Update Contact",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Contact_Name\": \"Jane Doe\",\n  \"Contact_Email\": \"jane.doe@acme.example.com\",\n  \"Contact_No\": \"0198765432\",\n  \"Country_Code\": \"+60\",\n  \"Contact_Role\": \"Head of Marketing\",\n  \"Company_ID\": {{customer_id}}\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/contacts/{{contact_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["contacts", "{{contact_id}}"]
+            },
+            "description": "Requires a write-ability token."
+          }
+        },
+        {
+          "name": "Delete Contact",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/contacts/{{contact_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["contacts", "{{contact_id}}"]
+            },
+            "description": "Requires a write-ability token."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Activities",
+      "item": [
+        {
+          "name": "List Activities",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{base_url}}/activities", "host": ["{{base_url}}"], "path": ["activities"] }
+          }
+        },
+        {
+          "name": "Get Single Activity",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/activities/{{activity_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["activities", "{{activity_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Activity",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Contact_ID\": {{contact_id}},\n  \"Activity_Type\": \"Call\",\n  \"Subject\": \"Follow-up call about proposal\",\n  \"Activity_Detail\": \"Discuss pricing and timeline\",\n  \"Dead_Line\": \"2026-09-01\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/activities", "host": ["{{base_url}}"], "path": ["activities"] },
+            "description": "Activity_Type must be one of: Call, Email, Meeting, Follow-Up, Other. Must include either Contact_ID or Lead_ID (or both) — omitting both returns a 422 error. Requires a write-ability token."
+          }
+        },
+        {
+          "name": "Update Activity",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Contact_ID\": {{contact_id}},\n  \"Activity_Type\": \"Call\",\n  \"Subject\": \"Follow-up call about proposal\",\n  \"Activity_Detail\": \"Call completed — client is reviewing\",\n  \"Dead_Line\": \"2026-09-01\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/activities/{{activity_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["activities", "{{activity_id}}"]
+            },
+            "description": "Requires a write-ability token."
+          }
+        },
+        {
+          "name": "Delete Activity",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/activities/{{activity_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["activities", "{{activity_id}}"]
+            },
+            "description": "Requires a write-ability token."
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -27,10 +27,12 @@
                 ☰
             </button>
 
-            <img
-                src="{{ asset('image/Visivest Logo_White.png') }}"
-                alt="Logo"
-                class="h-12 w-auto">
+            <a href="{{ route('dashboard') }}">
+                <img
+                    src="{{ asset('image/Visivest Logo_White.png') }}"
+                    alt="Logo"
+                    class="h-12 w-auto">
+            </a>
 
         </div>
 
@@ -308,14 +310,18 @@
     </div>
 @endif
 
-<div class="flex min-h-screen">
-
+<div class="min-h-screen">
+    
     <!-- Sidebar -->
 <aside
-    :class="sidebarOpen ? 'w-72 translate-x-0' : 'w-0 -translate-x-full md:translate-x-0'"
-    class="sticky top-[72px] md:top-[72px] left-0 h-full md:h-[calc(100vh-72px)] bg-white shadow-lg z-[50] transition-all duration-300 overflow-hidden">
+    :class="sidebarOpen ? 'w-72' : 'w-0'"
+    class="fixed left-0 top-[72px]
+           h-[calc(100vh-72px)]
+           bg-white shadow-lg
+           overflow-hidden z-30">
 
-    <div class="flex flex-col h-full w-72 overflow-y-auto">
+    <div class="flex flex-col h-full w-72">
+
         <!-- Sidebar Header -->
         <div class="flex items-center justify-between p-5 border-b">
             <h2 class="font-bold text-gray-800">Navigation</h2>
@@ -481,7 +487,9 @@
 </aside>
 
         <!-- Page content -->
-<main class="flex-1 p-6 overflow-x-auto">
+<main
+    :class="sidebarOpen ? 'md:ml-72' : 'ml-0'"
+    class="flex-1 p-6 overflow-x-auto">
 
     @if(session('success'))
         <div class="mb-4 px-4 py-3 rounded-lg bg-green-100 text-green-800 text-sm">
