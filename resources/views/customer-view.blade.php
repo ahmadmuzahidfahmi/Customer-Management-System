@@ -152,10 +152,26 @@
                     <p>{{ $customer->Company_Name }}</p>
                 </div>
 
-                <div>
-                    <p class="text-sm text-gray-500">Email</p>
-                    <p>{{ $customer->Company_Email }}</p>
-                </div>
+<div>
+    <p class="text-sm text-gray-500">Email</p>
+
+    @if($customer->Company_Email)
+
+<a
+    href="https://mail.google.com/mail/?view=cm&fs=1&to={{ urlencode($customer->Company_Email) }}"
+    target="_blank"
+    class="font-medium text-blue-600 hover:text-blue-700 hover:underline">
+
+    {{ $customer->Company_Email }}
+
+</a>
+
+    @else
+
+        <p class="font-medium">N/A</p>
+
+    @endif
+</div>
 
                 <div>
                     <p class="text-sm text-gray-500">Phone</p>

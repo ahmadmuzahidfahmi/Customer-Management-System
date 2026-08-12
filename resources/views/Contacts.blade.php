@@ -59,7 +59,7 @@
             </tr>
         </thead>
 
-        <tbody class="divide-y">
+        <tbody class="divide-y divide-gray-100">
 
             @foreach($pinnedContacts as $contact)
 
@@ -124,10 +124,12 @@
 
 @endif
 
+
 <!-- Min content table -->
 <div class="bg-white rounded-lg shadow overflow-hidden">
 
-    <table class="w-full text-sm">
+   <div class="overflow-x-auto">
+    <table class="w-full text-sm min-w-[700px]">
 
         <thead class="bg-gray-50">
             <tr>
@@ -139,59 +141,69 @@
             </tr>
         </thead>
 
-
-        <tbody class="divide-y">
+<tbody class="divide-y divide-gray-100">
+            
+        @if($contacts->count())
 
             @foreach($contacts as $contact)
-        <tr
-            onclick="window.location='{{ route('contacts.show', $contact->Contact_ID) }}'"
-            class="cursor-pointer hover:bg-cyan-50">
 
-            <td class="px-6 py-4"><div class="group flex items-center gap-2">
+<tr
+                onclick="window.location='{{ route('contacts.show', $contact->Contact_ID) }}'"
+                class="group cursor-pointer hover:bg-cyan-50">
 
-    <span>
-        {{ $contact->Contact_Name }}
-    </span>
+                <td class="px-6 py-4">
 
-    <form
-        action="{{ route('contacts.pin', $contact->Contact_ID) }}"
-        method="POST"
-        onclick="event.stopPropagation()"
-        class="relative">
+                    <div class="flex items-center gap-2">
 
-        @csrf
+                        <span>
+                            {{ $contact->Contact_Name }}
+                        </span>
 
-        <button
-            type="submit"
-            title="{{ $contact->Is_Pinned ? 'Unpin' : 'Pin' }}"
-            class="
-                opacity-0
-                group-hover:opacity-100
-                transition
-                duration-75
-                hover:scale-110
-                {{ $contact->Is_Pinned ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}
-                 transition duration-200 hover:scale-110
-            ">
+                        <form
+                            action="{{ route('contacts.pin', $contact->Contact_ID) }}"
+                            method="POST"
+                            onclick="event.stopPropagation()"
+                            class="relative">
 
-            {{ $contact->Is_Pinned ? '📌' : '📍' }}
+                            @csrf
 
-        </button>
+                            <button
+                                type="submit"
+                                title="{{ $contact->Is_Pinned ? 'Unpin' : 'Pin' }}"
+                                class="transition duration-200 hover:scale-110
+                                {{ $contact->Is_Pinned ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}">
+                                {{ $contact->Is_Pinned ? '📌' : '📍' }}
+                            </button>
 
-    </form>
+                        </form>
 
-</div></td>
+                    </div>
+
+                </td>
+
             <td class="px-6 py-4"> {{ $contact->company->Company_Name ?? 'N/A' }}</td>
             <td class="px-6 py-4">{{ $contact->Contact_Email }}</td>
             <td class="px-6 py-4">{{ $contact->Country_Code }} {{ $contact->Contact_No ?? 'N/A' }}</td>
-            <td class="px-6 py-4">{{ $contact->Contact_Role }}</td>    
+            <td class="px-6 py-4">{{ $contact->Contact_Role }}</td>
 
+
+            </tr>
+            @endforeach
+
+            @else
+
+        <tr>
+            <td colspan="4" class="py-10 text-center text-gray-500">
+                No contacts found.
+            </td>
         </tr>
-        @endforeach
-    </tbody>
 
+     @endif
+
+        </tbody>
 
     </table>
+    </div>
 
 </div>
 

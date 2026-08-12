@@ -15,8 +15,8 @@
     x-data="{ mobileMenu: false, sidebarOpen: JSON.parse(localStorage.getItem('sidebarOpen') ?? 'true') }"
     x-init="$watch('sidebarOpen', value => localStorage.setItem('sidebarOpen', JSON.stringify(value)))">
 
-<nav class="sticky top-0 z-40 bg-[rgb(70,192,189)] text-white shadow-lg">
-    <div class="flex items-center justify-between px-6 py-3">
+<nav class="sticky top-0 z-40 bg-[rgb(70,192,189)] text-white shadow-lg h-20">
+    <div class="flex items-center justify-between px-6 h-full">
 
         <!-- Left -->
         <div class="flex items-center gap-4">
@@ -28,10 +28,10 @@
             </button>
 
             <a href="{{ route('dashboard') }}">
-                <img
-                    src="{{ asset('image/Visivest Logo_White.png') }}"
-                    alt="Logo"
-                    class="h-12 w-auto">
+            <img
+                src="{{ asset('image/Visivest Logo_White.png') }}"
+                alt="Logo"
+                class="h-16 w-auto">
             </a>
 
         </div>
@@ -299,13 +299,17 @@
 </nav>
 
 @if(auth()->check() && auth()->user()->User_Role === 'Guest')
-    <div class="bg-amber-50 border-b border-amber-200 text-amber-800 text-sm px-6 py-2 text-center">
+    <div
+        :class="sidebarOpen ? 'md:ml-72' : 'ml-0'"
+        class="bg-amber-50 border-b border-amber-200 text-amber-800 text-sm px-6 py-2 text-center">
         You're browsing as a guest — read-only mode. Sign in with a full account to make changes.
     </div>
 @endif
 
 @if(session('guest_blocked'))
-    <div class="bg-red-50 border-b border-red-200 text-red-700 text-sm px-6 py-2 text-center">
+    <div 
+        :class="sidebarOpen ? 'md:ml-72' : 'ml-0'"
+        class="bg-red-50 border-b border-red-200 text-red-700 text-sm px-6 py-2 text-center">
         {{ session('guest_blocked') }}
     </div>
 @endif

@@ -123,12 +123,19 @@
                     </p>
                 </div>
 
-                <div>
-                    <p class="text-sm text-gray-500">Email</p>
-                    <p class="font-medium">
-                        {{ $contact->Contact_Email ?? 'N/A' }}
-                    </p>
-                </div>
+            <div>
+                <p class="text-sm text-gray-500">Email</p>
+                @if($contact->Contact_Email)
+            <a
+                href="https://mail.google.com/mail/?view=cm&fs=1&to={{ urlencode($contact->Contact_Email) }}"
+                target="_blank"
+                class="font-medium text-blue-600 hover:text-blue-700 hover:underline">
+                {{ $contact->Contact_Email }}
+            </a>
+                @else
+                    <p class="font-medium">N/A</p>
+                @endif
+            </div>
 
                 <div>
                     <p class="text-sm text-gray-500">Phone</p>
