@@ -12,7 +12,16 @@
 
 <body
     class="bg-gray-100"
-    x-data="{ mobileMenu: false, sidebarOpen: JSON.parse(localStorage.getItem('sidebarOpen') ?? 'true') }"
+    x-data="{
+        mobileMenu: false,
+        sidebarOpen: JSON.parse(localStorage.getItem('sidebarOpen') ?? 'true'),
+
+        closeMobileSidebar() {
+            if (window.innerWidth < 768) {
+                this.sidebarOpen = false;
+            }
+        }
+    }"
     x-init="$watch('sidebarOpen', value => localStorage.setItem('sidebarOpen', JSON.stringify(value)))">
 
 <nav class="sticky top-0 z-40 bg-[rgb(70,192,189)] text-white shadow-lg h-20">
@@ -318,7 +327,9 @@
     
     <!-- Sidebar -->
 <aside
-    :class="sidebarOpen ? 'w-72' : 'w-0'"
+    :class="sidebarOpen
+        ? 'translate-x-0'
+        : '-translate-x-full'"
     class="fixed left-0 top-[72px]
            h-[calc(100vh-72px)]
            bg-white shadow-lg
@@ -336,22 +347,29 @@
         <div class="flex flex-col p-4 space-y-1">
 
             <a href="{{ route('dashboard') }}"
-               class="px-4 py-3 rounded-lg
+                @click="if (window.innerWidth < 768) sidebarOpen = false"
+                class="px-4 py-3 rounded-lg
                {{ request()->routeIs('dashboard') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
                 Dashboard
             </a>
 
 <!-- Customers -->
 <a href="{{ route('customers') }}"
+   @click="closeMobileSidebar()"
    class="px-4 py-3 rounded-lg
-   {{ request()->routeIs('customers*') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+   {{ request()->routeIs('customers*')
+        ? 'bg-cyan-500 text-white'
+        : 'text-gray-700 hover:bg-gray-100' }}">
     Customers
 </a>
 
 <!-- Contacts -->
 <a href="{{ route('contacts') }}"
+   @click="closeMobileSidebar()"
    class="px-4 py-3 rounded-lg
-   {{ request()->routeIs('contacts*') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+   {{ request()->routeIs('contacts*')
+        ? 'bg-cyan-500 text-white'
+        : 'text-gray-700 hover:bg-gray-100' }}">
     Contacts
 </a>
 
@@ -527,13 +545,28 @@
 <!-- Row 2 -->
         <div class="md:hidden mt-4">
 <button
-    @click="mobileMenu = true"
-    class="fixed bottom-6 right-6 z-50
-           bg-cyan-600 text-white
+    @click="sidebarOpen = !sidebarOpen"
+    class="fixed bottom-5 left-5 z-50
+           backdrop-blur-lg
+           bg-white/80
+           border border-white/40
+           text-cyan-700
            w-14 h-14 rounded-full
-           shadow-lg md:hidden">
+           shadow-xl
+           flex items-center justify-center
+           active:scale-95
+           transition">
 
-    ☰
+    <svg xmlns="http://www.w3.org/2000/svg"
+         class="w-6 h-6"
+         fill="none"
+         viewBox="0 0 24 24"
+         stroke="currentColor">
+        <path stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16"/>
+    </svg>
 
 </button>
         </div>
