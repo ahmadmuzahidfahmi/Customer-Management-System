@@ -12,6 +12,7 @@ use App\Models\Note;
 use App\Models\Attachment;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Pin;
 
 
 class CustomerController extends Controller
@@ -62,9 +63,13 @@ public function index(Request $request)
             break;
     }
 
-    $pinnedCustomers = Customer::where('Is_Pinned', true)
-    ->orderBy('Company_Name')
-    ->get();
+    $pinnedCustomerIds = Pin::where('User_ID', Auth::id())
+        ->where('Entity_Type', 'Company')
+        ->pluck('Entity_ID');
+
+    $pinnedCustomers = Customer::whereIn('Company_ID', $pinnedCustomerIds)
+        ->orderBy('Company_Name')
+        ->get();
 
     $customers = $query
         ->paginate(10)
@@ -82,7 +87,8 @@ public function index(Request $request)
         'customersCount',
         'activeCustomers',
         'inactiveCustomers',
-        'pinnedCustomers'
+        'pinnedCustomers',
+        'pinnedCustomerIds'
 
     ));
 }
@@ -336,9 +342,20 @@ public function togglePin($id)
 {
     $customer = Customer::findOrFail($id);
 
-    $customer->update([
-        'Is_Pinned' => !$customer->Is_Pinned
-    ]);
+    $pin = Pin::where('User_ID', Auth::id())
+        ->where('Entity_Type', 'Company')
+        ->where('Entity_ID', $customer->Company_ID)
+        ->first();
+
+    if ($pin) {
+        $pin->delete();
+    } else {
+        Pin::create([
+            'User_ID'     => Auth::id(),
+            'Entity_Type' => 'Company',
+            'Entity_ID'   => $customer->Company_ID,
+        ]);
+    }
 
     return back();
 }

@@ -8,6 +8,8 @@ use App\Models\Customer;
 use App\Models\Contact;  
 use App\Models\User;
 use App\Models\Note;
+use App\Models\Pin;
+use Illuminate\Support\Facades\Auth; 
 use Illuminate\Database\Eloquent\Model;
 
 
@@ -43,6 +45,14 @@ class LeadController extends Controller
         $query->where('Source', $request->source);
     }
 
+    $pinnedLeadIds = Pin::where('User_ID', Auth::id())
+        ->where('Entity_Type', 'Leads')
+        ->pluck('Entity_ID');
+
+    $pinnedLeads = Leads::whereIn('Lead_ID', $pinnedLeadIds)
+        ->orderBy('Lead_Name')
+        ->get();
+
   $leads = $query->paginate(10)->withQueryString();
 
     $sources = Leads::whereNotNull('Source')
@@ -58,13 +68,15 @@ class LeadController extends Controller
     $wonLeads = Leads::where('Status', 'Won')->count();
 
     return view('leads', compact(
-        'leads',
-        'totalLeads',
-        'newLeads',
-        'contactedLeads',
-        'wonLeads',
-        'sources'
-    ));
+            'leads',
+            'totalLeads',
+            'newLeads',
+            'contactedLeads',
+            'wonLeads',
+            'sources',
+            'pinnedLeads',
+            'pinnedLeadIds'
+        ));
 }
 
 
@@ -202,5 +214,27 @@ public function showDeleted($id)
 public function notes()
 {
     return $this->hasMany(Note::class, 'Customer_ID', 'Company_ID')->latest('Created_At');
+}
+
+public function togglePin($id)
+{
+    $lead = Leads::findOrFail($id);
+
+    $pin = Pin::where('User_ID', Auth::id())
+        ->where('Entity_Type', 'Leads')
+        ->where('Entity_ID', $lead->Lead_ID)
+        ->first();
+
+    if ($pin) {
+        $pin->delete();
+    } else {
+        Pin::create([
+            'User_ID'     => Auth::id(),
+            'Entity_Type' => 'Leads',
+            'Entity_ID'   => $lead->Lead_ID,
+        ]);
+    }
+
+    return back();
 }
 }

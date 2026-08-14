@@ -146,6 +146,67 @@
             Account Settings
         </h2>
 
+        <!-- My Work -->
+
+        <h3 class="text-lg font-semibold mb-4">My Work</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- My Leads -->
+            <div>
+                <div class="flex justify-between items-center mb-3">
+                    <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Assigned Leads</p>
+                    <a href="{{ route('leads') }}" class="text-xs text-cyan-600 hover:underline">View All</a>
+                </div>
+
+                <div class="space-y-2">
+                    @forelse($myLeads as $lead)
+                        <a href="{{ route('leads.show', $lead->Lead_ID) }}"
+                           class="block border rounded-lg p-3 hover:bg-cyan-50 hover:shadow-sm transition">
+                            <p class="font-medium text-gray-800 text-sm">{{ $lead->Lead_Name }}</p>
+                            <p class="text-xs text-gray-500">
+                                {{ $lead->company->Company_Name ?? 'No Company' }} ·
+                                <span class="font-medium">{{ $lead->Status }}</span>
+                            </p>
+                        </a>
+                    @empty
+                        <p class="text-sm text-gray-400">No active leads assigned to you.</p>
+                    @endforelse
+                </div>
+            </div>
+
+            <!-- My Pending Activities -->
+            <div>
+                <div class="flex justify-between items-center mb-3">
+                    <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Pending Activities</p>
+                    <a href="{{ route('activities.index') }}" class="text-xs text-cyan-600 hover:underline">View All</a>
+                </div>
+
+                <div class="space-y-2">
+                    @forelse($myPendingActivities as $activity)
+                        @php
+                            $borderColor = $activity->isOverdue()
+                                ? 'border-red-500'
+                                : ($activity->Dead_Line && $activity->Dead_Line->isToday() ? 'border-yellow-500' : 'border-blue-500');
+                        @endphp
+                        <div class="border-l-4 {{ $borderColor }} pl-3 py-1">
+                            <p class="font-medium text-gray-800 text-sm">{{ $activity->Subject }}</p>
+                            <p class="text-xs text-gray-500">
+                                {{ $activity->lead->Lead_Name ?? $activity->contact->Contact_Name ?? 'Unlinked' }}
+                                @if($activity->Dead_Line)
+                                    — {{ $activity->Dead_Line->isToday() ? 'Due Today' : $activity->Dead_Line->format('d M') }}
+                                @endif
+                            </p>
+                        </div>
+                    @empty
+                        <p class="text-sm text-gray-400">No pending activities assigned to you.</p>
+                    @endforelse
+                </div>
+            </div>
+
+        </div>
+
+
         <div class="space-y-3 text-sm text-gray-600">
 
             <p>• Notification settings (coming soon)</p>

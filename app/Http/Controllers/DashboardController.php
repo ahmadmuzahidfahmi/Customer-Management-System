@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Customer;
+use App\Models\Contact;
 use App\Models\Leads;
 use App\Models\Activity;
 use Carbon\Carbon;
+use App\Models\Pin;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -117,6 +120,15 @@ $completedThisWeek = Activity::where('Status', 'Completed')
     ->whereDate('Created_At', '>=', now()->subDays(7))
     ->count();
 
+$pinnedCustomerIds = Pin::where('User_ID', Auth::id())->where('Entity_Type', 'Company')->pluck('Entity_ID');
+$pinnedCustomers = Customer::whereIn('Company_ID', $pinnedCustomerIds)->orderBy('Company_Name')->get();
+
+$pinnedContactIds = Pin::where('User_ID', Auth::id())->where('Entity_Type', 'Contact')->pluck('Entity_ID');
+$pinnedContacts = Contact::whereIn('Contact_ID', $pinnedContactIds)->orderBy('Contact_Name')->get();
+
+$pinnedLeadIds = Pin::where('User_ID', Auth::id())->where('Entity_Type', 'Leads')->pluck('Entity_ID');
+$pinnedLeads = Leads::whereIn('Lead_ID', $pinnedLeadIds)->orderBy('Lead_Name')->get();
+
 return view('dashboard', compact(
     'totalCustomers',
     'totalLeads',
@@ -134,7 +146,13 @@ return view('dashboard', compact(
     'weeklyData',
     'dueToday',
     'overdueActivities',
-    'completedThisWeek'
+    'completedThisWeek',
+    'pinnedCustomerIds',
+    'pinnedCustomers',
+    'pinnedContactIds',
+    'pinnedContacts',
+    'pinnedLeadIds',
+    'pinnedLeads'
 ));
     }
 

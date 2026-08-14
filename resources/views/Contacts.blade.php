@@ -170,10 +170,10 @@
 
                             <button
                                 type="submit"
-                                title="{{ $contact->Is_Pinned ? 'Unpin' : 'Pin' }}"
+                                title="{{ $pinnedContactIds->contains($contact->Contact_ID) ? 'Unpin' : 'Pin' }}"
                                 class="transition duration-200 hover:scale-110
-                                {{ $contact->Is_Pinned ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}">
-                                {{ $contact->Is_Pinned ? '📌' : '📍' }}
+                                {{ $pinnedContactIds->contains($contact->Contact_ID) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}">
+                                {{ $pinnedContactIds->contains($contact->Contact_ID) ? '📌' : '📍' }}
                             </button>
 
                         </form>

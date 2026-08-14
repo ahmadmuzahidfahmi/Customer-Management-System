@@ -136,7 +136,44 @@
         </table>
     </div>
 
-    {{ $activities->links() }}
+<!-- Pagination Controls -->
+<div class="px-6 py-4 border-t">
+    <div class="flex items-center justify-center gap-2 mt-6">
+
+        @if ($activities->onFirstPage())
+            <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded-lg">
+                Previous
+            </span>
+        @else
+            <a href="{{ $activities->previousPageUrl() }}"
+               class="px-4 py-2 bg-white border rounded-lg hover:bg-gray-50">
+                Previous
+            </a>
+        @endif
+
+        @for ($i = 1; $i <= $activities->lastPage(); $i++)
+            <a href="{{ $activities->url($i) }}"
+               class="px-4 py-2 rounded-lg
+               {{ $activities->currentPage() == $i
+                   ? 'bg-cyan-600 text-white'
+                   : 'bg-white border hover:bg-gray-50' }}">
+                {{ $i }}
+            </a>
+        @endfor
+
+        @if ($activities->hasMorePages())
+            <a href="{{ $activities->nextPageUrl() }}"
+               class="px-4 py-2 bg-white border rounded-lg hover:bg-gray-50">
+                Next
+            </a>
+        @else
+            <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded-lg">
+                Next
+            </span>
+        @endif
+
+    </div>
+</div>
 
 </div>
 

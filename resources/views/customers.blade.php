@@ -189,10 +189,10 @@
 
                             <button
                                 type="submit"
-                                title="{{ $customer->Is_Pinned ? 'Unpin' : 'Pin' }}"
+                                title="{{ $pinnedCustomerIds->contains($customer->Company_ID) ? 'Unpin' : 'Pin' }}"
                                 class="transition duration-200 hover:scale-110
-                                {{ $customer->Is_Pinned ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}">
-                                {{ $customer->Is_Pinned ? '📌' : '📍' }}
+                                {{ $pinnedCustomerIds->contains($customer->Company_ID) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}">
+                                {{ $pinnedCustomerIds->contains($customer->Company_ID) ? '📌' : '📍' }}
                             </button>
 
                         </form>

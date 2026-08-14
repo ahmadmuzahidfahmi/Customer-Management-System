@@ -6,13 +6,33 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use App\Models\Leads;
+use App\Models\Activity;
 
 class ProfileController extends Controller
 {
     public function edit()
     {
+        $user = Auth::user();
+
+        $myLeads = Leads::with('company')
+            ->where('User_ID', $user->User_ID)
+            ->whereNotIn('Status', ['Won', 'Lost'])
+            ->orderBy('Updated_At', 'desc')
+            ->take(5)
+            ->get();
+
+        $myPendingActivities = Activity::with(['lead', 'contact'])
+            ->where('Assigned_To', $user->User_ID)
+            ->where('Status', 'Pending')
+            ->orderBy('Dead_Line', 'asc')
+            ->take(5)
+            ->get();
+
         return view('profile', [
-            'user' => Auth::user(),
+            'user' => $user,
+            'myLeads' => $myLeads,
+            'myPendingActivities' => $myPendingActivities,
         ]);
     }
 

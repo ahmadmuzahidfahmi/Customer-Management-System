@@ -11,7 +11,7 @@ use App\Models\Leads;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
-
+use App\Models\Pin;
 
 
 class ContactController extends Controller
@@ -87,10 +87,14 @@ switch ($request->get('sort', 'newest')) {
           ->orWhere('Contact_Email', '');
     })->count();
 
-    $pinnedContacts = Contact::with('company')
-    ->where('Is_Pinned', 1)
-    ->orderBy('Contact_Name')
-    ->get();
+$pinnedContactIds = Pin::where('User_ID', Auth::id())
+        ->where('Entity_Type', 'Contact')
+        ->pluck('Entity_ID');
+
+    $pinnedContacts = Contact::whereIn('Contact_ID', $pinnedContactIds)
+        ->with('company')
+        ->orderBy('Contact_Name')
+        ->get();
 
     $companies = Customer::orderBy('Company_Name')->get();
 
@@ -101,6 +105,7 @@ switch ($request->get('sort', 'newest')) {
         'withoutEmail',
         'companies',
         'roles',
+        'pinnedContactIds',
         'pinnedContacts'
     ));
 }
@@ -241,7 +246,8 @@ $countries = config('countries');
 return view('contact-edit', compact(
     'contact',
     'customers',
-    'countries'
+    'countries',
+    'pinnedContactIds'
 ));}
 
 public function update(Request $request, $id)
@@ -267,9 +273,20 @@ public function togglePin($id)
 {
     $contact = Contact::findOrFail($id);
 
-    $contact->update([
-        'Is_Pinned' => !$contact->Is_Pinned
-    ]);
+    $pin = Pin::where('User_ID', Auth::id())
+        ->where('Entity_Type', 'Contact')
+        ->where('Entity_ID', $contact->Contact_ID)
+        ->first();
+
+    if ($pin) {
+        $pin->delete();
+    } else {
+        Pin::create([
+            'User_ID'     => Auth::id(),
+            'Entity_Type' => 'Contact',
+            'Entity_ID'   => $contact->Contact_ID,
+        ]);
+    }
 
     return back();
 }

@@ -120,6 +120,7 @@ Route::get('/leads/board', [LeadController::class, 'board'])->name('leads.board'
 
 Route::post('/leads/{lead}/move', [LeadController::class, 'move'])->name('leads.move');
 
+Route::post('/leads/{id}/pin', [LeadController::class, 'togglePin'])->name('leads.pin');
 /*
 |--------------------------------------------------------------------------
 | Contacts

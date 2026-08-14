@@ -78,17 +78,25 @@
 
 </div>
 
-<div class="bg-white rounded-lg shadow overflow-hidden">
+<!-- Pinned Leads -->
+@if($pinnedLeads->count())
+<div class="flex justify-between items-center mb-1">
+
+    <h3 class="text-xl font-semibold text-gray-800">
+        Pinned Leads
+    </h3>
+</div>  
+
+<div class="bg-white rounded-lg shadow overflow-hidden mb-6">
 
     <table class="w-full text-sm">
 
         <thead class="bg-gray-50">
-            <tr>
+             <tr>
                 <th class="px-6 py-3 text-left">Lead Name</th>
                 <th class="px-6 py-3 text-left">Customer</th>
                 <th class="px-6 py-3 text-left">Value</th>
                 <th class="px-6 py-3 text-left">Source</th>
-                <th class="px-6 py-3 text-left">Last Update</th>
                 <th class="px-6 py-3 text-left">Status</th>
                 <th class="px-6 py-3 text-left">Assigned To</th>
             </tr>
@@ -96,17 +104,42 @@
 
         <tbody class="divide-y">
 
-            @foreach($leads as $lead)
+            @foreach($pinnedLeads as $lead)
 
-                <tr
-                    onclick="window.location='{{ route('leads.show', $lead->Lead_ID) }}'"
-                    class="cursor-pointer hover:bg-cyan-50">
+            <tr
+                onclick="window.location='{{ route('leads.show', $lead->Lead_ID) }}'"
+                class="cursor-pointer hover:bg-cyan-50">
 
-                    <td class="px-6 py-4">
+                <td class="px-6 py-4">
+
+                    <div class="flex items-center gap-2 group">
+
+                        <span class="font-medium">
                         {{ $lead->Lead_Name }}
-                    </td>
+                        </span>
 
-                    <td class="px-6 py-4">
+                        <form
+                            action="{{ route('leads.pin', $lead->Lead_ID) }}"
+                            method="POST"
+                            onclick="event.stopPropagation()">
+
+                            @csrf
+
+                            <button
+                                type="submit"
+                                title="Unpin lead"
+                                class="text-lg hover:scale-110 transition">
+
+                                📌
+
+                            </button>
+
+                        </form>
+
+                    </div>
+                </td>
+
+                   <td class="px-6 py-4">
                         {{ $lead->company->Company_Name ?? 'No Company' }}
                     </td>
 
@@ -119,7 +152,118 @@
                     </td>
 
                     <td class="px-6 py-4">
-                        {{ $lead->Updated_At ?? 'Unassigned' }}
+
+                        @if($lead->Status == 'New')
+
+                            <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700">
+                                New
+                            </span>
+
+                        @elseif($lead->Status == 'Won')
+
+                            <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">
+                                Won
+                            </span>
+
+                        @elseif($lead->Status == 'Qualified')
+
+                            <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">
+                                Qualified
+                            </span>
+
+                        @elseif($lead->Status == 'Contacted')
+
+                            <span class="px-2 py-1 text-xs rounded-full bg-amber-100 text-amber-700">
+                                Contacted
+                            </span>
+
+                        @else
+
+                            <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-700">
+                                Lost
+                            </span>
+
+                        @endif
+
+                    </td>
+
+                    <td class="px-6 py-4">
+                        {{ $lead->user->User_Name ?? 'Unassigned' }}
+                    </td>
+
+            </tr>
+
+            @endforeach
+
+        </tbody>
+
+    </table>
+
+</div>
+
+@endif
+
+<div class="bg-white rounded-lg shadow overflow-hidden">
+
+    <table class="w-full text-sm">
+
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left">Lead Name</th>
+                <th class="px-6 py-3 text-left">Customer</th>
+                <th class="px-6 py-3 text-left">Value</th>
+                <th class="px-6 py-3 text-left">Source</th>
+                <th class="px-6 py-3 text-left">Status</th>
+                <th class="px-6 py-3 text-left">Assigned To</th>
+            </tr>
+        </thead>
+
+        <tbody class="divide-y">
+
+            @foreach($leads as $lead)
+
+<tr
+                    onclick="window.location='{{ route('leads.show', $lead->Lead_ID) }}'"
+                    class="group cursor-pointer hover:bg-cyan-50">
+
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-2">
+
+                            <span>
+                                {{ $lead->Lead_Name }}
+                            </span>
+
+                            <form
+                                action="{{ route('leads.pin', $lead->Lead_ID) }}"
+                                method="POST"
+                                onclick="event.stopPropagation()"
+                                class="relative">
+
+                                @csrf
+
+                                <button
+                                    type="submit"
+                                    title="{{ $pinnedLeadIds->contains($lead->Lead_ID) ? 'Unpin' : 'Pin' }}"
+                                    class="transition duration-200 hover:scale-110
+                                    {{ $pinnedLeadIds->contains($lead->Lead_ID) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}">
+                                    {{ $pinnedLeadIds->contains($lead->Lead_ID) ? '📌' : '📍' }}
+                                </button>
+
+                            </form>
+
+                        </div>
+                    </td>
+
+                    <td class="px-6 py-4">
+                        {{ $lead->company->Company_Name ?? 'No Company' }}
+                    </td>
+
+                    <td class="px-6 py-4">
+                        {{ $lead->Estimated_Value ?? 'unknown' }}
+                    </td>
+
+                    <td class="px-6 py-4">
+                        {{ $lead->Source ?? 'unknown' }}
                     </td>
 
                     <td class="px-6 py-4">

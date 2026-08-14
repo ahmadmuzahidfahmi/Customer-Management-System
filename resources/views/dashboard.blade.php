@@ -10,6 +10,183 @@
         Dashboard
     </h1>
 
+    <div x-data="{
+    sections: JSON.parse(localStorage.getItem('dashboardSections') ?? '{}'),
+    isCollapsed(key) { return this.sections[key] === true; },
+    toggleSection(key) {
+        this.sections[key] = !this.isCollapsed(key);
+        localStorage.setItem('dashboardSections', JSON.stringify(this.sections));
+    }
+}">
+
+@if($pinnedCustomers->count() || $pinnedLeads->count())
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-semibold text-gray-800">📌 Pinned</h2>
+            <button type="button" @click="toggleSection('pinned')" class="text-sm text-gray-500 hover:text-gray-700">
+                <span x-text="isCollapsed('pinned') ? '▸ Show' : '▾ Hide'"></span>
+            </button>
+        </div>
+
+        <div x-show="!isCollapsed('pinned')" x-cloak class="space-y-6">
+
+            @if($pinnedCustomers->count())
+                <div>
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Customers</p>
+                    <div class="overflow-x-auto border rounded-lg">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left">Company</th>
+                                    <th class="px-6 py-3 text-left">Email</th>
+                                    <th class="px-6 py-3 text-left">Phone</th>
+                                    <th class="px-6 py-3 text-left">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y">
+                                @foreach($pinnedCustomers as $customer)
+                                    <tr
+                                        onclick="window.location='{{ route('customers.show', $customer->Company_ID) }}'"
+                                        class="cursor-pointer hover:bg-cyan-50">
+                                        <td class="px-6 py-4">{{ $customer->Company_Name }}</td>
+                                        <td class="px-6 py-4">{{ $customer->Company_Email }}</td>
+                                        <td class="px-6 py-4">{{ $customer->Company_No ?? 'N/A' }}</td>
+                                        <td class="px-6 py-4">
+                                            @if($customer->Status == 'Active')
+                                                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">Active</span>
+                                            @elseif($customer->Status == 'Lead')
+                                                <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">Lead</span>
+                                            @else
+                                                <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-700">Inactive</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            @endif
+
+                        @if($pinnedContacts->count())
+    <div>
+        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Contacts</p>
+    <div class="overflow-x-auto border rounded-lg">
+    <table class="w-full text-sm">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left">Name</th>
+                <th class="px-6 py-3 text-left">Company</th>
+                <th class="px-6 py-3 text-left">Email</th>
+                <th class="px-6 py-3 text-left">Phone</th>
+                <th class="px-6 py-3 text-left">Position</th>
+            </tr>
+        </thead>
+
+        <tbody class="divide-y divide-gray-100">
+
+            @foreach($pinnedContacts as $contact)
+
+            <tr
+                onclick="window.location='{{ route('contacts.show', $contact->Contact_ID) }}'"
+                class="cursor-pointer hover:bg-cyan-50">
+
+                <td class="px-6 py-4">
+
+                    <div class="flex items-center gap-2 group">
+
+                        <span class="font-medium">
+                        {{ $contact->Contact_Name }}
+                        </span>
+
+                        <form
+                            action="{{ route('contacts.pin', $contact->Contact_ID) }}"
+                            method="POST"
+                            onclick="event.stopPropagation()">
+
+                            @csrf
+
+                        </form>
+
+                    </div>
+
+                <td class="px-6 py-4"> {{ $contact->company->Company_Name ?? 'N/A' }}</td>
+
+                </td>
+
+                <td class="px-6 py-4">
+                    {{ $contact->Contact_Email }}
+                </td>
+
+                <td class="px-6 py-4">
+                    {{ $contact->Country_Code }}
+                    {{ $contact->Contact_No }}
+                </td>
+
+                <td class="px-6 py-4">
+                    {{ $contact->Contact_Role }}
+                </td>
+
+            </tr>
+
+            @endforeach
+
+        </tbody>
+
+    </table>
+
+</div>
+</div>
+            @endif
+
+            @if($pinnedLeads->count())
+                <div>
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Leads</p>
+                    <div class="overflow-x-auto border rounded-lg">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left">Lead Name</th>
+                                    <th class="px-6 py-3 text-left">Customer</th>
+                                    <th class="px-6 py-3 text-left">Value</th>
+                                    <th class="px-6 py-3 text-left">Source</th>
+                                    <th class="px-6 py-3 text-left">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y">
+                                @foreach($pinnedLeads as $lead)
+                                    <tr
+                                        onclick="window.location='{{ route('leads.show', $lead->Lead_ID) }}'"
+                                        class="cursor-pointer hover:bg-cyan-50">
+                                        <td class="px-6 py-4">{{ $lead->Lead_Name }}</td>
+                                        <td class="px-6 py-4">{{ $lead->company->Company_Name ?? 'No Company' }}</td>
+                                        <td class="px-6 py-4">{{ $lead->Estimated_Value ?? 'unknown' }}</td>
+                                        <td class="px-6 py-4">{{ $lead->Source ?? 'unknown' }}</td>
+                                        <td class="px-6 py-4">
+                                            @if($lead->Status == 'New')
+                                                <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700">New</span>
+                                            @elseif($lead->Status == 'Won')
+                                                <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">Won</span>
+                                            @elseif($lead->Status == 'Qualified')
+                                                <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">Qualified</span>
+                                            @elseif($lead->Status == 'Contacted')
+                                                <span class="px-2 py-1 text-xs rounded-full bg-amber-100 text-amber-700">Contacted</span>
+                                            @else
+                                                <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-700">Lost</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            @endif
+
+        </div>
+    </div>
+    @endif
+
     <!-- Summary Cards -->
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
 
@@ -368,5 +545,5 @@ window.updateChart = function(view) {
 
 </script>
 @endpush
-    
+</div>
 @endsection

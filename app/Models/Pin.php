@@ -13,4 +13,9 @@ class Pin extends Model
         'Entity_Type',
         'Entity_ID',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'User_ID', 'User_ID');
+    }
 }
