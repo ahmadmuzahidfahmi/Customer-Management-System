@@ -5,8 +5,8 @@
     <title>Customer Management System</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">  
 
-    <link rel="icon" type="image/png" href="{{ asset('Image/Visivest Logo.png') }}">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="icon" type="image/png" href="{{ asset('Image\WSC_logo_head.png') }}">
+    @vite(['resources/css/app.css', 'resources/js/app.js']) 
 </head>
 
 
