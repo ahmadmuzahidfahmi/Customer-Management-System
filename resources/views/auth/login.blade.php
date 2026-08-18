@@ -10,7 +10,7 @@
     <div class="w-full max-w-sm">
         <div class="flex justify-center mb-6">
         <img
-            src="{{ asset('image/visivest Logo.png') }}"
+            src="{{ asset('Image/visivest Logo.png') }}"
             alt="Logo"
             class="h-24 w-auto">       
         </div>
