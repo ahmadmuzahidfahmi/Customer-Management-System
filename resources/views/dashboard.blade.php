@@ -400,8 +400,7 @@
 
                 <div class="text-right">
                     <p class="text-sm text-gray-500">
-                        {{ $customer->Closed_Date->format('d M Y') }}
-                    </p>
+                        {{ $customer->Closed_Date?->format('d M Y') ?? 'N/A' }}                    </p>
 
                     <p class="text-xs text-gray-400">
                         Added
