@@ -161,11 +161,8 @@
     href="https://mail.google.com/mail/?view=cm&fs=1&to={{ urlencode($customer->Company_Email) }}"
     target="_blank"
     class="font-medium text-blue-600 hover:text-blue-700 hover:underline">
-
     {{ $customer->Company_Email }}
-
 </a>
-
     @else
 
         <p class="font-medium">N/A</p>
@@ -459,6 +456,8 @@ class="bg-white border rounded-lg shadow-sm hover:shadow-md hover:bg-cyan-50 tra
                                     <td class="px-6 py-4">
                                         @if($lead->Status == 'won')
                                             <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">Won</span>
+                                        @elseif($lead->Status == 'new')
+                                            <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-700">New</span>
                                         @elseif($lead->Status == 'Qualified')
                                             <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">Qualified</span>
                                         @elseif($lead->Status == 'Contacted')

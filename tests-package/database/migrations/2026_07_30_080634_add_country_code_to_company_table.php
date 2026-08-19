@@ -8,8 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasColumn('company', 'Country_Code')) {
+            return;
+        }
+
         Schema::table('company', function (Blueprint $table) {
-            $table->string('Country_Code')->nullable()->after('Company_No');
+            $table->string('Country_Code', 10)->nullable()->default('+60')->after('Company_No');
         });
     }
 
