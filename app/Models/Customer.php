@@ -16,6 +16,8 @@ class Customer extends Model
     protected $table = 'company'; // 👈 this tells Laravel to use "company" table
     protected $primaryKey = 'Company_ID'; // 👈 this tells Laravel to use "Company_ID" as the primary key
 
+    const CREATED_AT = 'Created_At';
+    const UPDATED_AT = 'Updated_At';
     protected $fillable = [
         'Company_ID',
         'Company_Name',
