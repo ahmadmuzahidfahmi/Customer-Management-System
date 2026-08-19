@@ -386,8 +386,10 @@
 
         @forelse($recentCustomers as $customer)
 
-            <div class="px-6 py-4 flex justify-between items-center">
-
+        <div
+            onclick="window.location='{{ route('customers.show', $customer->Company_ID) }}'"
+            class="px-6 py-4 flex justify-between items-center cursor-pointer hover:bg-cyan-50 transition"
+        >
                 <div>
                     <p class="font-medium text-gray-800">
                         {{ $customer->Company_Name }}
@@ -400,7 +402,8 @@
 
                 <div class="text-right">
                     <p class="text-sm text-gray-500">
-                        {{ $customer->Closed_Date?->format('d M Y') ?? 'N/A' }}                    </p>
+                        {{ $customer->Closed_Date?->format('d M Y') ?? 'N/A' }}                    
+                    </p>
 
                     <p class="text-xs text-gray-400">
                         Added
