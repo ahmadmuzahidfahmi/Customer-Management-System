@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreCustomerRequest;
+use App\Http\Requests\UpdateCustomerRequest;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\LengthAwarePaginator;
 use App\Models\Customer;
@@ -112,20 +114,9 @@ public function create()
     return view('customer-create', compact('countries', 'existingContacts', 'existingLeads'));
 }
 
-public function store(Request $request)
+public function store(StoreCustomerRequest $request)
 {
-    $validated = $request->validate([
-        'Company_Name'  => 'required|string|max:255',
-        'Company_Email' => 'nullable|email|max:255',
-        'Country_Code'  => 'required|string|max:10',
-        'Company_No'    => 'required|string|max:20',
-        'Status'        => 'required|string',
-        'Notes'         => 'nullable|array',
-        'Notes.*.Subject' => 'nullable|string|max:255',
-        'Notes.*.Content'  => 'nullable|string',
-        'Attachments'   => 'nullable|array',
-        'Attachments.*' => 'file|max:10240',
-    ]);
+    $validated = $request->validated();
 
     $customer = Customer::create([
         'Company_Name'  => $validated['Company_Name'],
@@ -310,27 +301,11 @@ public function edit($id)
     ));
 }
 
-public function update(Request $request, $id)
+public function update(UpdateCustomerRequest $request, $id)
 {
     $customer = Customer::findOrFail($id);
 
-
-    $validated = $request->validate([
-
-        'Company_Name' => 'required|string|max:255',
-
-        'Company_Email' => 'nullable|email|max:255',
-
-        'Country_Code' => 'required|string|max:10',
-
-        'Company_No' => 'required|string|max:20',
-
-        'Status' => 'required|string',
-
-    ]);
-
-
-    $customer->update($validated);
+    $customer->update($request->validated());
 
 
     return redirect()
