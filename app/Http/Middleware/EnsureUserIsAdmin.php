@@ -9,7 +9,7 @@ class EnsureUserIsAdmin
 {
     public function handle($request, Closure $next)
     {
-        if (!Auth::check() || Auth::user()->Role !== 'Admin') {
+        if (!Auth::check() || Auth::user()->User_Role !== 'Admin') {
             abort(403, 'You do not have permission to access this page.');
         }
 
