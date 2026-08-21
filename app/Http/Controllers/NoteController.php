@@ -15,10 +15,11 @@ class NoteController extends Controller
             'Company_ID' => 'nullable|exists:company,Company_ID',
             'Contact_ID' => 'nullable|exists:contacts,Contact_ID',
             'Lead_ID' => 'nullable|exists:leads,Lead_ID',
+            'Activity_ID' => 'nullable|exists:activities,Activity_ID',
         ]);
 
         Note::create($request->only([
-            'Subject', 'Content', 'Company_ID', 'Contact_ID', 'Lead_ID',
+            'Subject', 'Content', 'Company_ID', 'Contact_ID', 'Lead_ID', 'Activity_ID',
         ]));
 
         return back()->with('success', 'Note added.');

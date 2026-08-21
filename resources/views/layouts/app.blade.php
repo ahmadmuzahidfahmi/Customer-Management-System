@@ -64,6 +64,7 @@
         'customers',
         'contacts',
         'leads',
+        'leads.kanban',
         'activities.index',
         'audit-log',
     ]);
@@ -101,6 +102,7 @@
 
                 <input
                     type="text"
+                    id="header-search-input"
                     name="search"
                     value="{{ request('search') }}"
                     placeholder="Search..."
@@ -192,6 +194,20 @@
                                 @endforeach
                             </select>
                         </div>
+                    </div>
+
+                @elseif(request()->routeIs('leads.kanban'))
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Source</label>
+                        <select name="source" form="global-search-form" onchange="this.form.submit()"
+                                class="w-full border rounded-lg px-2 py-1.5 text-sm">
+                            <option value="">All sources</option>
+                            @foreach($sources ?? [] as $sourceOption)
+                                <option value="{{ $sourceOption }}" {{ request('source') === $sourceOption ? 'selected' : '' }}>
+                                    {{ $sourceOption }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
 
                 @elseif(request()->routeIs('contacts'))
@@ -502,6 +518,15 @@
     {{ request()->routeIs('recycle-bin') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
     Recycle Bin
 </a>
+
+@if(auth()->check() && auth()->user()->User_Role === 'Admin')
+<!-- Attachment Backups -->
+<a href="{{ route('attachments.syncStatus') }}"
+    class="px-4 py-3 rounded-lg
+    {{ request()->routeIs('attachments.syncStatus') ? 'bg-cyan-500 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+    Attachment Backups
+</a>
+@endif
 
         </div>
     </div>

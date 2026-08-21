@@ -31,7 +31,7 @@ class DashboardController extends Controller
 
         $contactedleads = Leads::where('Status', 'Contacted')->count();
 
-        $recentCustomers = Customer::orderBy('Closed_Date', 'desc')
+        $recentCustomers = Customer::orderBy('Created_At', 'desc')
             ->take(5)
             ->get();
 

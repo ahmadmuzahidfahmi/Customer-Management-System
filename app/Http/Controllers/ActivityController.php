@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Activity;
+use App\Models\Leads;
+use App\Models\Contact;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -35,9 +38,25 @@ class ActivityController extends Controller
         ->orderBy('Dead_Line')
         ->get();
 
+        $totalActivities = Activity::count();
+        $pendingActivities = Activity::where('Status', 'Pending')->count();
+        $overdueActivities = Activity::where('Status', 'Pending')->where('Dead_Line', '<', now())->count();
+        $completedActivities = Activity::where('Status', 'Completed')->count();
+
+        $leads = Leads::with('company')->orderBy('Lead_Name')->get();
+        $contacts = Contact::with('company')->orderBy('Contact_Name')->get();
+        $users = User::orderBy('User_Name')->get();
+
         return view('activities.index', compact(
         'activities',
-        'dueToday'
+        'dueToday',
+        'totalActivities',
+        'pendingActivities',
+        'overdueActivities',
+        'completedActivities',
+        'leads',
+        'contacts',
+        'users'
             ));
     }
 

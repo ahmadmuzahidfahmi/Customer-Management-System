@@ -18,6 +18,7 @@ class Note extends Model
         'Company_ID',
         'Contact_ID',
         'Lead_ID',
+        'Activity_ID',
     ];
 
     protected $casts = [
@@ -38,6 +39,11 @@ class Note extends Model
     public function lead()
     {
         return $this->belongsTo(Leads::class, 'Lead_ID', 'Lead_ID');
+    }
+
+    public function activity()
+    {
+        return $this->belongsTo(Activity::class, 'Activity_ID', 'Activity_ID');
     }
 
         public function getAuditLabel(): string

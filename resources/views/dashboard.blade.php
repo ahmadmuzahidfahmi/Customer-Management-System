@@ -19,7 +19,58 @@
     }
 }">
 
-@if($pinnedCustomers->count() || $pinnedLeads->count())
+@php
+    $hasNotifications = $overdueActivities > 0 || $dueToday > 0 || $staleLeads->count() > 0;
+@endphp
+@if($hasNotifications)
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-semibold text-gray-800">🔔 Notifications</h2>
+            <button type="button" @click="toggleSection('notifications')" class="text-sm text-gray-500 hover:text-gray-700">
+                <span x-text="isCollapsed('notifications') ? '▸ Show' : '▾ Hide'"></span>
+            </button>
+        </div>
+
+        <div x-show="!isCollapsed('notifications')" x-cloak class="space-y-2">
+
+            @if($overdueActivities > 0)
+                <a href="{{ route('activities.index', ['filter' => 'overdue']) }}"
+                   class="flex items-center justify-between border-l-4 border-red-500 bg-red-50 rounded-r-lg px-4 py-3 hover:bg-red-100 transition">
+                    <span class="text-sm text-red-700">
+                        <span class="font-semibold">{{ $overdueActivities }}</span>
+                        {{ $overdueActivities === 1 ? 'activity' : 'activities' }} overdue
+                    </span>
+                    <span class="text-red-400">→</span>
+                </a>
+            @endif
+
+            @if($dueToday > 0)
+                <a href="{{ route('activities.index', ['filter' => 'today']) }}"
+                   class="flex items-center justify-between border-l-4 border-yellow-500 bg-yellow-50 rounded-r-lg px-4 py-3 hover:bg-yellow-100 transition">
+                    <span class="text-sm text-yellow-700">
+                        <span class="font-semibold">{{ $dueToday }}</span>
+                        {{ $dueToday === 1 ? 'activity' : 'activities' }} due today
+                    </span>
+                    <span class="text-yellow-500">→</span>
+                </a>
+            @endif
+
+            @if($staleLeads->count() > 0)
+                <a href="{{ route('leads') }}"
+                   class="flex items-center justify-between border-l-4 border-gray-400 bg-gray-50 rounded-r-lg px-4 py-3 hover:bg-gray-100 transition">
+                    <span class="text-sm text-gray-700">
+                        <span class="font-semibold">{{ $staleLeads->count() }}</span>
+                        {{ $staleLeads->count() === 1 ? 'lead has' : 'leads have' }} gone stale (no update in 7+ days)
+                    </span>
+                    <span class="text-gray-400">→</span>
+                </a>
+            @endif
+
+        </div>
+    </div>
+@endif
+
+@if($pinnedCustomers->count() || $pinnedContacts->count() || $pinnedLeads->count())
     <div class="bg-white rounded-lg shadow p-6 mb-6">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-lg font-semibold text-gray-800">📌 Pinned</h2>
@@ -50,7 +101,7 @@
                                         class="cursor-pointer hover:bg-cyan-50">
                                         <td class="px-6 py-4">{{ $customer->Company_Name }}</td>
                                         <td class="px-6 py-4">{{ $customer->Company_Email }}</td>
-                                        <td class="px-6 py-4">{{ $customer->Company_No ?? 'N/A' }}</td>
+                                        <td class="px-6 py-4">{{ $customer->Company_No ? $customer->Country_Code . ' ' . $customer->Company_No : 'N/A' }}</td>
                                         <td class="px-6 py-4">
                                             @if($customer->Status == 'Active')
                                                 <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">Active</span>
@@ -68,75 +119,36 @@
                 </div>
             @endif
 
-                        @if($pinnedContacts->count())
-    <div>
-        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Contacts</p>
-    <div class="overflow-x-auto border rounded-lg">
-    <table class="w-full text-sm">
-        <thead class="bg-gray-50">
-            <tr>
-                <th class="px-6 py-3 text-left">Name</th>
-                <th class="px-6 py-3 text-left">Company</th>
-                <th class="px-6 py-3 text-left">Email</th>
-                <th class="px-6 py-3 text-left">Phone</th>
-                <th class="px-6 py-3 text-left">Position</th>
-            </tr>
-        </thead>
-
-        <tbody class="divide-y divide-gray-100">
-
-            @foreach($pinnedContacts as $contact)
-
-            <tr
-                onclick="window.location='{{ route('contacts.show', $contact->Contact_ID) }}'"
-                class="cursor-pointer hover:bg-cyan-50">
-
-                <td class="px-6 py-4">
-
-                    <div class="flex items-center gap-2 group">
-
-                        <span class="font-medium">
-                        {{ $contact->Contact_Name }}
-                        </span>
-
-                        <form
-                            action="{{ route('contacts.pin', $contact->Contact_ID) }}"
-                            method="POST"
-                            onclick="event.stopPropagation()">
-
-                            @csrf
-
-                        </form>
-
+            @if($pinnedContacts->count())
+                <div>
+                    <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Contacts</p>
+                    <div class="overflow-x-auto border rounded-lg">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left">Name</th>
+                                    <th class="px-6 py-3 text-left">Company</th>
+                                    <th class="px-6 py-3 text-left">Email</th>
+                                    <th class="px-6 py-3 text-left">Phone</th>
+                                    <th class="px-6 py-3 text-left">Position</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y">
+                                @foreach($pinnedContacts as $contact)
+                                    <tr
+                                        onclick="window.location='{{ route('contacts.show', $contact->Contact_ID) }}'"
+                                        class="cursor-pointer hover:bg-cyan-50">
+                                        <td class="px-6 py-4 font-medium">{{ $contact->Contact_Name }}</td>
+                                        <td class="px-6 py-4">{{ $contact->company->Company_Name ?? 'N/A' }}</td>
+                                        <td class="px-6 py-4">{{ $contact->Contact_Email }}</td>
+                                        <td class="px-6 py-4">{{ $contact->Country_Code }} {{ $contact->Contact_No }}</td>
+                                        <td class="px-6 py-4">{{ $contact->Contact_Role }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
-
-                <td class="px-6 py-4"> {{ $contact->company->Company_Name ?? 'N/A' }}</td>
-
-                </td>
-
-                <td class="px-6 py-4">
-                    {{ $contact->Contact_Email }}
-                </td>
-
-                <td class="px-6 py-4">
-                    {{ $contact->Country_Code }}
-                    {{ $contact->Contact_No }}
-                </td>
-
-                <td class="px-6 py-4">
-                    {{ $contact->Contact_Role }}
-                </td>
-
-            </tr>
-
-            @endforeach
-
-        </tbody>
-
-    </table>
-
-</div>
-</div>
+                </div>
             @endif
 
             @if($pinnedLeads->count())
@@ -402,7 +414,7 @@
 
                 <div class="text-right">
                     <p class="text-sm text-gray-500">
-                        {{ $customer->Closed_Date?->format('d M Y') ?? 'N/A' }}                    
+                        {{ $customer->Created_At?->format('d M Y') ?? 'N/A' }}
                     </p>
 
                     <p class="text-xs text-gray-400">
@@ -523,7 +535,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         options: {
             responsive: true,
-            maintainAspectRatio: false
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    min: 0,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
         }
     });
 });

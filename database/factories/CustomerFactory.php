@@ -16,7 +16,7 @@ class CustomerFactory extends Factory
         return [
             'Company_Name'  => fake()->unique()->company(),
             'Company_Email' => fake()->unique()->companyEmail(),
-            'Company_No'    => fake()->phoneNumber(),
+            'Company_No'    => fake()->numerify('#########'),
             'Status'        => 'Active',
         ];
     }

@@ -67,4 +67,13 @@ public function attachments()
     return $this->morphMany(Attachment::class, 'entity', 'Entity_Type', 'Entity_ID', 'Company_ID');
 }
 
+public function getWhatsappNumberAttribute()
+{
+    return preg_replace(
+        '/[^0-9]/',
+        '',
+        $this->Country_Code . $this->Company_No
+    );
+}
+
 }

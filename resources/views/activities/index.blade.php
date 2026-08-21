@@ -2,10 +2,20 @@
 
 @section('content')
 
-<div class="space-y-6">
+<div class="space-y-6" x-data="{ creating: false }">
 
     <div class="flex justify-between items-center">
         <h1 class="text-2xl font-bold text-gray-800">Activities</h1>
+
+        @unless(auth()->user()?->isGuest())
+        <button
+            @click="creating = true"
+            type="button"
+            class="bg-cyan-600 hover:bg-cyan-700 text-white px-5 py-2.5 rounded-lg shadow-sm font-medium flex items-center gap-2">
+            <span class="text-lg">+</span>
+            <span>New Activity</span>
+        </button>
+        @endunless
     </div>
 
     <!-- Due Today -->
@@ -174,6 +184,90 @@
 
     </div>
 </div>
+
+    <!-- New Activity Modal -->
+    <div x-show="creating"
+         x-cloak
+         @click.self="creating = false"
+         @keydown.escape.window="creating = false"
+         class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-gray-800">New Activity</h2>
+                <button @click="creating = false" type="button" class="text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
+            </div>
+
+            <form method="POST" action="{{ route('activities.store') }}" class="space-y-2">
+                @csrf
+
+                <select name="Activity_Type" required class="w-full border rounded-lg px-3 py-2 text-sm">
+                    <option value="">Type...</option>
+                    @foreach(['Call','Email','Meeting','Follow-Up','Other'] as $type)
+                        <option value="{{ $type }}">{{ $type }}</option>
+                    @endforeach
+                </select>
+
+                <input
+                    type="text"
+                    name="Subject"
+                    placeholder="Subject"
+                    required
+                    class="w-full border rounded-lg px-3 py-2 text-sm">
+
+                <textarea
+                    name="Activity_Detail"
+                    rows="2"
+                    placeholder="Details (optional)"
+                    class="w-full border rounded-lg px-3 py-2 text-sm"></textarea>
+
+                <div class="grid grid-cols-2 gap-2">
+
+                    @include('partials.entity-picker', [
+                        'fieldName' => 'Lead_ID',
+                        'options' => $leads->map(fn ($l) => ['id' => $l->Lead_ID, 'label' => $l->Lead_Name, 'sublabel' => $l->company->Company_Name ?? null]),
+                        'placeholder' => 'Link to Lead...',
+                        'title' => 'Select a Lead',
+                    ])
+
+                    @include('partials.entity-picker', [
+                        'fieldName' => 'Contact_ID',
+                        'options' => $contacts->map(fn ($c) => ['id' => $c->Contact_ID, 'label' => $c->Contact_Name, 'sublabel' => $c->company->Company_Name ?? null]),
+                        'placeholder' => 'Link to Contact...',
+                        'title' => 'Select a Contact',
+                    ])
+
+                </div>
+
+                <p class="text-xs text-gray-500">Must link to at least a Lead or a Contact.</p>
+
+                <input
+                    type="datetime-local"
+                    name="Dead_Line"
+                    class="w-full border rounded-lg px-3 py-2 text-sm">
+
+                @include('partials.entity-picker', [
+                    'fieldName' => 'Assigned_To',
+                    'options' => $users->map(fn ($u) => ['id' => $u->User_ID, 'label' => $u->User_Name]),
+                    'placeholder' => 'Assign to me',
+                    'title' => 'Assign To',
+                ])
+
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" @click="creating = false" class="px-4 py-2 rounded-lg bg-gray-200 text-sm">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 rounded-lg bg-cyan-600 text-white text-sm hover:bg-cyan-700">
+                        Create Activity
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
 
 </div>
 

@@ -285,7 +285,9 @@ public function show($id)
             'company' => $l->company->Company_Name ?? null,
         ]);
 
-    return view('customer-view', compact('customer', 'allAttachments', 'allOtherContacts', 'allOtherLeads'));
+    $countries = config('countries');
+
+    return view('customer-view', compact('customer', 'allAttachments', 'allOtherContacts', 'allOtherLeads', 'countries'));
 }
 
 public function edit($id)
@@ -342,8 +344,8 @@ public function addContact(Request $request, $id)
         $validated = $request->validate([
             'Contact_Name'  => 'required|string|max:255',
             'Contact_Email' => 'nullable|email|max:255',
-            'Country_Code'  => 'nullable|string|max:10',
-            'Contact_No'    => 'nullable|string|max:20',
+            'Country_Code'  => ['nullable', 'regex:/^\+[0-9]{1,4}$/'],
+            'Contact_No'    => 'nullable|digits_between:5,15',
             'Contact_Role'  => 'nullable|string|max:255',
         ]);
 

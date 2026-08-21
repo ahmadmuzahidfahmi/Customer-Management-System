@@ -145,8 +145,8 @@ public function store(Request $request)
     $validated = $request->validate([
         'Contact_Name'   => 'required|string|max:255',
         'Contact_Email'  => 'nullable|email|max:255',
-        'Country_Code'   => 'required|string|max:10',
-        'Contact_No'     => 'required|string|max:20',
+        'Country_Code'   => ['required', 'regex:/^\+[0-9]{1,4}$/'],
+        'Contact_No'     => 'required|digits_between:5,15',
         'Contact_Role'   => 'nullable|string|max:255',
         'Contact_Note'   => 'nullable|string',
         'Company_ID'     => 'required|exists:company,Company_ID',
@@ -246,22 +246,27 @@ $countries = config('countries');
 return view('contact-edit', compact(
     'contact',
     'customers',
-    'countries',
-    'pinnedContactIds'
+    'countries'
 ));}
 
 public function update(Request $request, $id)
 {
     $contact = Contact::findOrFail($id);
 
+    $validated = $request->validate([
+        'Company_ID' => 'required|exists:company,Company_ID',
+        'Country_Code' => ['required', 'regex:/^\+[0-9]{1,4}$/'],
+        'Contact_No' => 'required|digits_between:5,15',
+    ]);
+
     $contact->update([
         'Contact_Name' => $request->Contact_Name,
         'Contact_Email' => $request->Contact_Email,
-        'Contact_No' => $request->Contact_No,
-        'Company_ID' => $request->Company_ID,
+        'Contact_No' => $validated['Contact_No'],
+        'Company_ID' => $validated['Company_ID'],
         'Contact_Role' => $request->Contact_Role,
         'Contact_Note' => $request->Contact_Note,
-        'Country_Code' => $request->Country_Code,
+        'Country_Code' => $validated['Country_Code'],
     ]);
 
     return redirect()

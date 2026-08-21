@@ -57,127 +57,13 @@
                     Phone Number
                 </label>
 
-                <div class="flex gap-2">
-
-                <div
-                    x-data="{
-                        open:false,
-                        selected:'{{ old('Country_Code', '+60') }}',
-                        countries:@js($countries),
-
-                        get selectedCountry(){
-
-                            return this.countries.find(
-                                c => c.code === this.selected
-                            );
-
-                        },
-
-                        selectCountry(country){
-
-                            this.selected = country.code;
-                            this.open = false;
-
-                        }
-
-                    }"
-
-                    class="relative w-40"
-                >
-
-
-                <input
-                    type="hidden"
-                    name="Country_Code"
-                    x-model="selected"
-                >
-
-
-                <!-- Selected value -->
-                <button
-                    type="button"
-                    @click="open=!open"
-
-                    class="
-                    w-full
-                    border
-                    rounded-lg
-                    px-3
-                    py-2
-                    text-left
-                    bg-white
-                    "
-                >
-
-                    <span x-text="selected"></span>
-
-                </button>
-
-
-
-                <!-- Dropdown -->
-                <div
-                    x-show="open"
-                    @click.outside="open=false"
-
-                    class="
-                    absolute
-                    z-50
-                    w-full
-                    bg-white
-                    border
-                    rounded-lg
-                    shadow-lg
-                    mt-1
-                    max-h-60
-                    overflow-y-auto
-                    "
-                >
-
-
-                <template x-for="country in countries"
-                :key="country.code">
-
-
-                <div
-
-                @click="selectCountry(country)"
-
-                class="
-                px-3
-                py-2
-                cursor-pointer
-                hover:bg-gray-100
-                "
-                >
-
-                <span x-text="country.name"></span>
-
-                <span class="text-gray-500">
-                (
-                <span x-text="country.code"></span>
-                )
-                </span>
-
-
-                </div>
-
-
-                </template>
-
-
-                </div>
-
-
-                </div>
-
-                    <input
-                        type="text"
-                        name="Company_No"
-                        placeholder="123456789"
-                        class="flex-1 border rounded-lg px-3 py-2">
-
-                </div>
+                @include('partials.phone-input', [
+                    'countryField' => 'Country_Code',
+                    'numberField' => 'Company_No',
+                    'countries' => $countries,
+                    'selectedCode' => old('Country_Code', '+60'),
+                    'selectedNumber' => old('Company_No'),
+                ])
             </div>
 
             <!-- Status -->

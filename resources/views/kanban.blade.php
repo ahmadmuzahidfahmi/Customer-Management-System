@@ -9,15 +9,6 @@
     </a>
 </div>
 
-<div class="mb-4">
-    <input
-        type="text"
-        id="kanban-search"
-        placeholder="Search leads by name or company..."
-        class="w-full sm:w-80 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500"
-    >
-</div>
-
 <div class="flex gap-4 overflow-x-auto pb-4">
 
     @php
@@ -157,13 +148,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Live search across lead name + company name. While searching, temporarily
-    // expand every column so matches in collapsed columns (e.g. Won/Lost) are
-    // visible; clearing the search restores whatever was collapsed before.
-    const searchInput = document.getElementById('kanban-search');
+    // Live search across lead name + company name, driven by the header search bar.
+    // While searching, temporarily expand every column so matches in collapsed
+    // columns (e.g. Won/Lost) are visible; clearing the search restores whatever
+    // was collapsed before.
+    const searchInput = document.getElementById('header-search-input');
     let collapsedBeforeSearch = null;
 
-    searchInput.addEventListener('input', () => {
+    // If the page loaded with a search already applied (header form submitted,
+    // results filtered server-side), make sure matches in normally-collapsed
+    // columns (e.g. Won/Lost) aren't hidden.
+    if (searchInput?.value.trim()) {
+        collapsedBeforeSearch = new Set(collapsedColumns);
+        applyCollapsedState(new Set());
+    }
+
+    searchInput?.addEventListener('input', () => {
         const query = searchInput.value.trim().toLowerCase();
 
         if (query && collapsedBeforeSearch === null) {

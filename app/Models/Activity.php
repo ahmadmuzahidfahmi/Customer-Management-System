@@ -63,6 +63,12 @@ class Activity extends Model
             && $this->Dead_Line
             && $this->Dead_Line->isPast();
     }
+
+    public function notes()
+    {
+        return $this->hasMany(Note::class, 'Activity_ID', 'Activity_ID')->latest('Created_At');
+    }
+
         public function attachments()
     {
         return $this->morphMany(Attachment::class, 'entity', 'Entity_Type', 'Entity_ID', 'Activity_ID');

@@ -34,13 +34,6 @@
 
 <div class="flex gap-2">
 
-    <button
-    type="button"
-    @click="emailing = true"
-    class="flex items-center justify-center w-36 h-12 bg-gray-700 text-white rounded-lg hover:bg-gray-800">
-    Send Email
-</button>
-
     <a href="{{ route('customers.edit', $customer->Company_ID) }}"
        class="flex items-center justify-center w-36 h-12 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700">
         Edit Customer
@@ -66,10 +59,10 @@
 <!-- Quick stats strip -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="bg-white rounded-lg shadow p-4 text-center">
+            <p class="text-xs text-gray-500">Pipeline Value</p>
             <p class="text-2xl font-bold text-gray-800">
                 RM {{ number_format($customer->leads->sum('Estimated_Value'), 0) }}
             </p>
-            <p class="text-xs text-gray-500">Pipeline Value</p>
         </div>
         <div class="bg-white rounded-lg shadow p-4 text-center">
             <p class="text-2xl font-bold text-gray-800">
@@ -84,10 +77,10 @@
             <p class="text-xs text-gray-500">Won Leads</p>
         </div>
         <div class="bg-white rounded-lg shadow p-4 text-center">
+             <p class="text-xs text-gray-500">Customer Since</p>
             <p class="text-sm font-bold text-gray-800">
                 {{ $customer->Created_At?->format('M j, Y') ?? 'Unknown' }}
             </p>
-            <p class="text-xs text-gray-500">Customer Since</p>
         </div>
     </div>
 
@@ -176,7 +169,7 @@
                     @if($customer->Company_No)
 
                         <a
-                            href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $customer->Company_No) }}"
+                            href="https://wa.me/{{ $customer->whatsapp_number }}"
                             target="_blank"
                             class="font-medium text-green-600 hover:text-green-700 hover:underline">
 
@@ -253,7 +246,13 @@
                     @csrf
                     <input type="text" name="Contact_Name" required placeholder="Contact Name" class="w-full border rounded-lg px-3 py-2 text-sm">
                     <input type="email" name="Contact_Email" placeholder="Email" class="w-full border rounded-lg px-3 py-2 text-sm">
-                    <input type="text" name="Contact_No" placeholder="Phone" class="w-full border rounded-lg px-3 py-2 text-sm">
+                    @include('partials.phone-input', [
+                        'countryField' => 'Country_Code',
+                        'numberField' => 'Contact_No',
+                        'countries' => $countries,
+                        'selectedCode' => '+60',
+                        'selectedNumber' => '',
+                    ])
                     <input type="text" name="Contact_Role" placeholder="Position" class="w-full border rounded-lg px-3 py-2 text-sm">
                     <button type="submit" class="md:col-span-2 bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 text-sm">
                         Save Contact
@@ -316,7 +315,7 @@ class="bg-white border rounded-lg shadow-sm hover:shadow-md hover:bg-cyan-50 tra
                     @if($contact->Contact_No)
 
                         <a
-                            href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $contact->Contact_No) }}"
+                            href="https://wa.me/{{ $contact->whatsapp_number }}"
                             target="_blank"
                             class="font-medium text-green-600 hover:text-green-700 hover:underline">
 

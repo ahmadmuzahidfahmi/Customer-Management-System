@@ -52,12 +52,12 @@
                 placeholder="Details (optional)"
                 class="w-full border rounded-lg px-3 py-2 text-sm"></textarea>
 
-            <select name="Assigned_To" class="w-full border rounded-lg px-3 py-2 text-sm">
-                <option value="">Assign to me</option>
-                @foreach($users as $u)
-                    <option value="{{ $u->User_ID }}">{{ $u->User_Name }}</option>
-                @endforeach
-            </select>
+            @include('partials.entity-picker', [
+                'fieldName' => 'Assigned_To',
+                'options' => $users->map(fn ($u) => ['id' => $u->User_ID, 'label' => $u->User_Name]),
+                'placeholder' => 'Assign to me',
+                'title' => 'Assign To',
+            ])
 
             <button
                 type="submit"

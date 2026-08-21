@@ -52,36 +52,13 @@
         Phone Number
     </label>
 
-    <div class="flex gap-2">
-
-        <select
-            name="Country_Code"
-            class="border rounded-lg px-3 py-2 w-40">
-
-            @foreach($countries as $country)
-
-                <option
-                    value="{{ $country['code'] }}"
-                    {{ $contact->Country_Code == $country['code'] ? 'selected' : '' }}>
-
-                    {{ $country['name'] }}
-                    ({{ $country['code'] }})
-
-                </option>
-
-            @endforeach
-
-        </select>
-
-
-        <input
-            type="text"
-            name="Contact_No"
-            value="{{ $contact->Contact_No }}"
-            placeholder="123456789"
-            class="flex-1 border rounded-lg px-3 py-2">
-
-    </div>
+    @include('partials.phone-input', [
+        'countryField' => 'Country_Code',
+        'numberField' => 'Contact_No',
+        'countries' => $countries,
+        'selectedCode' => old('Country_Code', $contact->Country_Code ?? '+60'),
+        'selectedNumber' => old('Contact_No', $contact->Contact_No),
+    ])
 
 </div>
 
@@ -105,24 +82,13 @@
         Company
     </label>
 
-    <select
-        name="Company_ID"
-        required
-        class="w-full border rounded-lg px-3 py-2">
-
-        <option value="">
-            Select Company
-        </option>
-
-        @foreach($customers as $customer)
-            <option
-                value="{{ $customer->Company_ID }}"
-                {{ $contact->Company_ID == $customer->Company_ID ? 'selected' : '' }}>
-                {{ $customer->Company_Name }}
-            </option>
-        @endforeach
-
-    </select>
+    @include('partials.entity-picker', [
+        'fieldName' => 'Company_ID',
+        'options' => $customers->map(fn ($c) => ['id' => $c->Company_ID, 'label' => $c->Company_Name]),
+        'placeholder' => 'Select Company',
+        'title' => 'Select a Company',
+        'selectedId' => $contact->Company_ID,
+    ])
 </div>
 
     </div>

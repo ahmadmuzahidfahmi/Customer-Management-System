@@ -10,13 +10,34 @@ class KanbanController extends Controller
 {
     protected array $statuses = ['New', 'Contacted', 'Qualified', 'Won', 'Lost'];
 
-    public function index()
+    public function index(Request $request)
     {
-        $leads = Leads::orderBy('Position')->get()->groupBy('Status');
+        $query = Leads::with('company');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('Lead_Name', 'like', "%{$search}%")
+                  ->orWhereHas('company', fn ($c) => $c->where('Company_Name', 'like', "%{$search}%"));
+            });
+        }
+
+        if ($request->filled('source')) {
+            $query->where('Source', $request->source);
+        }
+
+        $leads = $query->orderBy('Position')->get()->groupBy('Status');
+
+        $sources = Leads::whereNotNull('Source')
+            ->where('Source', '!=', '')
+            ->distinct()
+            ->orderBy('Source')
+            ->pluck('Source');
 
         return view('kanban', [
             'statuses' => $this->statuses,
             'leadsByStatus' => $leads,
+            'sources' => $sources,
         ]);
     }
 

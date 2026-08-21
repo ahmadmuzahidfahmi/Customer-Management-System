@@ -206,7 +206,7 @@
                 </td>
 
                 <td class="px-6 py-4">
-                    {{ $customer->Company_No ?? 'N/A' }}
+                    {{ $customer->Company_No ? $customer->Country_Code . ' ' . $customer->Company_No : 'N/A' }}
                 </td>
 
                 <td class="px-6 py-4">

@@ -29,10 +29,15 @@ class ProfileController extends Controller
             ->take(5)
             ->get();
 
+        $isAdmin = $user->User_Role === 'Admin';
+
         return view('profile', [
             'user' => $user,
             'myLeads' => $myLeads,
             'myPendingActivities' => $myPendingActivities,
+            'isAdmin' => $isAdmin,
+            'users' => $isAdmin ? \App\Models\User::orderBy('User_Name')->paginate(15) : null,
+            'roles' => ['Admin', 'Staff', 'Guest'],
         ]);
     }
 

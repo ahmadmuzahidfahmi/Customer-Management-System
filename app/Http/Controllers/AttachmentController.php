@@ -254,13 +254,80 @@ public function resync($id)
 
     public function syncStatus()
     {
-        $attachments = Attachment::with('entity')
-            ->where('Is_On_Local', false)
-            ->orWhere('Is_On_Drive', false)
-            ->orderBy('Created_At', 'desc')
-            ->get();
+        $sections = [];
+        $totalDriveFiles = 0;
+        $totalTracked = 0;
+        $totalUntracked = 0;
 
-        return view('attachments-sync-status', compact('attachments'));
+        foreach (Attachment::FOLDER_MAP as $entityType => $folder) {
+            $tracked = Attachment::with(['entity', 'uploader'])
+                ->where('Entity_Type', $entityType)
+                ->orderBy('Created_At', 'desc')
+                ->get();
+
+            $driveFiles = collect();
+            try {
+                $driveFiles = collect(Storage::disk('google')->listContents($folder, false)->toArray())
+                    ->filter(fn ($item) => $item->isFile());
+            } catch (\Throwable $e) {
+                Log::error('Failed to list Drive folder for sync status', [
+                    'folder' => $folder,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+
+            $trackedPaths = $tracked->pluck('File_Path')->all();
+
+            $untracked = $driveFiles
+                ->reject(fn ($item) => in_array($item->path(), $trackedPaths))
+                ->map(fn ($item) => [
+                    'path' => $item->path(),
+                    'name' => basename($item->path()),
+                    'size' => $item->fileSize(),
+                    'modified' => $item->lastModified(),
+                ])
+                ->values();
+
+            $totalDriveFiles += $driveFiles->count();
+            $totalTracked += $tracked->count();
+            $totalUntracked += $untracked->count();
+
+            $sections[$entityType] = [
+                'folder' => $folder,
+                'tracked' => $tracked,
+                'untracked' => $untracked,
+            ];
+        }
+
+        $localMissingCount = Attachment::where('Is_On_Local', false)->count();
+
+        return view('attachments-sync-status', compact(
+            'sections',
+            'totalDriveFiles',
+            'totalTracked',
+            'totalUntracked',
+            'localMissingCount'
+        ));
+    }
+
+    public function driveFileDestroy(Request $request)
+    {
+        $validated = $request->validate([
+            'path' => 'required|string',
+        ]);
+
+        try {
+            Storage::disk('google')->delete($validated['path']);
+        } catch (\Throwable $e) {
+            Log::error('Failed to delete untracked Drive file', [
+                'path' => $validated['path'],
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Could not delete that file from Drive.');
+        }
+
+        return back()->with('success', 'File deleted from Drive.');
     }
 
     public function verifyAll()

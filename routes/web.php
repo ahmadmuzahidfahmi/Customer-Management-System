@@ -14,6 +14,7 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\EmailController;
+use App\Http\Controllers\UserManagementController;
 
 
 Route::get('/', function () {
@@ -32,6 +33,13 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.at
 Route::middleware(['auth', 'guest.readonly'])->group(function () {
 Route::middleware('admin')->group(function () {
 Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log');
+Route::post('/users', [UserManagementController::class, 'store'])->name('users.store');
+Route::put('/users/{id}', [UserManagementController::class, 'update'])->name('users.update');
+Route::delete('/users/{id}', [UserManagementController::class, 'destroy'])->name('users.destroy');
+Route::get('/attachments/sync-status', [AttachmentController::class, 'syncStatus'])->name('attachments.syncStatus');
+Route::post('/attachments/{id}/resync', [AttachmentController::class, 'resync'])->name('attachments.resync');
+Route::post('/attachments/verify-all', [AttachmentController::class, 'verifyAll'])->name('attachments.verifyAll');
+Route::delete('/attachments/drive-file', [AttachmentController::class, 'driveFileDestroy'])->name('attachments.driveFileDestroy');
 });
 /*
 |--------------------------------------------------------------------------
@@ -190,13 +198,10 @@ Route::get(
 | Attachements
 |--------------------------------------------------------------------------
 */
-Route::get('/attachments/sync-status', [AttachmentController::class, 'syncStatus'])->name('attachments.syncStatus');
 Route::post('/attachments', [AttachmentController::class, 'store'])->name('attachments.store');
-Route::post('/attachments/{id}/resync', [AttachmentController::class, 'resync'])->name('attachments.resync');
 Route::delete('/attachments/bulk-destroy', [AttachmentController::class, 'bulkDestroy'])->name('attachments.bulkDestroy');
 Route::get('/attachments/{id}', [AttachmentController::class, 'show'])->name('attachments.show');
 Route::delete('/attachments/{id}', [AttachmentController::class, 'destroy'])->name('attachments.destroy');
-Route::post('/attachments/verify-all', [AttachmentController::class, 'verifyAll'])->name('attachments.verifyAll');
 
 // Note 
 Route::post('/notes', [NoteController::class, 'store'])->name('notes.store');
@@ -216,7 +221,6 @@ Route::middleware('log.view')->group(function () {
     Route::get('/contacts/{id}', [ContactController::class, 'show'])->name('contacts.show');
     Route::get('/leads/{id}', [LeadController::class, 'show'])->name('leads.show');
 });
-Route::get('/audit-log', [AuditLogController::class, 'index'])->name('audit-log');
 
 Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar');
 Route::post('/calendar/reschedule', [CalendarController::class, 'reschedule'])->name('calendar.reschedule');

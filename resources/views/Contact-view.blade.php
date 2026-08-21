@@ -34,13 +34,6 @@
         @unless(auth()->user()?->isGuest())
         <div class="flex gap-2">
 
-            <button
-                type="button"
-                @click="emailing = true"
-                class="flex items-center justify-center w-36 h-12 bg-gray-700 text-white rounded-lg hover:bg-gray-800">
-                Send Email
-            </button>
-
             <a href="{{ route('contacts.edit', $contact->Contact_ID) }}"
                class="flex items-center justify-center w-36 h-12 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700">
                 Edit Contact
@@ -142,7 +135,7 @@
 
                     @if($contact->Contact_No)
                         <a
-                            href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $contact->Contact_No) }}"
+                            href="https://wa.me/{{ $contact->whatsapp_number }}"
                             target="_blank"
                             class="font-medium text-green-600 hover:text-green-700 hover:underline">
                             {{ $contact->Country_Code }} {{ $contact->Contact_No }}

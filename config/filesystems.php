@@ -46,9 +46,9 @@ return [
 
         'network' => [
             'driver' => 'local',
-            'root'   => '\\\\10.10.0.130\\spspro\\Storage',
+            'root'   => env('LOCAL_ATTACHMENTS_PATH', storage_path('app/attachments')),
             'throw'  => false,
-        ], 
+        ],
 
         'public' => [
             'driver' => 'local',

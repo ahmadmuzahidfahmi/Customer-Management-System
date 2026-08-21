@@ -60,30 +60,13 @@
                     Phone Number
                 </label>
 
-                <div class="flex gap-2">
-
-                    <select
-                        name="Country_Code"
-                        class="border rounded-lg px-3 py-2 w-40">
-
-                        @foreach($countries as $country)
-                            <option
-                                value="{{ $country['code'] }}"
-                                {{ old('Country_Code', $customer->Country_Code) == $country['code'] ? 'selected' : '' }}>
-                                {{ $country['name'] }} ({{ $country['code'] }})
-                            </option>
-                        @endforeach
-
-                    </select>
-
-                    <input
-                        type="text"
-                        name="Company_No"
-                        value="{{ old('Company_No', $customer->Company_No) }}"
-                        placeholder="123456789"
-                        class="flex-1 border rounded-lg px-3 py-2">
-
-                </div>
+                @include('partials.phone-input', [
+                    'countryField' => 'Country_Code',
+                    'numberField' => 'Company_No',
+                    'countries' => $countries,
+                    'selectedCode' => old('Country_Code', $customer->Country_Code ?? '+60'),
+                    'selectedNumber' => old('Company_No', $customer->Company_No),
+                ])
             </div>
 
             <!-- Status -->

@@ -52,8 +52,8 @@ class CalendarController extends Controller
             'weeklyActivities' => $weeklyActivities,
 
             // For the "New Activity" modal
-            'leads' => Leads::orderBy('Lead_Name')->get(),
-            'contacts' => Contact::orderBy('Contact_Name')->get(),
+            'leads' => Leads::with('company')->orderBy('Lead_Name')->get(),
+            'contacts' => Contact::with('company')->orderBy('Contact_Name')->get(),
             'users' => User::orderBy('User_Name')->get(),
         ]);
     }

@@ -105,8 +105,7 @@
                 </td>
 
                 <td class="px-6 py-4">
-                    {{ $contact->Country_Code }}
-                    {{ $contact->Contact_No }}
+                    {{ $contact->Contact_No ? $contact->Country_Code . ' ' . $contact->Contact_No : 'N/A' }}
                 </td>
 
                 <td class="px-6 py-4">
@@ -184,7 +183,7 @@
 
             <td class="px-6 py-4"> {{ $contact->company->Company_Name ?? 'N/A' }}</td>
             <td class="px-6 py-4">{{ $contact->Contact_Email }}</td>
-            <td class="px-6 py-4">{{ $contact->Country_Code }} {{ $contact->Contact_No ?? 'N/A' }}</td>
+            <td class="px-6 py-4">{{ $contact->Contact_No ? $contact->Country_Code . ' ' . $contact->Contact_No : 'N/A' }}</td>
             <td class="px-6 py-4">{{ $contact->Contact_Role }}</td>
 
 

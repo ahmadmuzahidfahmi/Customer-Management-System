@@ -41,27 +41,13 @@
                 Company
             </label>
 
-            <select
-                name="Company_ID"
-                class="w-full border rounded-lg px-3 py-2">
-
-                <option value="">
-                    Select Company
-                </option>
-
-                @foreach($customers as $customer)
-
-                    <option
-                        value="{{ $customer->Company_ID }}"
-                        {{ $lead->Company_ID == $customer->Company_ID ? 'selected' : '' }}>
-
-                        {{ $customer->Company_Name }}
-
-                    </option>
-
-                @endforeach
-
-            </select>
+            @include('partials.entity-picker', [
+                'fieldName' => 'Company_ID',
+                'options' => $customers->map(fn ($c) => ['id' => $c->Company_ID, 'label' => $c->Company_Name]),
+                'placeholder' => 'Select Company',
+                'title' => 'Select a Company',
+                'selectedId' => $lead->Company_ID,
+            ])
         </div>
 
         <!-- Source -->
@@ -83,28 +69,13 @@
                 Assigned To
             </label>
 
-            <select
-                name="User_ID"
-                class="w-full border rounded-lg px-3 py-2">
-
-                <option value="">
-                    Unassigned
-                </option>
-
-                @foreach($users as $user)
-
-                    <option
-                        value="{{ $user->User_ID }}"
-                        
-                          {{ $lead->User_ID == $user->User_ID ?  'Selected' : '' }}>
-
-                        {{ $user->User_Name }}
-
-                    </option>
-
-                @endforeach
-
-            </select>
+            @include('partials.entity-picker', [
+                'fieldName' => 'User_ID',
+                'options' => $users->map(fn ($u) => ['id' => $u->User_ID, 'label' => $u->User_Name]),
+                'placeholder' => 'Unassigned',
+                'title' => 'Assign To',
+                'selectedId' => $lead->User_ID,
+            ])
         </div>
 
         <!-- Status -->

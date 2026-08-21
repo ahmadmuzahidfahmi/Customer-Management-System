@@ -38,6 +38,10 @@
         <div x-data="{
             selectedCompany: '{{ old('Company_ID', '') }}',
             selectedContact: '{{ old('Contact_ID', '') }}',
+            companyOpen: false,
+            companySearch: '',
+            contactOpen: false,
+            contactSearch: '',
             companies: @js($customers->map(fn ($c) => [
                 'id' => $c->Company_ID,
                 'name' => $c->Company_Name,
@@ -46,6 +50,22 @@
             get contactsForCompany() {
                 const company = this.companies.find(c => c.id == this.selectedCompany);
                 return company ? company.contacts : [];
+            },
+            get filteredCompanies() {
+                if (!this.companySearch) return this.companies;
+                const q = this.companySearch.toLowerCase();
+                return this.companies.filter(c => c.name.toLowerCase().includes(q));
+            },
+            get filteredContacts() {
+                if (!this.contactSearch) return this.contactsForCompany;
+                const q = this.contactSearch.toLowerCase();
+                return this.contactsForCompany.filter(c => c.name.toLowerCase().includes(q));
+            },
+            get selectedCompanyName() {
+                return this.companies.find(c => c.id == this.selectedCompany)?.name || '';
+            },
+            get selectedContactName() {
+                return this.contactsForCompany.find(c => c.id == this.selectedContact)?.name || '';
             },
             onContactChange() {
                 if (!this.selectedContact) return;
@@ -60,30 +80,96 @@
                 if (!this.contactsForCompany.some(ct => ct.id == this.selectedContact)) {
                     this.selectedContact = '';
                 }
+            },
+            pickCompany(c) {
+                this.selectedCompany = c.id;
+                this.onCompanyChange();
+                this.companyOpen = false;
+                this.companySearch = '';
+            },
+            pickContact(c) {
+                this.selectedContact = c.id;
+                this.onContactChange();
+                this.contactOpen = false;
+                this.contactSearch = '';
             }
         }" class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
 
             <div>
                 <label class="block text-sm font-medium mb-1">Company</label>
-                <select name="Company_ID" x-model="selectedCompany" @change="onCompanyChange()" class="w-full border rounded-lg px-3 py-2">
-                    <option value="">Select Company</option>
-                    @foreach($customers as $customer)
-                        <option value="{{ $customer->Company_ID }}">{{ $customer->Company_Name }}</option>
-                    @endforeach
-                </select>
+
+                <input type="hidden" name="Company_ID" x-model="selectedCompany">
+
+                <button type="button" @click="companyOpen = true; $nextTick(() => $refs.companySearch.focus())"
+                        class="w-full border rounded-lg px-3 py-2 text-sm text-left bg-white hover:bg-gray-50">
+                    <span :class="selectedCompanyName ? 'text-gray-800' : 'text-gray-400'"
+                          x-text="selectedCompanyName || 'Select Company'"></span>
+                </button>
+
+                <div x-show="companyOpen" x-cloak
+                     @click.self="companyOpen = false"
+                     @keydown.escape.window="companyOpen = false"
+                     class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+                    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md max-h-[80vh] flex flex-col">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">Select a Company</h3>
+                            <button type="button" @click="companyOpen = false" class="text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
+                        </div>
+
+                        <input type="text" x-model="companySearch" x-ref="companySearch" placeholder="Search..."
+                               class="w-full border rounded-lg px-3 py-2 text-sm mb-3">
+
+                        <div class="overflow-y-auto space-y-1 flex-1">
+                            <template x-for="c in filteredCompanies" :key="c.id">
+                                <button type="button" @click="pickCompany(c)"
+                                        class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 text-sm font-medium text-gray-800" x-text="c.name"></button>
+                            </template>
+                            <p x-show="filteredCompanies.length === 0" class="text-sm text-gray-400 text-center py-4">No matches.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div>
                 <label class="block text-sm font-medium mb-1">Contact (Optional)</label>
-                <select name="Contact_ID" x-model="selectedContact" @change="onContactChange()" class="w-full border rounded-lg px-3 py-2">
-                    <option value="">No specific contact</option>
-                    <template x-for="c in contactsForCompany" :key="c.id">
-                        <option :value="c.id" x-text="c.name"></option>
-                    </template>
-                </select>
+
+                <input type="hidden" name="Contact_ID" x-model="selectedContact">
+
+                <button type="button"
+                        @click="contactOpen = true; $nextTick(() => $refs.contactSearch.focus())"
+                        class="w-full border rounded-lg px-3 py-2 text-sm text-left bg-white hover:bg-gray-50">
+                    <span :class="selectedContactName ? 'text-gray-800' : 'text-gray-400'"
+                          x-text="selectedContactName || 'No specific contact'"></span>
+                </button>
+
                 <p class="text-xs text-gray-400 mt-1" x-show="contactsForCompany.length === 0 && selectedCompany">
                     This company has no contacts yet.
                 </p>
+
+                <div x-show="contactOpen" x-cloak
+                     @click.self="contactOpen = false"
+                     @keydown.escape.window="contactOpen = false"
+                     class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+                    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md max-h-[80vh] flex flex-col">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-gray-800">Select a Contact</h3>
+                            <button type="button" @click="contactOpen = false" class="text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
+                        </div>
+
+                        <input type="text" x-model="contactSearch" x-ref="contactSearch" placeholder="Search..."
+                               class="w-full border rounded-lg px-3 py-2 text-sm mb-3">
+
+                        <div class="overflow-y-auto space-y-1 flex-1">
+                            <template x-for="c in filteredContacts" :key="c.id">
+                                <button type="button" @click="pickContact(c)"
+                                        class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-100 text-sm font-medium text-gray-800" x-text="c.name"></button>
+                            </template>
+                            <p x-show="filteredContacts.length === 0" class="text-sm text-gray-400 text-center py-4">
+                                No matches<span x-show="!selectedCompany"> — select a company first</span>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -113,21 +199,13 @@
                 Assigned To
             </label>
 
-            <select
-                name="User_ID"
-                class="w-full border rounded-lg px-3 py-2">
-
-                <option value="">
-                    Unassigned
-                </option>
-
-                @foreach($users as $user)
-                    <option value="{{ $user->User_ID }}">
-                        {{ $user->User_Name }}
-                    </option>
-                @endforeach
-
-            </select>
+            @include('partials.entity-picker', [
+                'fieldName' => 'User_ID',
+                'options' => $users->map(fn ($u) => ['id' => $u->User_ID, 'label' => $u->User_Name]),
+                'placeholder' => 'Unassigned',
+                'title' => 'Assign To',
+                'selectedId' => old('User_ID'),
+            ])
         </div>
 
         <!-- Status -->
@@ -158,7 +236,7 @@
             <input
                 type="number"
                 name="Estimated_Value"
-                step="10"
+                step="1"
                 class="w-full border rounded-lg px-3 py-2">
         </div>
 

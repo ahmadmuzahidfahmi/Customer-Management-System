@@ -406,19 +406,19 @@
 
                 <div class="grid grid-cols-2 gap-2">
 
-                    <select name="Lead_ID" class="w-full border rounded-lg px-3 py-2 text-sm">
-                        <option value="">Link to Lead...</option>
-                        @foreach($leads as $lead)
-                            <option value="{{ $lead->Lead_ID }}">{{ $lead->Lead_Name }}</option>
-                        @endforeach
-                    </select>
+                    @include('partials.entity-picker', [
+                        'fieldName' => 'Lead_ID',
+                        'options' => $leads->map(fn ($l) => ['id' => $l->Lead_ID, 'label' => $l->Lead_Name, 'sublabel' => $l->company->Company_Name ?? null]),
+                        'placeholder' => 'Link to Lead...',
+                        'title' => 'Select a Lead',
+                    ])
 
-                    <select name="Contact_ID" class="w-full border rounded-lg px-3 py-2 text-sm">
-                        <option value="">Link to Contact...</option>
-                        @foreach($contacts as $contact)
-                            <option value="{{ $contact->Contact_ID }}">{{ $contact->Contact_Name }}</option>
-                        @endforeach
-                    </select>
+                    @include('partials.entity-picker', [
+                        'fieldName' => 'Contact_ID',
+                        'options' => $contacts->map(fn ($c) => ['id' => $c->Contact_ID, 'label' => $c->Contact_Name, 'sublabel' => $c->company->Company_Name ?? null]),
+                        'placeholder' => 'Link to Contact...',
+                        'title' => 'Select a Contact',
+                    ])
 
                 </div>
 
@@ -430,12 +430,12 @@
                     x-bind:value="createDateTime"
                     class="w-full border rounded-lg px-3 py-2 text-sm">
 
-                <select name="Assigned_To" class="w-full border rounded-lg px-3 py-2 text-sm">
-                    <option value="">Assign to me</option>
-                    @foreach($users as $u)
-                        <option value="{{ $u->User_ID }}">{{ $u->User_Name }}</option>
-                    @endforeach
-                </select>
+                @include('partials.entity-picker', [
+                    'fieldName' => 'Assigned_To',
+                    'options' => $users->map(fn ($u) => ['id' => $u->User_ID, 'label' => $u->User_Name]),
+                    'placeholder' => 'Assign to me',
+                    'title' => 'Assign To',
+                ])
 
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" @click="creating = false" class="px-4 py-2 rounded-lg bg-gray-200 text-sm">
