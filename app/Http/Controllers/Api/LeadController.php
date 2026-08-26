@@ -9,9 +9,15 @@ use Illuminate\Http\Request;
 
 class LeadController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $leads = Leads::latest('Created_At')->paginate(15);
+        $query = Leads::latest('Created_At');
+
+        if ($request->filled('company_id')) {
+            $query->where('Company_ID', $request->company_id);
+        }
+
+        $leads = $query->paginate(15)->withQueryString();
 
         return LeadResource::collection($leads);
     }

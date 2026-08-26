@@ -89,4 +89,23 @@ class LeadApiTest extends TestCase
 
         $response->assertStatus(403);
     }
+
+    public function test_can_filter_leads_by_company_id(): void
+    {
+        $companyA = Customer::factory()->create();
+        $companyB = Customer::factory()->create();
+
+        Leads::factory()->count(2)->create(['Company_ID' => $companyA->Company_ID]);
+        Leads::factory()->count(3)->create(['Company_ID' => $companyB->Company_ID]);
+
+        $response = $this->withHeaders($this->authHeader())
+            ->getJson("/api/leads?company_id={$companyA->Company_ID}");
+
+        $response->assertStatus(200);
+        $this->assertCount(2, $response->json('data'));
+
+        foreach ($response->json('data') as $lead) {
+            $this->assertSame($companyA->Company_ID, $lead['company_id']);
+        }
+    }
 }

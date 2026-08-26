@@ -9,14 +9,15 @@ use Illuminate\Http\Request;
 
 class ContactController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $contacts = Contact::latest('Contact_ID')->paginate(15);
+        $query = Contact::latest('Contact_ID');
 
-        $pinnedContacts = Contact::with('company')
-         ->where('Is_Pinned', 1)
-        ->orderBy('Contact_Name')
-        ->get();
+        if ($request->filled('company_id')) {
+            $query->where('Company_ID', $request->company_id);
+        }
+
+        $contacts = $query->paginate(15)->withQueryString();
 
         return ContactResource::collection($contacts);
     }

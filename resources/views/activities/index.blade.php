@@ -124,7 +124,7 @@
                                 {{ $activity->Status }}
                             </span>
                         </td>
-                        <td class="px-4 py-3 text-right">
+                        <td class="px-4 py-3 text-right" onclick="event.stopPropagation()">
                             @if($activity->Status === 'Pending')
                                 @unless(auth()->user()?->isGuest())
                                 <form method="POST" action="{{ route('activities.complete', $activity->Activity_ID) }}" class="inline ">

@@ -73,7 +73,9 @@
             <div class="border rounded-lg p-3 {{ $activity->isOverdue() ? 'border-red-300 bg-red-50' : '' }}" x-data="{ editing: false }">
                 
                 <!-- View mode -->
-                <div x-show="!editing">
+                <div x-show="!editing"
+                     onclick="window.location='{{ route('activities.show', $activity->Activity_ID) }}'"
+                     class="cursor-pointer -m-3 p-3 rounded-lg hover:bg-gray-50 transition">
                     <div class="flex justify-between items-start gap-2">
                         <div>
                             <div class="flex items-center gap-2 flex-wrap">
@@ -104,7 +106,7 @@
                             </p>
                         </div>
 
-                        <div class="flex flex-col items-end gap-1 shrink-0">
+                        <div class="flex flex-col items-end gap-1 shrink-0" onclick="event.stopPropagation()">
                             @if($activity->Status === 'Pending')
                                 <form method="POST" action="{{ route('activities.complete', $activity->Activity_ID) }}">
                                     @csrf
