@@ -16,8 +16,11 @@ class CustomerResource extends JsonResource
             'phone'      => $this->Company_No,
             'status'     => $this->Status,
             'closed_at'  => $this->Closed_Date?->toIso8601String(),
-            'created_at' => $this->created_at?->toIso8601String(),
-            'updated_at' => $this->updated_at?->toIso8601String(),
+            // The company table's timestamps are Created_At / Updated_At
+            // (see the rename_timestamps_on_company_table migration and
+            // Customer::CREATED_AT) — the lowercase attributes are null.
+            'created_at' => $this->Created_At?->toIso8601String(),
+            'updated_at' => $this->Updated_At?->toIso8601String(),
         ];
     }
 }

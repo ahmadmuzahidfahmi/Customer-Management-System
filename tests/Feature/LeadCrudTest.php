@@ -62,6 +62,24 @@ class LeadCrudTest extends TestCase
         $this->assertDatabaseCount('leads', 0);
     }
 
+    public function test_authenticated_user_can_update_a_leads_estimated_value(): void
+    {
+        $user = User::factory()->create();
+        $lead = Leads::factory()->create(['Estimated_Value' => 1500]);
+
+        $response = $this->actingAs($user)->put(route('leads.update', $lead->Lead_ID), [
+            'Lead_Name'       => $lead->Lead_Name,
+            'Status'          => $lead->Status,
+            'Estimated_Value' => 2750,
+        ]);
+
+        $response->assertRedirect(route('leads.show', $lead->Lead_ID));
+        $this->assertDatabaseHas('leads', [
+            'Lead_ID'         => $lead->Lead_ID,
+            'Estimated_Value' => 2750,
+        ]);
+    }
+
     public function test_kanban_board_can_be_viewed(): void
     {
         $user = User::factory()->create();

@@ -116,16 +116,19 @@
             </select>
         </div>
 
-        <!-- Notes -->
-        <div class="md:col-span-2">
+        <!-- Estimated Value -->
+        <div>
             <label class="block text-sm font-medium mb-1">
-                Notes
+                Estimated Value
             </label>
 
-            <textarea
-                name="Lead_Note"
-                rows="4"
-                class="w-full border rounded-lg px-3 py-2">{{ $lead->Lead_Note }}</textarea>
+            <input
+                type="number"
+                name="Estimated_Value"
+                value="{{ old('Estimated_Value', $lead->Estimated_Value) }}"
+                step="1"
+                min="0"
+                class="w-full border rounded-lg px-3 py-2">
         </div>
 
     </div>
