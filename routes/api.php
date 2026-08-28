@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\Api\ActivityController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\EmailController;
+use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\UserManagementController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +27,18 @@ Route::get('/test', function () {
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+// Profile (any authenticated user) + user administration (Admin-only,
+// enforced inside UserManagementController). Used by the mobile app's
+// Profile screen.
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'show']);
+    Route::put('/profile', [ProfileController::class, 'update']);
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
+
+    Route::apiResource('users', UserManagementController::class)
+        ->only(['index', 'store', 'update', 'destroy']);
 });
 
 Route::name('api.')->group(function () {
